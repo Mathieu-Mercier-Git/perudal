@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class QuerydslGenerator {
-	private static final String TABLES_PREFIX = "plm_";
+	private static final String TABLES_PREFIX = "prd_";
 
 	public static void main(String... args) {
 		Configuration configuration = new Configuration(SQLTemplates.DEFAULT);

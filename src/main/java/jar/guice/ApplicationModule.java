@@ -1,5 +1,6 @@
 package jar.guice;
 
+import com.coreoz.plume.db.querydsl.guice.GuiceQuerydslModule;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import jar.jersey.JerseyConfigProvider;
@@ -18,12 +19,11 @@ public class ApplicationModule extends AbstractModule {
 		install(new GuiceConfModule());
 		install(new GuiceJacksonWithMetricsModule());
 		// Database & Querydsl installation
-		// install(new GuiceQuerydslModule());
+		 install(new GuiceQuerydslModule());
         // Data source exposure for Flyway
         // install(new DataSourceModule());
 
 		// Prepare Jersey configuration
 		bind(ResourceConfig.class).toProvider(JerseyConfigProvider.class);
 	}
-
 }

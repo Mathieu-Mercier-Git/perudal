@@ -109,6 +109,11 @@
 			<optional>true</optional>
 		</dependency>
 		<!-- PUT YOUR DATABASE CONNECTOR HERE -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.24</version>
+        </dependency>
 		 <!--<dependency>
 		 	<groupId>org.mariadb.jdbc</groupId>
 		 	<artifactId>mariadb-java-client</artifactId>

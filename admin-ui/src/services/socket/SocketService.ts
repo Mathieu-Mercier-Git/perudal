@@ -4,7 +4,7 @@ const WS_URL = 'ws://localhost:8080';
 let idSocket: string;
 // const logger = new Logger('SocketEngineService');
 
-export default class SocketEngineService {
+export default class SocketService {
   private socket?: WebSocket;
   // private idSocket?: string;
   constructor() {}

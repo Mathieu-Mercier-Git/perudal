@@ -9,7 +9,7 @@ import { HOME, LOBBY } from './Routes';
 import Home from './pages/home/Home';
 import Lobby from './pages/lobby/Lobby';
 import LandingPage from './pages/LandingPage';
-import SocketEngineService from '../services/socket/SocketEngineService';
+import SocketService from '../services/socket/SocketService';
 
 const logger: Logger = new Logger('App');
 // To make the application have a base path that starts with /admin:
@@ -23,7 +23,7 @@ if (window && !window.location.pathname.startsWith(basePath)) {
 }
 
 export default function App() {
-  const socketEngineService = getGlobalInstance(SocketEngineService);
+  const socketEngineService = getGlobalInstance(SocketService);
 
   const [isSocketInitLoading, setIsSocketInitLoading] = useState<boolean>(false);
   const [isSocktetInitSuccess, setIsSocktetInitSuccess] = useState<boolean>(false);

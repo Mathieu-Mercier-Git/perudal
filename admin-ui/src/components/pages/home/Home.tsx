@@ -1,19 +1,22 @@
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getGlobalInstance } from 'plume-ts-di';
 import { Panel } from '../../theme/layout/Panel';
 import useMessages from '../../../i18n/hooks/messagesHook';
 import { ActionButton } from '../../theme/action/Actions';
 import { useOnComponentMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
-import { addOnMessage, removeOnMessage, socketListener } from '../../../services/socket/socketService';
 import { LOBBY } from '../../Routes';
+import SocketService from '../../../services/socket/SocketService';
 
 
 export default function Home() {
+  const socketService = getGlobalInstance(SocketService);
+
   const { messages } = useMessages();
   const navigate = useNavigate();
 
   const listenerSwitchPhase = useCallback(
-    socketListener("position_joueur", ([x, y]: string[]) => {
+    socketService.socketListener("position_joueur", ([x, y]: string[]) => {
       console.log('Display X', x);
       console.log('Display Y', y);
     }),
@@ -21,11 +24,11 @@ export default function Home() {
   );
 
   useOnComponentMounted(() => {
-    // addOnMessage(listenerSwitchPhase);
-    //
-    // return () => {
-    //   removeOnMessage(listenerSwitchPhase);
-    // };
+    socketService.addOnMessage(listenerSwitchPhase);
+
+    return () => {
+      socketService.removeOnMessage(listenerSwitchPhase);
+    };
   });
 
   const createLobby = () => {

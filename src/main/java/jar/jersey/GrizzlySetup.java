@@ -5,8 +5,12 @@ import java.net.URI;
 
 import javax.ws.rs.core.UriBuilder;
 
+import jar.services.socket.WebSocketApp;
 import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.http.server.NetworkListener;
+import org.glassfish.grizzly.websockets.WebSocketAddOn;
+import org.glassfish.grizzly.websockets.WebSocketEngine;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -21,7 +25,7 @@ public class GrizzlySetup {
 	private static final int DEFAULT_HTTP_PORT = 8080;
 	private static final String DEFAULT_HTTP_HOST = "0.0.0.0";
 
-	public static HttpServer start(ResourceConfig jerseyResourceConfig, String httpPort, String httpHost, Integer httpGrizzlyWorkerThreadsPoolSize)
+	public static HttpServer start(ResourceConfig jerseyResourceConfig, String httpPort, String httpHost, Integer httpGrizzlyWorkerThreadsPoolSize, WebSocketApp webSocketApp)
 			throws IOException {
 		// replace JUL logger (used by Grizzly) by SLF4J logger
 		SLF4JBridgeHandler.removeHandlersForRootLogger();
@@ -65,6 +69,13 @@ public class GrizzlySetup {
 		// in production, statics assets should be served by apache or nginx
 		httpHandler.setFileCacheEnabled(false);
 		httpServer.getServerConfiguration().addHttpHandler(httpHandler);
+
+        // websocket
+        WebSocketAddOn addon = new WebSocketAddOn();
+        for (NetworkListener listener : httpServer.getListeners()) {
+            listener.registerAddOn(addon);
+        }
+        WebSocketEngine.getEngine().register("", "/socket", webSocketApp);
 
 		httpServer.start();
 

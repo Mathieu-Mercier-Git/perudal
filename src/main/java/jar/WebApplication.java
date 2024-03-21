@@ -1,22 +1,20 @@
 package jar;
 
-import java.time.Duration;
-import java.util.concurrent.TimeUnit;
-
-import org.glassfish.grizzly.GrizzlyFuture;
-import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.jersey.server.ResourceConfig;
-
-import jar.guice.ApplicationModule;
-import jar.jersey.GrizzlySetup;
-import jar.services.configuration.ConfigurationService;
-
 import com.coreoz.plume.jersey.guice.JerseyGuiceFeature;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Stage;
-
+import jar.guice.ApplicationModule;
+import jar.jersey.GrizzlySetup;
+import jar.services.configuration.ConfigurationService;
+import jar.services.socket.WebSocketApp;
 import lombok.extern.slf4j.Slf4j;
+import org.glassfish.grizzly.GrizzlyFuture;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.jersey.server.ResourceConfig;
+
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The application entry point, where it all begins.
@@ -45,7 +43,8 @@ public class WebApplication {
 				jerseyResourceConfig,
 				System.getProperty("http.port"),
 				System.getProperty("http.address"),
-                injector.getInstance(ConfigurationService.class).httpGrizzlyWorkerThreadsPoolSize()
+                injector.getInstance(ConfigurationService.class).httpGrizzlyWorkerThreadsPoolSize(),
+                injector.getInstance(WebSocketApp.class)
 			);
 
 			// Add a shutdown hook to execute some code when the JVM receive a kill signal before it stops

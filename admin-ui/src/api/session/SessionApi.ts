@@ -27,4 +27,11 @@ export default class SessionApi implements SessionRefresher {
       .body(webSessionToken)
       .execute();
   }
+
+  test() {
+    return this
+      .httpClient
+      .restRequest<RefreshableJwtToken>(HttpMethod.PUT, '/test')
+      .execute();
+  }
 }

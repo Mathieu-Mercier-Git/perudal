@@ -6,10 +6,11 @@ import { getGlobalInstance } from 'plume-ts-di';
 import Router from './layout/Router';
 import Header from './layout/Header';
 import Navigation from './navigation/Navigation';
-import ConditionalRoute from './theme/routes/ConditionalRoute';
 import Login from './features/login/Login';
 import GlobalErrorBoundary from './theme/GlobalErrorBoundary';
 import SessionService from '../services/session/SessionService';
+import { useOnComponentMounted } from '../lib/react-hooks-alias/ReactHooksAlias';
+import { initSocket } from '../services/socketService';
 
 const logger: Logger = new Logger('App');
 // To make the application have a base path that starts with /admin:
@@ -24,6 +25,12 @@ if (window && !window.location.pathname.startsWith(basePath)) {
 
 export default function App() {
   const sessionService: SessionService = getGlobalInstance(SessionService);
+
+  useOnComponentMounted(() => {
+    initSocket()
+      .then((response) => console.log('initSocket success', response))
+      .catch((error) => console.log('initSocket error', error));
+  });
 
   logger.info('Render App');
   return (

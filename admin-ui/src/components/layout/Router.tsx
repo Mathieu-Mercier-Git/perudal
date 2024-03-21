@@ -5,7 +5,7 @@ import {
   Navigate,
 } from 'react-router-dom';
 import { getGlobalInstance } from 'plume-ts-di';
-import Home from '../features/Home';
+import Home from '../pages/home/Home';
 import Users from '../../lib/plume-admin-users/pages/Users';
 import PermissionRoute from '../theme/routes/PermissionRoute';
 import Permission from '../../services/session/Permission';

@@ -2,7 +2,7 @@ import { Translations } from './Translations';
 
 const frMessages: Translations = {
   app: {
-    name: 'Plume admin',
+    name: 'Pérudal',
   },
   // actions
   action: {
@@ -16,6 +16,11 @@ const frMessages: Translations = {
     disconnect: 'Me déconnecter',
     keep_editing: 'Rester sur la page',
     close_without_saving: 'Fermer sans sauvegarder',
+    start_game: 'Lancer la partie',
+    cancel_game: 'Anuuler la partie',
+    create_game: 'Créer une partie',
+    join_game: 'Rejoindre une partie',
+    quit_game: 'Quitter la partie',
   },
   // common labels
   label: {
@@ -37,7 +42,7 @@ const frMessages: Translations = {
   },
   // home
   home: {
-    title: 'Page d\'accueil',
+    title: 'Pérudal',
   },
   login: {
     title: 'Se connecter',

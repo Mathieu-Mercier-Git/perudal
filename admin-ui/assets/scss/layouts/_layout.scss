@@ -1,7 +1,7 @@
 @use "../variables" as *;
 
 body {
-  background: white;
+  background: $active-background-color;
   overflow: hidden;
   height: 100%;
 }
@@ -24,6 +24,9 @@ body {
 }
 
 .panel {
+  display: flex;
+  flex-direction: column;
+  gap: $spacer-6;
   padding: $spacer-6;
 }
 

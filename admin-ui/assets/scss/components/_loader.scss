@@ -1,0 +1,78 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.loader {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  font-size: $font-size-medium;
+  color: $gray-text;
+
+  .custom-message {
+    padding-top: $spacer-2;
+    font-size: $font-size-normal;
+  }
+
+  .lds-ring {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+  }
+
+  .lds-ring div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    margin: 8px;
+    border: 6px solid black;
+    border-radius: 50%;
+    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: black transparent transparent;
+  }
+
+  &.small-size {
+    .lds-ring {
+      width: 40px;
+      height: 40px;
+    }
+
+    .lds-ring div {
+      width: 30px;
+      height: 30px;
+      margin: 6px;
+      border-width: 3px;
+    }
+  }
+
+  .lds-ring div:nth-child(1) {
+    animation-delay: -0.45s;
+  }
+
+  .lds-ring div:nth-child(2) {
+    animation-delay: -0.3s;
+  }
+
+  .lds-ring div:nth-child(3) {
+    animation-delay: -0.15s;
+  }
+
+  @keyframes lds-ring {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+.loader-container {
+  margin: $spacer-8 0;
+}

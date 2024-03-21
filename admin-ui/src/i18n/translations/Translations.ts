@@ -18,6 +18,11 @@ export type Translations = {
     disconnect: string,
     keep_editing: string,
     close_without_saving: string,
+    start_game: string,
+    cancel_game: string,
+    create_game: string,
+    join_game: string,
+    quit_game: string,
   },
   // common labels
   label: {

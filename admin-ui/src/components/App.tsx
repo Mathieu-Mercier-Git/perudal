@@ -1,16 +1,15 @@
-import React from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import React, { useState } from 'react';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { getGlobalInstance } from 'plume-ts-di';
 import { ToastContainer } from 'react-toastify';
 import { Logger } from 'simple-logging-system';
-import { getGlobalInstance } from 'plume-ts-di';
-import Router from './layout/Router';
-import Header from './layout/Header';
-import Navigation from './navigation/Navigation';
-import Login from './features/login/Login';
 import GlobalErrorBoundary from './theme/GlobalErrorBoundary';
-import SessionService from '../services/session/SessionService';
 import { useOnComponentMounted } from '../lib/react-hooks-alias/ReactHooksAlias';
-import { initSocket } from '../services/socketService';
+import { HOME, LOBBY } from './Routes';
+import Home from './pages/home/Home';
+import Lobby from './pages/lobby/Lobby';
+import LandingPage from './pages/LandingPage';
+import SocketEngineService from '../services/socket/SocketEngineService';
 
 const logger: Logger = new Logger('App');
 // To make the application have a base path that starts with /admin:
@@ -24,35 +23,32 @@ if (window && !window.location.pathname.startsWith(basePath)) {
 }
 
 export default function App() {
-  const sessionService: SessionService = getGlobalInstance(SessionService);
+  const socketEngineService = getGlobalInstance(SocketEngineService);
+
+  const [isSocketInitLoading, setIsSocketInitLoading] = useState<boolean>(false);
+  const [isSocktetInitSuccess, setIsSocktetInitSuccess] = useState<boolean>(false);
+  const [hasSocketError, setHasSocketError] = useState<boolean>(false);
 
   useOnComponentMounted(() => {
-    initSocket()
-      .then((response) => console.log('initSocket success', response))
-      .catch((error) => console.log('initSocket error', error));
+    socketEngineService.initializeSocket()
+      .then(() => setIsSocktetInitSuccess(true))
+      .catch(() => setHasSocketError(true));
   });
 
   logger.info('Render App');
+
+  if (!isSocktetInitSuccess) {
+    return (<LandingPage isLoading={isSocketInitLoading} hasSocketError={hasSocketError} />)
+  }
+
   return (
       <GlobalErrorBoundary>
         <ToastContainer />
         <BrowserRouter basename={basePath}>
           <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/*"
-              element={(
-                <ConditionalRoute shouldDisplayRoute={sessionService.isAuthenticated()} defaultRoute="/login">
-                  <div id="main-layout">
-                    <Navigation />
-                    <div id="content-layout">
-                      <Header />
-                      <Router />
-                    </div>
-                  </div>
-                </ConditionalRoute>
-              )}
-            />
+            <Route path={HOME} element={<Home />} />
+            <Route path={LOBBY} element={<Lobby />} />
+            <Route path="*" element={<Navigate to={{ pathname: HOME }} />} />
           </Routes>
         </BrowserRouter>
       </GlobalErrorBoundary>

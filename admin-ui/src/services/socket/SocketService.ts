@@ -2,25 +2,23 @@ import { Logger } from 'simple-logging-system';
 
 const WS_URL = 'ws://localhost:8080';
 let idSocket: string;
+let socket: WebSocket;
 // const logger = new Logger('SocketEngineService');
 
 export default class SocketService {
-  private socket?: WebSocket;
-  // private idSocket?: string;
   constructor() {}
-
   initializeSocket() {
     return new Promise((resolve, reject) => {
-      this.socket = new WebSocket(`${WS_URL}/socket`);
-      console.log("Initialisation socket", this.socket);
+      socket = new WebSocket(`${WS_URL}/socket`);
+      console.log("Initialisation socket", socket);
       // Événement appelé lors de l'ouverture de la connexion
-      this.socket.onopen = function () {
+      socket.onopen = function () {
         console.log("Connected to the WebSocket server");
-        resolve();
+        resolve(socket);
       };
 
       // Événement appelé lors de la réception d'un message du serveur
-      this.socket.onmessage = function (event) {
+      socket.onmessage = function (event) {
         console.log("Message from server: " + event.data);
         if (event.data.includes("id:")) {
           idSocket = event.data.substring(3);
@@ -28,13 +26,13 @@ export default class SocketService {
       };
 
       // Événement appelé en cas d'erreur de la connexion WebSocket
-      this.socket.onerror = function (error) {
+      socket.onerror = function (error) {
         console.log("WebSocket error: ", error);
         reject(error);
       };
 
       // Événement appelé lorsque la connexion est fermée
-      this.socket.onclose = function () {
+      socket.onclose = function () {
         console.log("WebSocket connection closed");
       };
     });
@@ -52,19 +50,19 @@ export default class SocketService {
   };
 
   addOnMessage(listener: any) {
-    if (!this.socket) {
+    if (!socket) {
       console.log('Socket not initialized');
       return;
     }
-    this.socket.addEventListener("message", listener);
+    socket.addEventListener("message", listener);
   };
 
   removeOnMessage(listener: any) {
-    if (!this.socket) {
+    if (!socket) {
       console.log('Socket not initialized');
       return;
     }
-    this.socket.removeEventListener("message", listener);
+    socket.removeEventListener("message", listener);
   };
 }
 

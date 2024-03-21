@@ -4,7 +4,7 @@ import { BrowserUserActivityListener, IdlenessDetector, UserActivityListener } f
 import SessionService from './session/SessionService';
 import ObservableNotificationEngine from '../lib/plume-notification/ObservableNotificationEngine';
 import NotificationEngine from '../lib/plume-notification/NotificationEngine';
-import SocketService from './socket/SocketEngineService';
+import SocketService from './socket/SocketService';
 
 export default function installServicesModule(injector: Injector) {
   // browser dependent services

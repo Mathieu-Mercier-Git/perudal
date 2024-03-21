@@ -16,6 +16,11 @@ const enMessages: Translations = {
     disconnect: 'Log out',
     keep_editing: 'Keep editing',
     close_without_saving: 'Close without saving',
+    start_game: 'Lancer la partie',
+    cancel_game: 'Anuuler la partie',
+    create_game: 'Créer une partie',
+    join_game: 'Rejoindre une partie',
+    quit_game: 'Quitter la partie',
   },
   // common labels
   label: {

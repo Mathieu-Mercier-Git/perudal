@@ -1,5 +1,6 @@
 package jar.services.socket;
 
+import jar.services.game.GameService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.glassfish.grizzly.http.HttpRequestPacket;
@@ -17,12 +18,12 @@ public class WebSocketApp extends WebSocketApplication {
     private static final Logger logger = LoggerFactory.getLogger(WebSocketApp.class);
 
     private final SocketService socketService;
-    private final DataService dataService;
+    private final GameService gameService;
 
     @Inject
-    public WebSocketApp(SocketService socketService, DataService dataService) {
+    public WebSocketApp(SocketService socketService, GameService gameService) {
         this.socketService = socketService;
-        this.dataService = dataService;
+        this.gameService = gameService;
     }
 
     @Override
@@ -30,22 +31,22 @@ public class WebSocketApp extends WebSocketApplication {
                                   WebSocketListener... listeners) {
         return new SimpleWebSocket(
             handler,
-            new WebSocketListenerApp(socketService, dataService)
+            new WebSocketListenerApp(socketService, gameService)
         );
     }
 
     private static class WebSocketListenerApp implements WebSocketListener {
         private final SocketService socketService;
-        private final DataService dataService;
+        private final GameService gameService;
 
-        private WebSocketListenerApp(SocketService socketService, DataService dataService) {
+        private WebSocketListenerApp(SocketService socketService, GameService gameService) {
             this.socketService = socketService;
-            this.dataService = dataService;
+            this.gameService = gameService;
         }
 
         @Override
         public void onClose(WebSocket socket, DataFrame frame) {
-            SocketInfo socketInfo = dataService.getSockets().remove(socket);
+            SocketInfo socketInfo = gameService.getSockets().remove(socket);
             socketService.onClose(socketInfo);
             logger.info("A socket has been closed");
         }
@@ -53,7 +54,7 @@ public class WebSocketApp extends WebSocketApplication {
         @Override
         public void onConnect(WebSocket socket) {
             UUID idSocket = UUID.randomUUID();
-            dataService.getSockets().put(socket, new SocketInfo(idSocket, socket));
+            gameService.getSockets().put(socket, new SocketInfo(idSocket, socket));
             logger.info("A socket has been opened");
             socket.send("id:" + idSocket);
         }
@@ -61,7 +62,7 @@ public class WebSocketApp extends WebSocketApplication {
         @Override
         public void onMessage(WebSocket socket, String text) {
             try {
-                SocketInfo socketInfo = dataService.getSockets().get(socket);
+                SocketInfo socketInfo = gameService.getSockets().get(socket);
                 if (socketInfo == null) {
                     logger.error("Un message a été reçu via un socket qui n'a pas été déclaré");
                 } else {

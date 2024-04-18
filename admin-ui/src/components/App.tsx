@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { getGlobalInstance } from 'plume-ts-di';
 import { ToastContainer } from 'react-toastify';
 import { Logger } from 'simple-logging-system';
 import GlobalErrorBoundary from './theme/GlobalErrorBoundary';
@@ -9,7 +8,7 @@ import { HOME, LOBBY } from './Routes';
 import Home from './pages/home/Home';
 import Lobby from './pages/lobby/Lobby';
 import LandingPage from './pages/LandingPage';
-import SocketService from '../services/socket/SocketService';
+import { initSocket } from '../services/socket/SocketEngineService';
 
 const logger: Logger = new Logger('App');
 // To make the application have a base path that starts with /admin:
@@ -23,14 +22,12 @@ if (window && !window.location.pathname.startsWith(basePath)) {
 }
 
 export default function App() {
-  const socketEngineService = getGlobalInstance(SocketService);
-
   const [isSocketInitLoading, setIsSocketInitLoading] = useState<boolean>(false);
   const [isSocktetInitSuccess, setIsSocktetInitSuccess] = useState<boolean>(false);
   const [hasSocketError, setHasSocketError] = useState<boolean>(false);
 
   useOnComponentMounted(() => {
-    socketEngineService.initializeSocket()
+    initSocket()
       .then(() => setIsSocktetInitSuccess(true))
       .catch(() => setHasSocketError(true));
   });
@@ -42,15 +39,15 @@ export default function App() {
   }
 
   return (
-      <GlobalErrorBoundary>
-        <ToastContainer />
-        <BrowserRouter basename={basePath}>
-          <Routes>
-            <Route path={HOME} element={<Home />} />
-            <Route path={LOBBY} element={<Lobby />} />
-            <Route path="*" element={<Navigate to={{ pathname: HOME }} />} />
-          </Routes>
-        </BrowserRouter>
-      </GlobalErrorBoundary>
+    <GlobalErrorBoundary>
+      <ToastContainer />
+      <BrowserRouter basename={basePath}>
+        <Routes>
+          <Route path={HOME} element={<Home />} />
+          <Route path={LOBBY} element={<Lobby />} />
+          <Route path="*" element={<Navigate to={{ pathname: HOME }} />} />
+        </Routes>
+      </BrowserRouter>
+    </GlobalErrorBoundary>
   );
 }

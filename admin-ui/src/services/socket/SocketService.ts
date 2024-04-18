@@ -1,5 +1,3 @@
-import { Logger } from 'simple-logging-system';
-
 const WS_URL = 'ws://localhost:8080';
 let idSocket: string;
 let socket: WebSocket;
@@ -50,18 +48,11 @@ export default class SocketService {
   };
 
   addOnMessage(listener: any) {
-    if (!socket) {
-      console.log('Socket not initialized');
-      return;
-    }
+    console.log('logTest');
     socket.addEventListener("message", listener);
   };
 
   removeOnMessage(listener: any) {
-    if (!socket) {
-      console.log('Socket not initialized');
-      return;
-    }
     socket.removeEventListener("message", listener);
   };
 }

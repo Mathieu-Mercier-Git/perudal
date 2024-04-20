@@ -8,5 +8,6 @@ import lombok.Getter;
 public class Player {
     private String name;
     private int diceNumber;
+    private boolean isAdmin;
     // TODO : add Liste de dés
 }

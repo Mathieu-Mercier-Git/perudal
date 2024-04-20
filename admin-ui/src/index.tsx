@@ -1,7 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { CssBaseline } from '@mui/material';
 import 'react-toastify/dist/ReactToastify.css';
 import 'micro-observables/batchingForReactDom';
 import { Logger } from 'simple-logging-system';

@@ -1,34 +1,26 @@
+import { SocketResponse } from './SocketTypes';
+import generateLobbyId from '../../utils/StringUtils';
+
 let socket: WebSocket;
 let idSocket: string;
 
 const WS_URL = 'ws://localhost:8080';
 
-export const EVENT_START_KEY = "start";
-export const EVENT_PLAY_KEY = "play";
-export const EVENT_UPDATE_DAMAGES_KEY = "damages";
-export const EVENT_JOIN_GAME_KEY = "join_game";
-export const EVENT_WAITING_COUTDOWN_KEY = "waiting_countdown";
-export const EVENT_FREE_PHASE_COUTDOWN_KEY = "free_phase_countdown";
-export const EVENT_SWITCH_PHASE_KEY = "switch_phase";
-export const EVENT_EXIT_GAME_KEY = "exit_game";
-export const EVENT_CAN_ULTIMATE_KEY = "can_ultimate";
-export const EVENT_NOTIFY_CELL_POSITION_KEY = "notify_cell_position";
-
 export const socketListener = (
-  name: string,
-  func: (args: string[]) => void,
+  eventName: string,
+  callback: (body: Object) => void,
 ) => {
   return (event: MessageEvent) => {
     console.log('TRIGGER FROM BACK event', event);
-    const response = JSON.parse(event.data);
+    const response: SocketResponse = JSON.parse(event.data);
     console.log('TRIGGER FROM BACK parsed', response);
+    if (response.status === 'ERROR') {
+      // TODO : handle error (toastify ou truc du genre)
+    }
 
-    // const data = event.data.split("/");
-    // const eventName = data[0];
-    // if (eventName === name) {
-    //   data.shift();
-    //   func(data);
-    // }
+    if (response.event && response.event === eventName) {
+      callback(response.body);
+    }
   };
 };
 
@@ -78,6 +70,11 @@ export const getSocket = () => {
 export const getIdSocket = () => {
   return idSocket;
 };
+
+export const createGame = (name: string, diceNumber: number) => {
+  const gameCode = generateLobbyId();
+  socket.send(`create_game/${gameCode}/${name}/${diceNumber}`);
+}
 
 export const talkToServer = (gameCode: string, name: string, diceNumber: number) => {
   socket.send(`join_game/${gameCode}/${name}/${diceNumber}`);

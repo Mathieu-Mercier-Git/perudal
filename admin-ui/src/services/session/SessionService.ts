@@ -2,7 +2,7 @@ import { IdlenessDetector, JwtSessionManager, RefreshableJwtToken } from 'browse
 import { Scheduler } from 'simple-job-scheduler';
 import SessionApi, { SessionCredentials } from '../../api/session/SessionApi';
 import Permission from './Permission';
-import { UserWithExpiration } from './User';
+import { UserWithExpiration } from './UserSession';
 
 const THRESHOLD_IN_MILLIS_TO_DETECT_EXPIRED_SESSION: number = 60 * 1000; // 1 minutes
 const LOCAL_STORAGE_CURRENT_SESSION: string = 'user-session';

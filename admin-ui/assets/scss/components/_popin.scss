@@ -18,5 +18,20 @@
     padding: $spacer-6;
     max-height: 100%;
     overflow: auto;
+
+    .popin-title {
+      color: $secondary-color;
+      font-size: $font-size-large;
+    }
+
+    .popin-message {
+      margin: $spacer-6 0;
+      white-space: pre-wrap;
+    }
+
+    .popin-buttons {
+      display: flex;
+      justify-content: space-around;
+    }
   }
 }

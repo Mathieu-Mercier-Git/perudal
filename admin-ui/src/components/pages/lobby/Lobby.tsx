@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getGlobalInstance } from 'plume-ts-di';
 import { useObservable } from 'micro-observables';
@@ -9,16 +9,31 @@ import { HOME } from '../../Routes';
 import { useOnComponentMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
 import GameService from '../../../services/game/GameService';
 import { LobbyType } from '../../../services/game/GameTypes';
+import { addOnMessage, removeOnMessage, socketListener } from '../../../services/socket/SocketEngineService';
+import { ServerEvent } from '../../../services/socket/SocketTypes';
 
 export default function Lobby() {
   const gameService = getGlobalInstance(GameService);
   const lobby: LobbyType | undefined = useObservable(gameService.getLobby());
+  const isMainPlayer: boolean = useObservable(gameService.getIsMainPlayer());
 
   const { messages } = useMessages();
   const navigate = useNavigate();
 
+  const listenerSwitchPhase = useCallback(
+    socketListener(ServerEvent.UPDATED_LOBBY, (response: LobbyType) => {
+      gameService.setLobby(response);
+      // TODO : stocker dans un localStorage
+    }),
+    [],
+  );
+
   useOnComponentMounted(() => {
-    // TODO : listen to any game changes
+    addOnMessage(listenerSwitchPhase);
+
+    return () => {
+      removeOnMessage(listenerSwitchPhase);
+    };
   });
 
   const startGame = () => {
@@ -53,12 +68,18 @@ export default function Lobby() {
       <ActionButton onClick={startGame}>
         {messages.action.start_game}
       </ActionButton>
-      <ActionButton onClick={cancelGame}>
-      {messages.action.cancel_game}
-      </ActionButton>
-      <ActionButton onClick={quitGame}>
-        {messages.action.quit_game}
-      </ActionButton>
+      {isMainPlayer
+        ? (
+          <ActionButton onClick={cancelGame}>
+            {messages.action.cancel_game}
+          </ActionButton>
+        )
+        : (
+          <ActionButton onClick={quitGame}>
+            {messages.action.quit_game}
+          </ActionButton>
+        )
+      }
     </Panel>
   );
 }

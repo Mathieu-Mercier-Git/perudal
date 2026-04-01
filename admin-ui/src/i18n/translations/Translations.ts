@@ -23,6 +23,8 @@ export type Translations = {
     create_game: string,
     join_game: string,
     quit_game: string,
+    confirm: string,
+    close: string,
   },
   // common labels
   label: {

@@ -7,7 +7,7 @@ import SessionService from '../../services/session/SessionService';
 import DropdownMenu from '../theme/DropdownMenu';
 import LocaleSelector from '../theme/LocaleSelector';
 import useMessages from '../../i18n/hooks/messagesHook';
-import { UserWithExpiration } from '../../services/session/User';
+import { UserWithExpiration } from '../../services/session/UserSession';
 import { Locale } from '../../lib/locale-resolver/LocaleResolver';
 
 function makeInitials(fullName?: string): string {

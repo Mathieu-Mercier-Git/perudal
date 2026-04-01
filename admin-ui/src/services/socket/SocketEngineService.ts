@@ -76,6 +76,6 @@ export const createGame = (name: string, diceNumber: number) => {
   socket.send(`create_game/${gameCode}/${name}/${diceNumber}`);
 }
 
-export const talkToServer = (gameCode: string, name: string, diceNumber: number) => {
-  socket.send(`join_game/${gameCode}/${name}/${diceNumber}`);
+export const joinGame = (gameCode: string, name: string) => {
+  socket.send(`join_game/${gameCode}/${name}/6`);
 }

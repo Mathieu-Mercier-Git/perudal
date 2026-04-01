@@ -17,10 +17,12 @@ const enMessages: Translations = {
     keep_editing: 'Keep editing',
     close_without_saving: 'Close without saving',
     start_game: 'Lancer la partie',
-    cancel_game: 'Anuuler la partie',
+    cancel_game: 'Annuler la partie',
     create_game: 'Créer une partie',
     join_game: 'Rejoindre une partie',
     quit_game: 'Quitter la partie',
+    confirm: 'Confirmer',
+    close: 'Fermer',
   },
   // common labels
   label: {

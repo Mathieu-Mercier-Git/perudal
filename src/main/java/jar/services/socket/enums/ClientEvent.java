@@ -2,9 +2,11 @@ package jar.services.socket.enums;
 
 public enum ClientEvent {
     CREATE_GAME("create_game"),
-    JOIN_GAME("join_game");
+    JOIN_GAME("join_game"),
+    QUIT_GAME("quit_game"),
+    CANCEL_GAME("cancel_game");
 
-    String key;
+    final String key;
 
     ClientEvent(String key) {
         this.key = key;

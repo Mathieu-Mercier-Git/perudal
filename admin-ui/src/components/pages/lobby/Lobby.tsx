@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { getGlobalInstance } from 'plume-ts-di';
 import { useObservable } from 'micro-observables';
 import { Panel } from '../../theme/layout/Panel';
@@ -9,7 +9,12 @@ import { HOME } from '../../Routes';
 import { useOnComponentMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
 import GameService from '../../../services/game/GameService';
 import { LobbyType } from '../../../services/game/GameTypes';
-import { addOnMessage, removeOnMessage, socketListener } from '../../../services/socket/SocketEngineService';
+import {
+  addOnMessage,
+  cancelGame, quitGame,
+  removeOnMessage,
+  socketListener
+} from '../../../services/socket/SocketEngineService';
 import { ServerEvent } from '../../../services/socket/SocketTypes';
 
 export default function Lobby() {
@@ -20,7 +25,7 @@ export default function Lobby() {
   const { messages } = useMessages();
   const navigate = useNavigate();
 
-  const listenerSwitchPhase = useCallback(
+  const listenerUpdateLobby = useCallback(
     socketListener(ServerEvent.UPDATED_LOBBY, (response: LobbyType) => {
       gameService.setLobby(response);
       // TODO : stocker dans un localStorage
@@ -28,11 +33,21 @@ export default function Lobby() {
     [],
   );
 
+  const listenerCancelGame = useCallback( // TODO : ajouter une popin pour confirmer qu'on veut annuler la partie
+    socketListener(ServerEvent.CANCEL_GAME, (response: String) => {
+      console.log("CANCEL GAME : ", response);
+      navigate(HOME); // TODO : rediriger avec vers HOME avec une popup d'information pour dire que la partie a été annulée
+    }),
+    [],
+  );
+
   useOnComponentMounted(() => {
-    addOnMessage(listenerSwitchPhase);
+    addOnMessage(listenerUpdateLobby);
+    addOnMessage(listenerCancelGame);
 
     return () => {
-      removeOnMessage(listenerSwitchPhase);
+      removeOnMessage(listenerUpdateLobby);
+      removeOnMessage(listenerCancelGame);
     };
   });
 
@@ -40,17 +55,13 @@ export default function Lobby() {
     // TODO
   };
 
-  const cancelGame = () => {
-    // TODO
-  };
-
-  const quitGame = () => {
-    // TODO
+  const quitGameAction = () => {
+    quitGame(lobby!.gameCode);
     navigate(HOME);
   };
 
   if (!lobby) {
-    return (<div>ERROR NO LOBBY</div>);
+    return (<Navigate to={HOME} />);
   }
 
   return (
@@ -70,12 +81,12 @@ export default function Lobby() {
       </ActionButton>
       {isMainPlayer
         ? (
-          <ActionButton onClick={cancelGame}>
+          <ActionButton onClick={() => cancelGame(lobby!.gameCode)}>
             {messages.action.cancel_game}
           </ActionButton>
         )
         : (
-          <ActionButton onClick={quitGame}>
+          <ActionButton onClick={quitGameAction}>
             {messages.action.quit_game}
           </ActionButton>
         )

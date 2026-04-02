@@ -58,6 +58,10 @@ public class SocketService {
         socketRoom.put(socket, gameCode);
     }
 
+    private void removeRoom(String gameCode) {
+        roomSockets.remove(gameCode);
+    }
+
     private void leaveRooms(WebSocket socket) {
         String currentRoom = this.socketRoom.get(socket);
         if (currentRoom != null) {
@@ -88,18 +92,29 @@ public class SocketService {
         }
         switch (clientEvent) {
             case JOIN_GAME -> {
-                String idPlayer = data[0];
                 // mise à jour dans le board de la partie en cours
-                List<Player> players = gameService.updateGamePlayers(gameCode, socketInfo.getId(), data[0], Integer.valueOf(data[1]), false);
+                List<Player> players = gameService.addPlayer(gameCode, socketInfo.getId(), data[0], Integer.valueOf(data[1]), false);
                 // mise à jour au niveau des rooms
                 joinRoom(gameCode, socketInfo.getSocket());
-                sendLobby(gameCode, players, Integer.valueOf(data[1]));
+                sendLobby(gameCode, players);
             }
             case CREATE_GAME -> {
-                List<Player> players = gameService.updateGamePlayers(gameCode, socketInfo.getId(), data[0], Integer.valueOf(data[1]), true);
+                List<Player> players = gameService.addPlayer(gameCode, socketInfo.getId(), data[0], Integer.valueOf(data[1]), true);
                 // mise à jour au niveau des rooms
                 joinRoom(gameCode, socketInfo.getSocket());
-                sendLobby(gameCode, players, Integer.valueOf(data[1]));
+                sendLobby(gameCode, players);
+            }
+            case QUIT_GAME -> {
+                List<Player> players = gameService.removePlayer(gameCode, socketInfo.getId());
+                // mise à jour au niveau des rooms
+                leaveRooms(socketInfo.getSocket());
+                sendLobby(gameCode, players);
+            }
+            case CANCEL_GAME -> {
+                gameService.removeGame(gameCode);
+                sendCancelGame(gameCode);
+                // mise à jour au niveau des rooms
+                removeRoom(gameCode); // TODO : bien tester qu'on a bien supprimé ce qu'il fallait (room, game)
             }
         }
     }
@@ -108,11 +123,20 @@ public class SocketService {
         leaveRooms(socketInfo.getSocket());
     }
 
-    private void sendLobby(String gameCode, List<Player> players, int diceNumber) {
+    private void sendLobby(String gameCode, List<Player> players) {
         SocketResponse response = SocketResponse.of( // works with event and body
 //            ResponseStatus.SUCCESS,
             ServerEvent.UPDATED_LOBBY,
-            Lobby.of(gameCode, players, diceNumber)
+            Lobby.of(gameCode, players, 6)
+        );
+        broadcast(gameCode, response);
+    }
+
+    private void sendCancelGame(String gameCode) {
+        SocketResponse response = SocketResponse.of(
+//            ResponseStatus.SUCCESS,
+            ServerEvent.CANCEL_GAME,
+            gameCode
         );
         broadcast(gameCode, response);
     }

@@ -24,7 +24,7 @@ public class GameService {
     }
 
     // TODO : pas ouf de passer par le UUID, si la personne rafraichi la page, il perd la co
-    public List<Player> updateGamePlayers(String gameCode, UUID playerId, String playerName, int diceNumber, boolean isAdmin) {
+    public List<Player> addPlayer(String gameCode, UUID playerId, String playerName, int diceNumber, boolean isAdmin) {
         games.computeIfAbsent(gameCode, k -> new ConcurrentHashMap<>());
 
         Map<UUID, Player> players = games.get(gameCode);
@@ -33,5 +33,20 @@ public class GameService {
         games.put(gameCode, players);
 
         return new ArrayList<>(games.get(gameCode).values());
+    }
+
+    public List<Player> removePlayer(String gameCode, UUID playerId) {
+        games.computeIfAbsent(gameCode, k -> new ConcurrentHashMap<>());
+
+        Map<UUID, Player> players = games.get(gameCode);
+        players.remove(playerId);
+
+        games.put(gameCode, players);
+
+        return new ArrayList<>(games.get(gameCode).values());
+    }
+
+    public void removeGame(String gameCode) {
+        games.remove(gameCode);
     }
 }

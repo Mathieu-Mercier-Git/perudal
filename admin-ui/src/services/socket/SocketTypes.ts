@@ -12,4 +12,6 @@ export enum ClientEvent {
 
 export enum ServerEvent {
   UPDATED_LOBBY = 'UPDATED_LOBBY',
+  QUIT_GAME = 'QUIT_GAME',
+  CANCEL_GAME = 'CANCEL_GAME',
 }

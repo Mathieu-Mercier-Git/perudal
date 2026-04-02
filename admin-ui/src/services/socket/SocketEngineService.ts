@@ -79,3 +79,11 @@ export const createGame = (name: string, diceNumber: number) => {
 export const joinGame = (gameCode: string, name: string) => {
   socket.send(`join_game/${gameCode}/${name}/6`);
 }
+
+export const quitGame = (gameCode: string) => {
+  socket.send(`quit_game/${gameCode}`);
+}
+
+export const cancelGame = (gameCode: string) => {
+  socket.send(`cancel_game/${gameCode}`);
+}

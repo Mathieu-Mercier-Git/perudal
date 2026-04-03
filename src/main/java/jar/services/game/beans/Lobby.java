@@ -10,5 +10,4 @@ import java.util.List;
 public class Lobby {
     private String gameCode;
     private List<Player> players;
-    private int diceNumber;
 }

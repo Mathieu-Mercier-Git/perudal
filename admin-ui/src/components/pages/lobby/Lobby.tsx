@@ -11,7 +11,6 @@ import GameService from '../../../services/game/GameService';
 import { LobbyType } from '../../../services/game/GameTypes';
 import {
   addOnMessage,
-  cancelGame, quitGame,
   removeOnMessage,
   socketListener
 } from '../../../services/socket/SocketEngineService';
@@ -55,11 +54,6 @@ export default function Lobby() {
     // TODO
   };
 
-  const quitGameAction = () => {
-    quitGame(lobby!.gameCode);
-    navigate(HOME);
-  };
-
   if (!lobby) {
     return (<Navigate to={HOME} />);
   }
@@ -81,12 +75,12 @@ export default function Lobby() {
       </ActionButton>
       {isMainPlayer
         ? (
-          <ActionButton onClick={() => cancelGame(lobby!.gameCode)}>
+          <ActionButton onClick={() => gameService.cancelGame(lobby!.gameCode)}>
             {messages.action.cancel_game}
           </ActionButton>
         )
         : (
-          <ActionButton onClick={quitGameAction}>
+          <ActionButton onClick={() => gameService.quitGame(lobby!.gameCode)}>
             {messages.action.quit_game}
           </ActionButton>
         )

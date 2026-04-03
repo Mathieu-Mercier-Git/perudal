@@ -51,16 +51,19 @@ export default function Home() {
   const createLobby = () => {
     // TODO : vérifier que le username est bien renseigné
     // TODO emit event lobby
-    gameService.setIsMainPlayer(true);
-    createGame(username, 6);
-    // TODO : add loader
-    // navigate(LOBBY);
+    // TODO : laisser le choix du nombre de dés
+    gameService.createGame(username, 5)
+      .then(() => {
+        navigate(LOBBY);
+      });
   };
 
   const joinLobby = () => {
-    gameService.setIsMainPlayer(false);
-    joinGame(perucode, username);
-    // TODO loader
+    gameService.joinGame(username, perucode)
+      .then(() => {
+        navigate(LOBBY);
+      })
+      .catch((error) => console.error({ error }));
   };
 
   const onChangeUsername = (event) => {

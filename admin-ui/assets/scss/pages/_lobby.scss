@@ -1,6 +1,19 @@
 @use "../variables" as *;
 
 // TODO : changer la structure pour avoir des composants Page et non Panel
+
+.lobby-dice-number-container {
+  display: flex;
+  align-items: center;
+
+  .lobby-dice-number {
+    display: flex;
+    align-items: center;
+    margin-left: $spacer-2;
+    gap: $spacer-2;
+  }
+}
+
 .players {
   .players-title {
     margin-bottom: $spacer-2;

@@ -1,10 +1,10 @@
-import React, { useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { getGlobalInstance } from 'plume-ts-di';
 import { useObservable } from 'micro-observables';
 import { Panel } from '../../theme/layout/Panel';
 import useMessages from '../../../i18n/hooks/messagesHook';
-import { ActionButton } from '../../theme/action/Actions';
+import { ActionButton, IconButton } from '../../theme/action/Actions';
 import { GAME, HOME } from '../../Routes';
 import { useOnComponentMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
 import GameService from '../../../services/game/GameService';
@@ -16,10 +16,16 @@ import {
 } from '../../../services/socket/SocketEngineService';
 import { ServerEvent } from '../../../services/socket/SocketTypes';
 
+const DICE_NUMBER: number = 5;
+const MIN_DICE_NUMBER: number = 1;
+const MAX_DICE_NUMBER: number = 9;
+
 export default function Lobby() {
   const gameService = getGlobalInstance(GameService);
   const lobby: LobbyType | undefined = useObservable(gameService.getLobby());
   const isMainPlayer: boolean = useObservable(gameService.getIsMainPlayer());
+
+  const [diceNumber, setDiceNumber] = useState<number>(DICE_NUMBER);
 
   const { messages } = useMessages();
   const navigate = useNavigate();
@@ -66,6 +72,18 @@ export default function Lobby() {
     navigate(GAME);
   };
 
+  const removeDice = (): void => {
+    if (diceNumber > MIN_DICE_NUMBER) {
+      setDiceNumber(diceNumber - 1);
+    }
+  };
+
+  const addDice = (): void => {
+    if (diceNumber < MAX_DICE_NUMBER) {
+      setDiceNumber(diceNumber + 1);
+    }
+  };
+
   if (!lobby) {
     return (<Navigate to={HOME} />);
   }
@@ -77,10 +95,16 @@ export default function Lobby() {
         <span>{messages.lobby.perucode}</span>
         <span>{lobby.gameCode}</span>
       </div>
-      <div>
-        <span>{messages.lobby.dice_number}</span>
-        <span>5</span>
-      </div>
+      {isMainPlayer && (
+        <div className="lobby-dice-number-container">
+          <span>{messages.lobby.dice_number}</span>
+          <div className="lobby-dice-number">
+            <ActionButton onClick={removeDice} icon='linear_scale'/>
+            <span>{diceNumber}</span>
+            <ActionButton onClick={addDice} icon='add'/>
+          </div>
+        </div>
+      )}
       <div className="players">
         <div className="players-title">{messages.lobby.player_list}</div>
         {React.Children.toArray(lobby.players.map((player) => (

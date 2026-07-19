@@ -49,7 +49,7 @@ public class GameWs {
     @PUT
     @Path("/quit")
     @Operation(description = "Quit a game")
-    public void quiGame(@RequestBody ActionGame actionGame) {
+    public void quitGame(@RequestBody ActionGame actionGame) {
         gameService.quitGame(actionGame);
     }
 

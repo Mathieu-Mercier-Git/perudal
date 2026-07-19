@@ -5,7 +5,7 @@ import { useObservable } from 'micro-observables';
 import { Panel } from '../../theme/layout/Panel';
 import useMessages from '../../../i18n/hooks/messagesHook';
 import { ActionButton } from '../../theme/action/Actions';
-import { HOME } from '../../Routes';
+import { GAME, HOME } from '../../Routes';
 import { useOnComponentMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
 import GameService from '../../../services/game/GameService';
 import { LobbyType } from '../../../services/game/GameTypes';
@@ -40,18 +40,30 @@ export default function Lobby() {
     [],
   );
 
+  const listenerStartGame = useCallback(
+    socketListener(ServerEvent.START_GAME, (response: String) => {
+      console.log("START GAME : ", response);
+      navigate(GAME);
+    }),
+    [],
+  );
+
   useOnComponentMounted(() => {
     addOnMessage(listenerUpdateLobby);
     addOnMessage(listenerCancelGame);
+    addOnMessage(listenerStartGame);
 
     return () => {
       removeOnMessage(listenerUpdateLobby);
       removeOnMessage(listenerCancelGame);
+      removeOnMessage(listenerStartGame);
     };
   });
 
   const startGame = () => {
-    // TODO
+    // TODO : ajouter des conditions + une popin de confirmation
+    // TODO : idée, chargement sur le bouton de 5sec avec possibilités d'annuler pendant ce laps de temps
+    navigate(GAME);
   };
 
   if (!lobby) {

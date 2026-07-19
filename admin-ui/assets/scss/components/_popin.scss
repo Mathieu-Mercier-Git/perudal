@@ -12,11 +12,14 @@
   align-items: center;
 
   .popin-container {
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    gap: $spacer-7;
+    padding: $spacer-6;
     background-color: #ffffff;
     box-shadow: 0 3px 5px 1px rgba(#000000, .25);
     border-radius: 3px;
-    padding: $spacer-6;
-    max-height: 100%;
     overflow: auto;
 
     .popin-title {
@@ -29,9 +32,21 @@
       white-space: pre-wrap;
     }
 
+    .popin-content {
+    }
+
     .popin-buttons {
       display: flex;
       justify-content: space-around;
+
+      .actions {
+        justify-content: center;
+        width: 100%;
+
+        .action-container {
+          width: 50%;
+        }
+      }
     }
   }
 }

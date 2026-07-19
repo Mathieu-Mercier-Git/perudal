@@ -29,7 +29,7 @@ export default function ValidationPopin({
         {title}
       </div>
       {!!description && (<p className="popin-message">{description}</p>)}
-      {!!children && (children)}
+      {!!children && (<div className="popin-content">{children}</div>)}
       <div className="popin-buttons">
         <theme.actionsContainer>
           <theme.actionButton

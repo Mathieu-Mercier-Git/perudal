@@ -72,6 +72,8 @@ const frMessages: Translations = {
       required: 'Le champ est requis',
       email_wrong_format: 'L\'adresse e-mail saisie semble être incorrecte',
     },
+    username_missing: 'Choisie ton pseudo pour aller plus loin',
+    username_too_short: 'Ton pseudo est trop court'
   },
   'http-errors': {
     INTERNAL_ERROR: 'Une erreur inattendue s\'est produite',

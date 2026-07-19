@@ -5,6 +5,7 @@ import SessionService from './session/SessionService';
 import ObservableNotificationEngine from '../lib/plume-notification/ObservableNotificationEngine';
 import NotificationEngine from '../lib/plume-notification/NotificationEngine';
 import GameService from './game/GameService';
+import UserService from './user/UserService';
 
 export default function installServicesModule(injector: Injector) {
   // browser dependent services
@@ -15,5 +16,6 @@ export default function installServicesModule(injector: Injector) {
   injector.registerSingleton(ObservableNotificationEngine);
   injector.registerSingleton(ObservableNotificationEngine, NotificationEngine);
   injector.registerSingleton(GameService);
+  injector.registerSingleton(UserService);
   injector.registerSingleton(Scheduler);
 }

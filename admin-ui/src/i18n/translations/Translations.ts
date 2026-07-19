@@ -73,6 +73,8 @@ export type Translations = {
       required: string,
       email_wrong_format: string,
     },
+    username_missing: string,
+    username_too_short: string,
   },
   'http-errors': {
     INTERNAL_ERROR: string,

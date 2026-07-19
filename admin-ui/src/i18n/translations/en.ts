@@ -72,6 +72,8 @@ const enMessages: Translations = {
       required: 'Field is required',
       email_wrong_format: 'The input email address is invalid',
     },
+    username_missing: 'Choisie ton pseudo pour aller plus loin',
+    username_too_short: 'Ton pseudo est trop court'
   },
   'http-errors': {
     INTERNAL_ERROR: 'An unexpected error occurred',

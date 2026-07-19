@@ -16,6 +16,7 @@ import installPlumeAdminUsersModule from './lib/plume-admin-users/plume-admin-us
 import initializeLocalizedDate from './i18n/messages/LocalizedDate';
 import LocaleService from './i18n/locale/LocaleService';
 import NotificationRenderer from './components/theme/NotificationRenderer';
+import UserService from './services/user/UserService';
 
 const currentMillis: number = Date.now();
 const logger: Logger = new Logger('index');
@@ -34,6 +35,9 @@ configureGlobalInjector(injector);
 const sessionService: SessionService = injector.getInstance(SessionService);
 sessionService.tryInitializingSessionFromStorage();
 sessionService.synchronizeSessionFromOtherBrowserTags();
+
+const userService: UserService = injector.getInstance(UserService);
+userService.initializingUserFromStorage();
 
 // dayjs
 initializeLocalizedDate(injector.getInstance(LocaleService));

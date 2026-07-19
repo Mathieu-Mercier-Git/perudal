@@ -49,6 +49,12 @@ const frMessages: Translations = {
   login: {
     title: 'Se connecter',
   },
+  lobby: {
+    title: 'Lobby',
+    perucode: 'Pérucode de la partie : ',
+    dice_number: 'Nombre de dés : ',
+    player_list: 'Liste des participants : ',
+  },
   // users
   users: {
     userName: 'Nom d\'utilisateur',

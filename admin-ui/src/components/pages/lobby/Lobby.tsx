@@ -60,14 +60,22 @@ export default function Lobby() {
 
   return (
     <Panel>
-      <h1>Lobby</h1>
+      <h1>{messages.lobby.title}</h1>
       <div>
-        <span>Pérucode de la partie : </span>
+        <span>{messages.lobby.perucode}</span>
         <span>{lobby.gameCode}</span>
       </div>
+      <div>
+        <span>{messages.lobby.dice_number}</span>
+        <span>5</span>
+      </div>
       <div className="players">
+        <div className="players-title">{messages.lobby.player_list}</div>
         {React.Children.toArray(lobby.players.map((player) => (
-          <div>{player.name}</div>
+          <div className="player">
+            <span>-</span>
+            <div className="player-name">{player.name}</div>
+          </div>
         )))}
       </div>
       <ActionButton onClick={startGame}>

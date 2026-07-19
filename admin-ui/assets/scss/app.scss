@@ -5,6 +5,8 @@
 @use 'forms/index' as *;
 @use 'components/index' as *;
 
+@use 'pages/lobby' as *;
+
 @use '@fontsource/roboto/latin-100.css' as *;
 @use '@fontsource/roboto/latin-400.css' as *;
 @use '@fontsource/roboto/latin-700.css' as *;

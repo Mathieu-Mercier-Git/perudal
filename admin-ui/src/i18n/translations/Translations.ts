@@ -50,6 +50,12 @@ export type Translations = {
   login: {
     title: string,
   },
+  lobby: {
+    title: string,
+    perucode: string,
+    dice_number: string,
+    player_list: string,
+  },
   // users
   users: {
     userName: string,

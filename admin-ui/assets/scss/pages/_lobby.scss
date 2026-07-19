@@ -1,0 +1,17 @@
+@use "../variables" as *;
+
+// TODO : changer la structure pour avoir des composants Page et non Panel
+.players {
+  .players-title {
+    margin-bottom: $spacer-2;
+  }
+
+  .player {
+    display: flex;
+
+    .player-name {
+      margin-left: $spacer-2;
+    }
+  }
+}
+

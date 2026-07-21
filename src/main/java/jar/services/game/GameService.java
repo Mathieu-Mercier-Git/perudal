@@ -3,10 +3,12 @@ package jar.services.game;
 import com.coreoz.plume.jersey.errors.WsException;
 import jar.services.game.beans.ActionGame;
 import jar.services.game.beans.Game;
+import jar.services.game.beans.GameInfo;
 import jar.services.game.beans.JoinGame;
 import jar.services.game.beans.Lobby;
 import jar.services.game.beans.NewGame;
 import jar.services.game.beans.Player;
+import jar.services.game.beans.StartGame;
 import jar.services.socket.SocketService;
 import jar.webservices.api.errors.CustomWsError;
 import lombok.Getter;
@@ -43,12 +45,30 @@ public class GameService {
         if (!games.containsKey(joinGame.getGameCode())) {
             throw new WsException(CustomWsError.GAME_NOT_FOUND);
         }
-        List<Player> players = addPlayer(joinGame.getGameCode(), joinGame.getUserSocketId(), joinGame.getUserName(), true);
+        List<Player> players = addPlayer(joinGame.getGameCode(), joinGame.getUserSocketId(), joinGame.getUserName(), false);
 
         Lobby lobby = Lobby.of(joinGame.getGameCode(), players);
         socketService.joinGame(joinGame.getUserSocketId(), lobby);
 
         return lobby;
+    }
+
+    public void startGame(StartGame startGame) {
+        if (!games.containsKey(startGame.getGameCode())) {
+            throw new WsException(CustomWsError.GAME_NOT_FOUND);
+        }
+        Game currentGame = games.get(startGame.getGameCode());
+
+        currentGame.setDiceNumber(startGame.getDiceNumber());
+        for (Player player : currentGame.getPlayers().values()) {
+            player.setDiceNumber(startGame.getDiceNumber());
+        }
+
+        games.put(startGame.getGameCode(), currentGame);
+
+        GameInfo gameInfo = GameInfo.of(new ArrayList<>(currentGame.getPlayers().values()), currentGame.getDiceNumber(), startGame.getGameCode());
+
+        socketService.startGame(gameInfo);
     }
 
     public void quitGame(ActionGame actionGame) {

@@ -4,11 +4,11 @@ import { getGlobalInstance } from 'plume-ts-di';
 import { useObservable } from 'micro-observables';
 import { Panel } from '../../theme/layout/Panel';
 import useMessages from '../../../i18n/hooks/messagesHook';
-import { ActionButton, IconButton } from '../../theme/action/Actions';
+import { ActionButton } from '../../theme/action/Actions';
 import { GAME, HOME } from '../../Routes';
 import { useOnComponentMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
 import GameService from '../../../services/game/GameService';
-import { LobbyType } from '../../../services/game/GameTypes';
+import { Game, LobbyType } from '../../../services/game/GameTypes';
 import {
   addOnMessage,
   removeOnMessage,
@@ -23,7 +23,7 @@ const MAX_DICE_NUMBER: number = 9;
 export default function Lobby() {
   const gameService = getGlobalInstance(GameService);
   const lobby: LobbyType | undefined = useObservable(gameService.getLobby());
-  const isMainPlayer: boolean = useObservable(gameService.getIsMainPlayer());
+  const isMainPlayer: boolean = useObservable(gameService.getIsMainPlayer()); // TODO : peut être mutualiser avec la liste des joueurs remontés dans l'objet Lobby
 
   const [diceNumber, setDiceNumber] = useState<number>(DICE_NUMBER);
 
@@ -47,7 +47,8 @@ export default function Lobby() {
   );
 
   const listenerStartGame = useCallback(
-    socketListener(ServerEvent.START_GAME, (response: String) => {
+    socketListener(ServerEvent.START_GAME, (response: Game) => {
+      gameService.setGame(response);
       console.log("START GAME : ", response);
       navigate(GAME);
     }),
@@ -69,7 +70,7 @@ export default function Lobby() {
   const startGame = () => {
     // TODO : ajouter des conditions + une popin de confirmation
     // TODO : idée, chargement sur le bouton de 5sec avec possibilités d'annuler pendant ce laps de temps
-    navigate(GAME);
+    gameService.startGame(lobby!.gameCode, diceNumber);
   };
 
   const removeDice = (): void => {

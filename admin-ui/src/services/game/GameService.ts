@@ -1,15 +1,17 @@
 import { Observable, observable, WritableObservable } from 'micro-observables';
-import { LobbyType } from './GameTypes';
+import { Game, LobbyType } from './GameTypes';
 import GameApi from '../../api/game/GameApi';
 import { getIdSocket } from '../socket/SocketEngineService';
 
 export default class GameService {
   private lobby: WritableObservable<LobbyType | undefined>;
+  private game: WritableObservable<Game | undefined>;
   private isMainPlayer: WritableObservable<boolean>;
 
   // TODO : c'est dans le constructeur qu'on devra alimenter avec le localStorage
   constructor(private readonly gameApi: GameApi) {
-    this.lobby = observable(undefined);
+    this.lobby = observable(undefined); // pas sûr que ça soit utile de l'avoir en observable
+    this.game = observable(undefined); // pas sûr que ça soit utile de l'avoir en observable
     this.isMainPlayer = observable(false);
   }
 
@@ -19,6 +21,14 @@ export default class GameService {
 
   setLobby(currentLobby: LobbyType | undefined): void {
     this.lobby.set(currentLobby);
+  }
+
+  getGame(): Observable<Game | undefined> {
+    return this.game.readOnly();
+  }
+
+  setGame(currentGame: Game | undefined): void {
+    this.game.set(currentGame);
   }
 
   getIsMainPlayer(): Observable<boolean> {
@@ -42,6 +52,11 @@ export default class GameService {
     this.setIsMainPlayer(false);
     return this.gameApi.joinGame({userSocketId, userName, gameCode})
       .then((lobby) => this.setLobby(lobby))
+  }
+
+  startGame(gameCode: string, diceNumber): void {
+    return this.gameApi.startGame({gameCode, diceNumber})
+      .then(() => this.setLobby(undefined))
   }
 
   quitGame(gameCode: string):void {

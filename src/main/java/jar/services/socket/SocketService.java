@@ -1,5 +1,6 @@
 package jar.services.socket;
 
+import jar.services.game.beans.GameInfo;
 import jar.services.game.beans.Lobby;
 import jar.services.socket.enums.ServerEvent;
 import jar.services.socket.beans.SocketResponse;
@@ -70,6 +71,15 @@ public class SocketService {
         sendLobby(lobby);
     }
 
+    public void startGame(GameInfo gameInfo) {
+        List<WebSocket> sockets = socketsByGame.get(gameInfo.getGameCode());
+        for (WebSocket socket: sockets) {
+            IdAndGameCodebySocket.computeIfPresent(socket,
+                (key, passport) -> Passport.of(passport.getSocketId(), null));
+        }
+        sendStartGame(gameInfo);
+    }
+
     public void quitGame(UUID socketId, Lobby lobby) {
         WebSocket socket = socketById.get(socketId);
         Passport passport = IdAndGameCodebySocket.get(socket);
@@ -127,6 +137,14 @@ public class SocketService {
             gameCode
         );
         broadcast(gameCode, response);
+    }
+
+    private void sendStartGame(GameInfo gameInfo) {
+        SocketResponse response = SocketResponse.of(
+            ServerEvent.START_GAME,
+            gameInfo
+        );
+        broadcast(gameInfo.getGameCode(), response);
     }
 
 //    private WebSocket retrieveSocketFromId(UUID idSocket) {

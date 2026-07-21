@@ -9,6 +9,7 @@ import jar.services.game.beans.ActionGame;
 import jar.services.game.beans.JoinGame;
 import jar.services.game.beans.Lobby;
 import jar.services.game.beans.NewGame;
+import jar.services.game.beans.StartGame;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -44,6 +45,13 @@ public class GameWs {
     @Operation(description = "Join a game")
     public Lobby joinGame(@RequestBody JoinGame joinGame) {
         return gameService.joinGame(joinGame);
+    }
+
+    @PUT
+    @Path("/start")
+    @Operation(description = "Start a game")
+    public void startGame(@RequestBody StartGame startGame) {
+        gameService.startGame(startGame);
     }
 
     @PUT

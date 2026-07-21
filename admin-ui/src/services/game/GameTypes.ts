@@ -8,3 +8,9 @@ export type Player = {
   diceNumber: number,
   isAdmin: boolean,
 };
+
+export type Game = {
+  players: Player[];
+  diceNumber: number,
+  gameCode: string,
+}

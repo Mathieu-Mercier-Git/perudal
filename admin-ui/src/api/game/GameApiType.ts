@@ -14,3 +14,8 @@ export type ActionGame = {
   userSocketId: string,
   gameCode: string,
 };
+
+export type StartGame = {
+  gameCode: string,
+  diceNumber: number,
+};

@@ -9,6 +9,7 @@ import { HOME } from '../../Routes';
 import Dice from './Dice';
 import useToggle from '../../../lib/react-hook-toggle/ReactHookToggle';
 import { ActionButton } from '../../theme/action/Actions';
+import DiceCounter from './DiceCounter';
 
 export default function Game() {
   const gameService = getGlobalInstance(GameService);
@@ -51,6 +52,7 @@ export default function Game() {
               </div>
             ))}
           </div>
+          <DiceCounter game={game}/>
           <div className="main-player">
             {mainPlayer && (
               <div className="main-player-dices">

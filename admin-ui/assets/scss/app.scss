@@ -4,7 +4,8 @@
 @use 'features/index' as *;
 @use 'forms/index' as *;
 @use 'components/index' as *;
-@use 'components/dice' as *;
+@use 'components/dice/dice' as *;
+@use 'components/dice/dice-counter' as *;
 
 @use 'pages/lobby' as *;
 @use 'pages/game' as *;

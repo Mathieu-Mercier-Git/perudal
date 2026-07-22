@@ -1,0 +1,18 @@
+@use "../../variables" as *;
+
+.dice-counter {
+  display: flex;
+  flex-direction: column;
+
+  .dice-counter-list {
+    display: flex;
+
+    .dice-counter-item {
+      display: flex;
+
+      .dice-count {
+        display: flex;
+      }
+    }
+  }
+}

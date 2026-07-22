@@ -4,8 +4,10 @@
 @use 'features/index' as *;
 @use 'forms/index' as *;
 @use 'components/index' as *;
+@use 'components/dice' as *;
 
 @use 'pages/lobby' as *;
+@use 'pages/game' as *;
 
 @use '@fontsource/roboto/latin-100.css' as *;
 @use '@fontsource/roboto/latin-400.css' as *;

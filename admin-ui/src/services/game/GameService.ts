@@ -1,5 +1,5 @@
 import { Observable, observable, WritableObservable } from 'micro-observables';
-import { Game, LobbyType } from './GameTypes';
+import { Game, LobbyType, Player } from './GameTypes';
 import GameApi from '../../api/game/GameApi';
 import { getIdSocket } from '../socket/SocketEngineService';
 
@@ -37,6 +37,22 @@ export default class GameService {
 
   setIsMainPlayer(isCurrentPlayer: boolean): void {
     this.isMainPlayer.set(isCurrentPlayer);
+  }
+
+  getOpponents(): Player[] { // TODO : checker comment rejouter cette fonction uniquement quand l'observable bouge
+    const game = this.game.get();
+    if (!game) {
+      return [];
+    }
+    return game.players.filter(player => player.id !== getIdSocket());
+  }
+
+  getMainPlayer(): Player | undefined { // TODO : checker comment rejouter cette fonction uniquement quand l'observable bouge
+    const game = this.game.get();
+    if (!game) {
+      return undefined;
+    }
+    return game.players.find(player => player.id == getIdSocket());
   }
 
   createGame(userName: string, diceNumber: number):void {

@@ -100,7 +100,7 @@ export default function Lobby() {
         <div className="lobby-dice-number-container">
           <span>{messages.lobby.dice_number}</span>
           <div className="lobby-dice-number">
-            <ActionButton onClick={removeDice} icon='linear_scale'/>
+            <ActionButton onClick={removeDice} icon='remove'/>
             <span>{diceNumber}</span>
             <ActionButton onClick={addDice} icon='add'/>
           </div>

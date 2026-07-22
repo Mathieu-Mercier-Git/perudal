@@ -41,6 +41,7 @@ public class GameService {
         return Lobby.of(gameCode, players);
     }
 
+    // TODO : ajouter une limite maximum de joueurs dans une partie, et gérer le cas où la partie est pleine
     public Lobby joinGame(JoinGame joinGame) {
         if (!games.containsKey(joinGame.getGameCode())) {
             throw new WsException(CustomWsError.GAME_NOT_FOUND);
@@ -62,6 +63,7 @@ public class GameService {
         currentGame.setDiceNumber(startGame.getDiceNumber());
         for (Player player : currentGame.getPlayers().values()) {
             player.setDiceNumber(startGame.getDiceNumber());
+            player.setDices(rollDices(startGame.getDiceNumber()));
         }
 
         games.put(startGame.getGameCode(), currentGame);
@@ -69,6 +71,15 @@ public class GameService {
         GameInfo gameInfo = GameInfo.of(new ArrayList<>(currentGame.getPlayers().values()), currentGame.getDiceNumber(), startGame.getGameCode());
 
         socketService.startGame(gameInfo);
+    }
+
+    private List<Integer> rollDices(int diceNumber) {
+        List<Integer> dices = new ArrayList<>();
+        Random random = new Random();
+        for (int i = 0; i < diceNumber; i++) {
+            dices.add(random.nextInt(6) + 1);
+        }
+        return dices;
     }
 
     public void quitGame(ActionGame actionGame) {
@@ -90,7 +101,7 @@ public class GameService {
     public List<Player> addPlayer(String gameCode, UUID userSocketId, String username, boolean isAdmin) {
         Game game = games.get(gameCode);
         Map<UUID, Player> players = game.getPlayers();
-        players.put(userSocketId, Player.of(username, game.getDiceNumber(), isAdmin));
+        players.put(userSocketId, Player.of(userSocketId, username, game.getDiceNumber(), new ArrayList<>(), isAdmin));
 
         games.put(gameCode, Game.of(players, game.getDiceNumber()));
 

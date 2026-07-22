@@ -1,0 +1,41 @@
+@use "../variables" as *;
+
+.game {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+
+  .game-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+
+    .opponents-container {
+      display: flex;
+      flex-direction: column;
+      gap: $spacer-4;
+
+      .opponent {
+        .opponent-dices {
+          display: flex;
+          gap: $spacer-2;
+        }
+      }
+    }
+
+    .main-player {
+      display: flex;
+      flex-direction: column;
+      gap: $spacer-3;
+
+      .main-player-dices {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        gap: $spacer-2;
+      }
+    }
+  }
+}

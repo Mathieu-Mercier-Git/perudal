@@ -15,4 +15,5 @@ export enum ServerEvent {
   QUIT_GAME = 'QUIT_GAME',
   CANCEL_GAME = 'CANCEL_GAME',
   START_GAME = 'START_GAME',
+  REVEAL_DICES = 'REVEAL_DICES',
 }

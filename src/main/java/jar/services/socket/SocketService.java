@@ -2,6 +2,7 @@ package jar.services.socket;
 
 import jar.services.game.beans.GameInfo;
 import jar.services.game.beans.Lobby;
+import jar.services.socket.enums.ClientEvent;
 import jar.services.socket.enums.ServerEvent;
 import jar.services.socket.beans.SocketResponse;
 import jar.services.utils.ParserService;
@@ -147,6 +148,14 @@ public class SocketService {
         broadcast(gameInfo.getGameCode(), response);
     }
 
+    private void sendRevealDices(String gameCode) {
+        SocketResponse response = SocketResponse.of(
+            ServerEvent.REVEAL_DICES,
+            gameCode
+        );
+        broadcast(gameCode, response);
+    }
+
 //    private WebSocket retrieveSocketFromId(UUID idSocket) {
 //        for (Map.Entry<WebSocket, WebSocketApp.SocketInfo> entry : gameService.getSockets().entrySet()) {
 //            if (entry.getValue().getId().equals(idSocket)) return entry.getKey();
@@ -181,40 +190,16 @@ public class SocketService {
         }
     }
 
-//    public void onMessage(WebSocketApp.SocketInfo socketInfo, String eventName, String gameCode, String[] data) {
-//        ClientEvent clientEvent = ClientEvent.findByName(eventName);
-//        if (clientEvent == null) {
-//            // TODO : handle error
-//            return;
-//        }
-//        switch (clientEvent) {
-//            case JOIN_GAME -> {
-//                // mise à jour dans le board de la partie en cours
-//                List<Player> players = gameService.addPlayer(gameCode, NewGame.of(socketInfo.getId(), data[0], Integer.valueOf(data[1])), false);
-//                // mise à jour au niveau des rooms
-//                joinRoom(gameCode, socketInfo.getSocket());
-//                sendLobby(gameCode, players);
-//            }
-//            case CREATE_GAME -> {
-//                List<Player> players = gameService.addPlayer(gameCode, NewGame.of(socketInfo.getId(), data[0], Integer.valueOf(data[1])), true);
-//                // mise à jour au niveau des rooms
-//                joinRoom(gameCode, socketInfo.getSocket());
-//                sendLobby(gameCode, players);
-//            }
-//            case QUIT_GAME -> {
-//                List<Player> players = gameService.removePlayer(gameCode, socketInfo.getId());
-//                // mise à jour au niveau des rooms
-//                leaveRooms(socketInfo.getSocket());
-//                sendLobby(gameCode, players);
-//            }
-//            case CANCEL_GAME -> {
-//                gameService.removeGame(gameCode);
-//                sendCancelGame(gameCode);
-//                // mise à jour au niveau des rooms
-//                removeRoom(gameCode); // TODO : bien tester qu'on a bien supprimé ce qu'il fallait (room, game)
-//            }
-//        }
-//    }
+    public void onMessage(WebSocket socket, String eventKey, String gameCode) {
+        ClientEvent clientEvent = ClientEvent.findByName(eventKey);
+        if (clientEvent == null) {
+            logger.error("Unknown client event received: {}", eventKey);
+            return;
+        }
+        if (clientEvent == ClientEvent.REVEAL_DICES) {
+            sendRevealDices(gameCode);
+        }
+    }
 
     @Data
     @AllArgsConstructor(staticName="of")

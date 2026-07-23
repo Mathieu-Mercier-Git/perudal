@@ -1,7 +1,7 @@
 import { Observable, observable, WritableObservable } from 'micro-observables';
 import { Game, LobbyType, Player } from './GameTypes';
 import GameApi from '../../api/game/GameApi';
-import { getIdSocket } from '../socket/SocketEngineService';
+import { sendRevealDices, getIdSocket } from '../socket/SocketEngineService';
 
 export default class GameService {
   private lobby: WritableObservable<LobbyType | undefined>;
@@ -71,8 +71,7 @@ export default class GameService {
   }
 
   startGame(gameCode: string, diceNumber): void {
-    return this.gameApi.startGame({gameCode, diceNumber})
-      .then(() => this.setLobby(undefined))
+    this.gameApi.startGame({gameCode, diceNumber});
   }
 
   quitGame(gameCode: string):void {
@@ -86,5 +85,9 @@ export default class GameService {
     this.setIsMainPlayer(false);
     return this.gameApi.cancelGame({userSocketId, gameCode})
       .then(() => this.setLobby(undefined))
+  }
+
+  sendRevealDices(gameCode: string):void {
+    sendRevealDices(gameCode);
   }
 }

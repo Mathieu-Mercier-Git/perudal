@@ -58,27 +58,19 @@ public class WebSocketApp extends WebSocketApplication {
 
         @Override
         public void onMessage(WebSocket socket, String text) {
-//            int dataMinimumLength = 2;
-//            try {
-//                SocketInfo socketInfo = gameService.getSockets().get(socket);
-//                if (socketInfo == null) {
-//                    logger.error("Un message a été reçu via une socket qui n'a pas été déclaré");
-//                } else {
-//                    logger.info("[" + socketInfo.getId() + "] : " + text);
-//                    String[] dataMessage = text.split("/");
-//                    logger.info("dataMinimumLength : " + dataMinimumLength); // TODO : remove
-//                    if (dataMessage.length < dataMinimumLength) { // TODO : attention à cette condition
-//                        return;
-//                    }
-//                    String event = dataMessage[0];
-//                    String gameCode = dataMessage[1];
-//                    String[] data = Arrays.copyOfRange(dataMessage, 2, dataMessage.length); // TODO : BUG ici
-//
-//                    socketService.onMessage(socketInfo, event, gameCode, data);
-//                }
-//            } catch (Exception e) {
-//                logger.warn("Cannot handle message", e);
-//            }
+            int dataMinimumLength = 2;
+            try {
+                String[] dataMessage = text.split("/");
+                if (dataMessage.length < dataMinimumLength) {
+                    return;
+                }
+                String eventKey = dataMessage[0];
+                String gameCode = dataMessage[1];
+
+                socketService.onMessage(socket, eventKey, gameCode);
+            } catch (Exception e) {
+                logger.warn("Cannot handle message", e);
+            }
         }
 
         @Override

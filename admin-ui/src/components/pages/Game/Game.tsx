@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useObservable } from 'micro-observables';
 import { getGlobalInstance } from 'plume-ts-di';
@@ -10,20 +10,52 @@ import Dice from './Dice';
 import useToggle from '../../../lib/react-hook-toggle/ReactHookToggle';
 import { ActionButton } from '../../theme/action/Actions';
 import DiceCounter from './DiceCounter';
+import {
+  addOnMessage,
+  removeOnMessage,
+  socketListener
+} from '../../../services/socket/SocketEngineService';
+import { ServerEvent } from '../../../services/socket/SocketTypes';
+import { useOnComponentMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
 
 export default function Game() {
   const gameService = getGlobalInstance(GameService);
   const game: Game | undefined = useObservable(gameService.getGame());
 
   const [showMyDices, toggleShowMyDices] = useToggle(false);
+  const [showTourResult, setShowTourResult] = useState(false);
 
   // const { messages } = useMessages();
   // const navigate = useNavigate();
 
+  const listenerRevealDices = useCallback(
+    socketListener(ServerEvent.REVEAL_DICES, () => {
+      setShowTourResult(true);
+    }),
+    [],
+  );
+
+  useOnComponentMounted(() => {
+    addOnMessage(listenerRevealDices);
+
+    return () => {
+      removeOnMessage(listenerRevealDices);
+    };
+  });
+
   const opponents: Player[] = gameService.getOpponents(game);
   const mainPlayer: Player | undefined = gameService.getMainPlayer();
 
-  const endTour = () => { // TODO : accès à cette fonction uniquement si tu es admin
+  const revealDices = () => {
+    gameService.sendRevealDices(game?.gameCode);
+    // TODO : accès à cette fonction uniquement si tu es admin
+    // TODO 1 : Afficher à tout le monde combien de chaque il y avait
+    // TODO 2 : afficher une popup qui propose de retirer ou d'ajouter des dés à un joueur
+    // TOOD : gérer le planificato
+  }
+
+  const finishTour = () => {
+    // TODO : accès à cette fonction uniquement si tu es admin
     // TODO 1 : Afficher à tout le monde combien de chaque il y avait
     // TODO 2 : afficher une popup qui propose de retirer ou d'ajouter des dés à un joueur
     // TOOD : gérer le planificato
@@ -46,13 +78,13 @@ export default function Game() {
                 {opponent.name}
                 <div className="opponent-dices">
                   {opponent.dices.map((dice, index) => (
-                    <Dice key={index} number={dice} show={showMyDices}/>
+                    <Dice key={index} number={dice} show={showTourResult}/>
                   ))}
                 </div>
               </div>
             ))}
           </div>
-          <DiceCounter game={game}/>
+          {showTourResult && (<DiceCounter game={game} />)}
           <div className="main-player">
             {mainPlayer && (
               <div className="main-player-dices">
@@ -62,7 +94,11 @@ export default function Game() {
               </div>
             )}
             <ActionButton onClick={toggleShowMyDices} icon={showMyDices ? 'visibility' : 'visibility_off'}/>
-            <ActionButton onClick={toggleShowMyDices}>Fin du tour</ActionButton>
+            <span>Tu es maître du jeu, tes actions dictent la partie</span>
+            {showTourResult
+              ? (<ActionButton onClick={finishTour}>Fin du tour</ActionButton>)
+              : (<ActionButton onClick={revealDices}>Révéler tous les dés</ActionButton>)
+            }
           </div>
         </div>
       </div>

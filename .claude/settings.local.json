@@ -8,7 +8,11 @@
       "Bash(JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.0.3.1.jdk/Contents/Home timeout 15 mvn -q exec:java -Dexec.mainClass=jar.WebApplication)",
       "Bash(JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.0.3.1.jdk/Contents/Home mvn -q exec:java -Dexec.mainClass=jar.WebApplication)",
       "Bash(kill %1)",
-      "Bash(pkill -f \"jar.WebApplication\")"
+      "Bash(pkill -f \"jar.WebApplication\")",
+      "Bash(export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.0.3.1.jdk/Contents/Home)",
+      "Bash(mvn -q -o compile)",
+      "Bash(mvn -o compile)",
+      "Bash(yarn typescript *)"
     ]
   }
 }

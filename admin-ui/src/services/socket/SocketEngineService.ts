@@ -87,3 +87,7 @@ export const quitGame = (gameCode: string) => {
 export const cancelGame = (gameCode: string) => {
   socket.send(`cancel_game/${gameCode}`);
 }
+
+export const sendRevealDices = (gameCode: string) => {
+  socket.send(`reveal_dices/${gameCode}`);
+}

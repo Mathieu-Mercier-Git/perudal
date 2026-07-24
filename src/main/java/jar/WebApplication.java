@@ -13,6 +13,9 @@ import org.glassfish.grizzly.GrizzlyFuture;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.server.ResourceConfig;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
@@ -25,6 +28,7 @@ public class WebApplication {
 	public static final Duration GRACEFUL_SHUTDOWN_TIMEOUT = Duration.ofSeconds(60);
 
 	public static void main(String[] args) {
+		printBanner();
 		try {
 			long startTimestamp = System.currentTimeMillis();
 
@@ -59,6 +63,16 @@ public class WebApplication {
 			// to daemon, which mean that even if the project is completely down, the JVM is not stopped.
 			// Stopping the JVM is important to enable production supervision tools to detect and restart the project.
 			System.exit(1);
+		}
+	}
+
+	private static void printBanner() {
+		try (InputStream bannerStream = WebApplication.class.getResourceAsStream("/banner.txt")) {
+			if (bannerStream != null) {
+				System.out.println(new String(bannerStream.readAllBytes(), StandardCharsets.UTF_8));
+			}
+		} catch (IOException e) {
+			logger.warn("Unable to read banner.txt", e);
 		}
 	}
 

@@ -15,4 +15,5 @@ export type Game = {
   players: Player[],
   diceNumber: number,
   gameCode: string,
+  isPlanificato: boolean,
 }

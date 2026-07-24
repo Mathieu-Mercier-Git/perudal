@@ -11,9 +11,7 @@ export const socketListener = (
   callback: (body: Object) => void,
 ) => {
   return (event: MessageEvent) => {
-    console.log('TRIGGER FROM BACK event', event);
     const response: SocketResponse = JSON.parse(event.data);
-    console.log('TRIGGER FROM BACK parsed', response);
     if (response.status === 'ERROR') {
       // TODO : handle error (toastify ou truc du genre)
     }
@@ -44,7 +42,6 @@ export const initSocket = () => {
 
     // Événement appelé lors de la réception d'un message du serveur
     socket.onmessage = function (event) {
-      console.log("Message from server: " + event.data);
       if (event.data.includes("id:")) {
         idSocket = event.data.substring(3);
       }

@@ -4,6 +4,7 @@ import { Game, Player } from '../../../../services/game/GameTypes';
 
 type Props = {
   game: Game;
+  isPlanificato?: boolean;
 };
 
 type DiceCount = {
@@ -15,7 +16,7 @@ type DiceCount = {
   six: number;
 }
 
-export default function DiceCounter({ game }: Props) {
+export default function DiceCounter({ game, isPlanificato }: Props) {
   const players: Player[] = [...game.players];
 
   const makeDiceCount = (): DiceCount => {
@@ -46,7 +47,7 @@ export default function DiceCounter({ game }: Props) {
       <div>Résultat du tour</div>
       <div className="dice-counter-list">
         <div className="dice-counter-item">
-          <Dice number={1} show />
+          <Dice number={1} show isPlanificato={isPlanificato} />
           <div className="dice-count">
             <span>x</span>
             {diceCount.one}

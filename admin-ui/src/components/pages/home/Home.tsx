@@ -70,7 +70,6 @@ export default function Home() {
     }
     gameService.createGame(username, 5)
       .then(() => {
-        console.log('createGame LALALAL')
         navigate(LOBBY);
       });
   };

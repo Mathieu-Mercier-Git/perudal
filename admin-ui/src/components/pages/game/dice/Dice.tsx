@@ -4,8 +4,8 @@ const toucanImage = '/assets/images/toucan.png';
 
 type Props = {
   number: number,
-  show?: boolean,
   isPlanificato?: boolean,
+  show?: boolean,
 };
 
 export default function Dice({ number, show, isPlanificato }: Props) {

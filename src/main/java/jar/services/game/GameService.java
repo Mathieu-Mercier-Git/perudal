@@ -70,7 +70,7 @@ public class GameService {
         }
 
         games.put(startGame.getGameCode(), currentGame);
-        GameInfo gameInfo = GameInfo.of(new ArrayList<>(currentGame.getPlayers().values()), currentGame.getDiceNumber(), startGame.getGameCode());
+        GameInfo gameInfo = GameInfo.of(new ArrayList<>(currentGame.getPlayers().values()), currentGame.getDiceNumber(), startGame.getGameCode(), false);
         socketService.startGame(gameInfo);
     }
 
@@ -97,7 +97,9 @@ public class GameService {
         Map<UUID, Player> players = game.getPlayers();
 
         Player currentplayer = players.get(turnInfo.getPlayerId());
+        boolean isPlanificato = false;
         if (turnInfo.isHasLost()) {
+            isPlanificato = currentplayer.getDiceNumber() == 2;
             currentplayer.setDiceNumber(currentplayer.getDiceNumber() - 1);
         } else { // Cas d'un chiffre exact
             if (currentplayer.getDiceNumber() < game.getDiceNumber()) {
@@ -116,7 +118,7 @@ public class GameService {
             player.setDices(GameUtils.rollDices(player.getDiceNumber()));
         }
         games.put(turnInfo.getGameCode(), game);
-        GameInfo gameInfo = GameInfo.of(new ArrayList<>(game.getPlayers().values()), game.getDiceNumber(), turnInfo.getGameCode());
+        GameInfo gameInfo = GameInfo.of(new ArrayList<>(game.getPlayers().values()), game.getDiceNumber(), turnInfo.getGameCode(), isPlanificato);
         socketService.finishTurn(gameInfo);
     }
 

@@ -55,11 +55,12 @@ export default function Game() {
       setShowMyDices(false);
       setShowFinishTurnPopin(false);
       gameService.setGame(response);
+      console.log('EVENT FINISH_TURN', response);
     }), [],
   );
 
   const listenerCancelGame = useCallback( // TODO : ajouter une popin pour confirmer qu'on veut annuler la partie
-    socketListener(ServerEvent.CANCEL_GAME, (response: String) => {
+    socketListener(ServerEvent.CANCEL_GAME, () => {
       navigate(HOME);
     }), [],
   );
@@ -115,14 +116,18 @@ export default function Game() {
       console.error('No player found');
       return 'Personne ne commence';
     }
+
     if (currentPlayer.diceNumber === 0) {
       return `À gauche de ${currentPlayer.name}, tu commences`;
+    } else if (currentPlayer.diceNumber === 1 && game.isPlanificato) {
+      return `${currentPlayer.name} est en planificato`;
     } else {
       return `${currentPlayer.name}, tu commences`;
     }
   };
 
   const diceTotalQuantity: number = game?.players.reduce((total, player) => total + player.dices.length, 0) ?? 0;
+  const isPlanificato: boolean | undefined = game?.isPlanificato;
 
   if (!game) {
     return (<Navigate to={HOME} />);
@@ -132,10 +137,10 @@ export default function Game() {
     <Panel>
       <div className="game">
         <div className="game-header">
-          <h1>Partie en cours</h1>
+          <h1>{isPlanificato ? 'Pla pla planificato' : 'Partie en cours'}</h1>
           <div>{whoStarts()}</div>
           <div>
-            <span>Nombre de dés : </span>
+            <span>Nombre total de dés : </span>
             <span>{diceTotalQuantity}</span>
           </div>
         </div>
@@ -151,7 +156,7 @@ export default function Game() {
                   ? (
                     <div className="opponent-dices">
                       {opponent.dices.map((dice, index) => (
-                        <Dice key={index} number={dice} show={isRevealDices}/>
+                        <Dice key={index} number={dice} show={isRevealDices} isPlanificato={isPlanificato} />
                       ))}
                     </div>
                   )
@@ -161,14 +166,14 @@ export default function Game() {
               </div>
             ))}
           </div>
-          {isRevealDices && (<DiceCounter game={game} />)}
+          {isRevealDices && (<DiceCounter game={game} isPlanificato={isPlanificato} />)}
           <div className="main-player">
             {mainPlayer && (
               mainPlayer.dices.length > 0
                 ? (
                   <div className="main-player-dices">
                     {mainPlayer.dices.map((dice, index) => (
-                      <Dice key={index} number={dice} show={showMyDices}/>
+                      <Dice key={index} number={dice} show={showMyDices} isPlanificato={isPlanificato} />
                     ))}
                   </div>
                 )

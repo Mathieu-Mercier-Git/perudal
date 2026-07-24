@@ -15,4 +15,5 @@ public class GameInfo {
     private List<Player> players;
     private int diceNumber;
     private String gameCode;
+    private Boolean isPlanificato;
 }

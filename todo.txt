@@ -16,6 +16,8 @@ o Sur mobile, il y a un focus quand on clique dans le champ, il faut le retirer
 
 o Ajout de tests
 
+o POur le pseudo, interdire les caractères spéciaux
+
 ========================================
 LOBBY / GESTION DE PARTIE
 ========================================

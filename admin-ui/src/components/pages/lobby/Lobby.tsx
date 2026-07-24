@@ -45,8 +45,7 @@ export default function Lobby() {
   );
 
   const listenerCancelGame = useCallback( // TODO : ajouter une popin pour confirmer qu'on veut annuler la partie
-    socketListener(ServerEvent.CANCEL_GAME, (response: String) => {
-      console.log("CANCEL GAME : ", response);
+    socketListener(ServerEvent.CANCEL_GAME, () => {
       navigate(HOME); // TODO : rediriger avec vers HOME avec une popup d'information pour dire que la partie a été annulée
     }), [],
   );
@@ -54,7 +53,6 @@ export default function Lobby() {
   const listenerStartGame = useCallback(
     socketListener(ServerEvent.START_GAME, (response: Game) => {
       gameService.setGame(response);
-      console.log("START GAME : ", response);
       navigate(GAME);
     }), [],
   );

@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useObservable } from 'micro-observables';
 import { getGlobalInstance } from 'plume-ts-di';
 import { Panel } from '../../theme/layout/Panel';
@@ -18,6 +18,7 @@ import {
 import { ServerEvent } from '../../../services/socket/SocketTypes';
 import { useOnComponentMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
 import FinishTurnPopin from './popin/FinishTurnPopin';
+import FinishGamePopin from './popin/FinishGamePopin';
 
 export default function Game() {
   const gameService = getGlobalInstance(GameService);
@@ -28,9 +29,11 @@ export default function Game() {
   const [isRevealDices, setIsRevealDices] = useState<boolean>(false);
   const [showFinishTurnPopin, setShowFinishTurnPopin] = useState<boolean>(false);
   const [playerIdFinishTurn, setPlayerIdFinishTurn] = useState<string>('');
+  const [playerWinner, setPlayerWinner] = useState<Player | undefined>(undefined);
 
   // const { messages } = useMessages();
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
+
   useOnComponentMounted(() => {
     if (game) {
       setIsAdmin(!!game.players.find(player => player.id === getIdSocket() && player.isAdmin));
@@ -47,7 +50,7 @@ export default function Game() {
 
   const listenerFinishTurn = useCallback(
     socketListener(ServerEvent.FINISH_TURN, (response: Game) => {
-      // TODO : Mettre à jour la personne qui commence le tour
+      processIsGameFinished(response);
       setIsRevealDices(false);
       setShowMyDices(false);
       setShowFinishTurnPopin(false);
@@ -55,18 +58,33 @@ export default function Game() {
     }), [],
   );
 
+  const listenerCancelGame = useCallback( // TODO : ajouter une popin pour confirmer qu'on veut annuler la partie
+    socketListener(ServerEvent.CANCEL_GAME, (response: String) => {
+      navigate(HOME);
+    }), [],
+  );
+
   useOnComponentMounted(() => {
     addOnMessage(listenerRevealDices);
     addOnMessage(listenerFinishTurn);
+    addOnMessage(listenerCancelGame);
 
     return () => {
       removeOnMessage(listenerRevealDices);
       removeOnMessage(listenerFinishTurn);
+      removeOnMessage(listenerCancelGame);
     };
   });
 
   const opponents: Player[] = gameService.getOpponents(game);
   const mainPlayer: Player | undefined = gameService.getMainPlayer();
+
+  const processIsGameFinished = (currentGame: Game) => {
+    const playersWithDices = currentGame.players.filter(player => player.diceNumber > 0);
+    if (playersWithDices.length === 1) {
+      setPlayerWinner(playersWithDices[0]);
+    }
+  }
 
   const revealDices = () => {
     gameService.sendRevealDices(game?.gameCode);
@@ -77,6 +95,10 @@ export default function Game() {
     setPlayerIdFinishTurn(playerId);
     gameService.finishTurn(game?.gameCode, playerId, hasLost);
   }
+
+  const backToHome = () => {
+    gameService.cancelGame(game?.gameCode);
+  };
 
   const whoStarts = (): string => {
     if (!game?.players.length) { // error
@@ -125,22 +147,32 @@ export default function Game() {
                 {opponent.isAdmin && (
                   <span> (boss)</span>
                 )}
-                <div className="opponent-dices">
-                  {opponent.dices.map((dice, index) => (
-                    <Dice key={index} number={dice} show={isRevealDices}/>
-                  ))}
-                </div>
+                {opponent.dices.length > 0
+                  ? (
+                    <div className="opponent-dices">
+                      {opponent.dices.map((dice, index) => (
+                        <Dice key={index} number={dice} show={isRevealDices}/>
+                      ))}
+                    </div>
+                  )
+                  : (<span> a lamentablement perdu</span>)
+                }
+
               </div>
             ))}
           </div>
           {isRevealDices && (<DiceCounter game={game} />)}
           <div className="main-player">
             {mainPlayer && (
-              <div className="main-player-dices">
-                {mainPlayer.dices.map((dice, index) => (
-                  <Dice key={index} number={dice} show={showMyDices}/>
-                ))}
-              </div>
+              mainPlayer.dices.length > 0
+                ? (
+                  <div className="main-player-dices">
+                    {mainPlayer.dices.map((dice, index) => (
+                      <Dice key={index} number={dice} show={showMyDices}/>
+                    ))}
+                  </div>
+                )
+              : (<div>Ils sont où tes dés ? Remets toi en question bonhomme.</div>)
             )}
             <ActionButton onClick={() => setShowMyDices(!showMyDices)} icon={showMyDices ? 'visibility' : 'visibility_off'}/>
             {isAdmin && (
@@ -157,6 +189,9 @@ export default function Game() {
       </div>
       {showFinishTurnPopin && (
        <FinishTurnPopin onClick={finishTurn} onClose={() => setShowFinishTurnPopin(false)} players={game.players} />
+      )}
+      {!!playerWinner && (
+        <FinishGamePopin onClick={backToHome} playerName={playerWinner.name} />
       )}
     </Panel>
   );

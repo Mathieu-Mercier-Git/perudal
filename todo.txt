@@ -12,6 +12,9 @@ o Gérer le planificato de tour (actuellement le tour est planifié mais pas ex�
 
 o Utiliser Claude code pour stocker les chaines de caractère dans MessageService
 
+o Sur mobile, il y a un focus quand on clique dans le champ, il faut le retirer
+
+o Ajout de tests
 
 ========================================
 LOBBY / GESTION DE PARTIE

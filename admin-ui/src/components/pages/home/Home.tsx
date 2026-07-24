@@ -68,7 +68,6 @@ export default function Home() {
     if (usernameCheck()) {
       return;
     }
-    // TODO emit event lobby
     gameService.createGame(username, 5)
       .then(() => {
         console.log('createGame LALALAL')

@@ -100,17 +100,22 @@ export default function Game() {
     }
   };
 
+  const diceTotalQuantity: number = game?.players.reduce((total, player) => total + player.dices.length, 0) ?? 0;
+
   if (!game) {
     return (<Navigate to={HOME} />);
   } // TODO : ajouter le total de dés sur la table
-  // TODO : afficher que c'est le leader de la partie
 
   return (
     <Panel>
       <div className="game">
         <div className="game-header">
-          <div className="title">Pérudal</div>
+          <h1>Partie en cours</h1>
           <div>{whoStarts()}</div>
+          <div>
+            <span>Nombre de dés : </span>
+            <span>{diceTotalQuantity}</span>
+          </div>
         </div>
         <div className="game-content">
           <div className="opponents-container">

@@ -5,29 +5,19 @@ GAMEPLAY / REGLES DU JEU
 o Dans la Game, prévoir une option d'aide pour retirer ou ajouter des dès à un joueur pendant la game en cas d'erreur
   -> demander au joueur admin s'il souhaite relancer les dés ou conserver le tirage
 
-o Ajouter un petit symbole pour que les joueurs de la partie sachent qui est l'admin de la partie
-
 o Ajouter une page pour les règles
 
-o Préciser sur le plateau de jeu qui commence à jouer
-  - Front : admin-ui/src/components/pages/game/Game.tsx:42 (mettre à jour la personne qui commence le tour)
-  - Front : admin-ui/src/components/pages/game/Game.tsx:76 (afficher que c'est le leader de la partie)
-
-o Ajouter le total de dés sur la table
-  - Front : admin-ui/src/components/pages/game/Game.tsx:75
-
-o Gérer le style visuel du perudo (dés)
-  - Front : admin-ui/src/components/pages/game/dice/Dice.tsx:10
-
-o Restreindre l'accès à certaines actions de jeu à l'admin uniquement, et gérer le planificateur
+o Gérer le planificato de tour (actuellement le tour est planifié mais pas exécuté)
   - Front : admin-ui/src/components/pages/game/Game.tsx:65-66
+
+o Utiliser Claude code pour stocker les chaines de caractère dans MessageService
 
 
 ========================================
 LOBBY / GESTION DE PARTIE
 ========================================
 
-o Limiter le nombre maximum de joueurs dans une partie et gérer le cas où la partie est pleine
+o Limiter le nombre maximum et minimum de joueurs dans une partie et gérer le cas où la partie est pleine
   - Back : src/main/java/jar/services/game/GameService.java:46
 
 o Générer un vrai code de partie (actuellement toujours "123" en dur)
@@ -44,10 +34,6 @@ o Ajouter des conditions + une popin de confirmation avant de quitter/annuler
 
 o Idée : bouton avec chargement de 5s et possibilité d'annuler pendant ce laps de temps
   - Front : admin-ui/src/components/pages/lobby/Lobby.tsx:69
-
-o Mutualiser isMainPlayer avec la liste des joueurs remontée dans l'objet Lobby
-  - Front : admin-ui/src/components/pages/lobby/Lobby.tsx:26
-
 
 ========================================
 RECONNEXION JOUEUR (problème connu)
@@ -68,9 +54,6 @@ o Stocker les infos de session/partie dans le localStorage (home + lobby)
 WEBSOCKET / SOCKET SERVICE
 ========================================
 
-o Nettoyer les événements ClientEvent qui ne sont plus utilisés
-  - Back : src/main/java/jar/services/socket/enums/ClientEvent.java:3
-
 o Vérifier que le passport/socket ne sont pas null avant utilisation
   - Back : src/main/java/jar/services/socket/SocketService.java:47
   - Back : src/main/java/jar/services/socket/SocketService.java:111
@@ -82,10 +65,6 @@ o Gérer les cas d'erreur actuellement en TODO (onClose / onError)
 
 o Gérer l'erreur de connexion socket côté front (ex: notification toastify)
   - Front : admin-ui/src/services/socket/SocketEngineService.ts:18
-
-o Émettre l'event lobby après action (home)
-  - Front : admin-ui/src/components/pages/home/Home.tsx:71
-
 
 ========================================
 DETTE TECHNIQUE BACKEND

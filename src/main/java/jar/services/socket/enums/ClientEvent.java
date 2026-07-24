@@ -1,10 +1,6 @@
 package jar.services.socket.enums;
 
 public enum ClientEvent { // TODO : supprimer les events qu'on n'utlise plus
-    CREATE_GAME("create_game"),
-    JOIN_GAME("join_game"),
-    QUIT_GAME("quit_game"),
-    CANCEL_GAME("cancel_game"),
     REVEAL_DICES("reveal_dices");
 
     final String key;

@@ -1,8 +1,128 @@
-o Dans la Game, prévoir une option d'aide pour retirer ou ajouter des dès à un joueur pendant la game en cas d'erreur
--> demander au joueur admin s'il souhaite relancer les dés ou conserver le tirage
+========================================
+GAMEPLAY / REGLES DU JEU
+========================================
 
-o Ajouter un petit symbole pour les joueurs de la partie sachent qui est l'admin de la partie
+o Dans la Game, prévoir une option d'aide pour retirer ou ajouter des dès à un joueur pendant la game en cas d'erreur
+  -> demander au joueur admin s'il souhaite relancer les dés ou conserver le tirage
+
+o Ajouter un petit symbole pour que les joueurs de la partie sachent qui est l'admin de la partie
 
 o Ajouter une page pour les règles
 
 o Préciser sur le plateau de jeu qui commence à jouer
+  - Front : admin-ui/src/components/pages/game/Game.tsx:42 (mettre à jour la personne qui commence le tour)
+  - Front : admin-ui/src/components/pages/game/Game.tsx:76 (afficher que c'est le leader de la partie)
+
+o Ajouter le total de dés sur la table
+  - Front : admin-ui/src/components/pages/game/Game.tsx:75
+
+o Gérer le style visuel du perudo (dés)
+  - Front : admin-ui/src/components/pages/game/dice/Dice.tsx:10
+
+o Restreindre l'accès à certaines actions de jeu à l'admin uniquement, et gérer le planificateur
+  - Front : admin-ui/src/components/pages/game/Game.tsx:65-66
+
+
+========================================
+LOBBY / GESTION DE PARTIE
+========================================
+
+o Limiter le nombre maximum de joueurs dans une partie et gérer le cas où la partie est pleine
+  - Back : src/main/java/jar/services/game/GameService.java:46
+
+o Générer un vrai code de partie (actuellement toujours "123" en dur)
+  - Back : src/main/java/jar/services/utils/GameUtils.java:13-14
+
+o Ajouter une popin de confirmation avant d'annuler la partie
+  - Front : admin-ui/src/components/pages/lobby/Lobby.tsx:40
+
+o Rediriger vers HOME avec une popup d'information quand la partie a été annulée
+  - Front : admin-ui/src/components/pages/lobby/Lobby.tsx:43
+
+o Ajouter des conditions + une popin de confirmation avant de quitter/annuler
+  - Front : admin-ui/src/components/pages/lobby/Lobby.tsx:68
+
+o Idée : bouton avec chargement de 5s et possibilité d'annuler pendant ce laps de temps
+  - Front : admin-ui/src/components/pages/lobby/Lobby.tsx:69
+
+o Mutualiser isMainPlayer avec la liste des joueurs remontée dans l'objet Lobby
+  - Front : admin-ui/src/components/pages/lobby/Lobby.tsx:26
+
+
+========================================
+RECONNEXION JOUEUR (problème connu)
+========================================
+
+o Les joueurs sont identifiés par leur UUID de connexion WebSocket : un rafraîchissement de page fait perdre la connexion.
+  Prévoir une identification plus stable (ex: token persistant / localStorage) plutôt que le seul UUID socket.
+  - Back : src/main/java/jar/services/game/GameService.java:122
+  - Back : src/main/java/jar/webservices/api/GameWs.java:40 (ajouter le socketId dans la signature du WS)
+
+o Stocker les infos de session/partie dans le localStorage (home + lobby)
+  - Front : admin-ui/src/components/pages/home/Home.tsx:39
+  - Front : admin-ui/src/components/pages/lobby/Lobby.tsx:36
+  - Front : admin-ui/src/services/game/GameService.ts:11 (alimenter depuis le localStorage dans le constructeur)
+
+
+========================================
+WEBSOCKET / SOCKET SERVICE
+========================================
+
+o Nettoyer les événements ClientEvent qui ne sont plus utilisés
+  - Back : src/main/java/jar/services/socket/enums/ClientEvent.java:3
+
+o Vérifier que le passport/socket ne sont pas null avant utilisation
+  - Back : src/main/java/jar/services/socket/SocketService.java:47
+  - Back : src/main/java/jar/services/socket/SocketService.java:111
+  - Back : src/main/java/jar/services/socket/SocketService.java:113
+
+o Gérer les cas d'erreur actuellement en TODO (onClose / onError)
+  - Back : src/main/java/jar/services/socket/SocketService.java:60
+  - Back : src/main/java/jar/services/socket/SocketService.java:69
+
+o Gérer l'erreur de connexion socket côté front (ex: notification toastify)
+  - Front : admin-ui/src/services/socket/SocketEngineService.ts:18
+
+o Émettre l'event lobby après action (home)
+  - Front : admin-ui/src/components/pages/home/Home.tsx:71
+
+
+========================================
+DETTE TECHNIQUE BACKEND
+========================================
+
+o Créer un objet générique de gestion des erreurs (statut SUCCESS/ERROR) au lieu du ParseError ad-hoc,
+  avec un parent commun à tous les futurs objets de réponse
+  - Back : src/main/java/jar/services/utils/ParserService.java:15-16
+
+o Scinder Player en deux types : PlayerLobby (name + isAdmin) et Player complet
+  - Back : src/main/java/jar/services/game/beans/Player.java:13
+  - Front (type miroir) : admin-ui/src/services/game/GameTypes.ts:6
+
+
+========================================
+DETTE TECHNIQUE FRONTEND
+========================================
+
+o Se documenter sur le hook utilisé pour listenerSwitchPhase (useCallback)
+  - Front : admin-ui/src/components/pages/home/Home.tsx:35
+
+o Vérifier comment ne réévaluer getOpponents/getMainPlayer que lorsque l'observable change réellement
+  - Front : admin-ui/src/services/game/GameService.ts:42
+  - Front : admin-ui/src/services/game/GameService.ts:50
+
+o Créer un composant "tile" pour l'affichage des joueurs (repris de ValidationPopin)
+  - Front : admin-ui/src/components/pages/game/popin/FinishTurnPopin.tsx:14
+  - Front : admin-ui/src/components/pages/game/popin/FinishTurnPopin.tsx:24
+
+o Ligne commentée à décommenter/nettoyer selon besoin de test multi-joueurs en local
+  - Front : admin-ui/src/index.tsx:40 (initializingUserFromStorage)
+
+
+========================================
+LIB VENDORÉE (plume-admin-users — tiers, à ne pas modifier sauf besoin réel)
+========================================
+
+o admin-ui/src/lib/plume-admin-users/pages/Users.tsx:27 — récupérer la route courante où le composant est monté
+o admin-ui/src/lib/plume-admin-users/pages/Users.tsx:36 — récupération des rôles (utilisés partout)
+o admin-ui/src/lib/plume-admin-users/pages/UsersEdit.tsx:73 — le changement de mot de passe devrait être une action à part

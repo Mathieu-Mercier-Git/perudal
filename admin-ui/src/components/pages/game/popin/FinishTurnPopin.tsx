@@ -21,7 +21,7 @@ export default function FinishTurnPopin({ onClose, onClick, players }: Props) {
       <div className={`popin-title ${hasLostTurn ? '' : 'win'}`}>
         {hasLostTurn ? 'Qui a perdu ce tour ?' : 'Qui a trouvé le chiffre exact ?'}
       </div>
-      {players.map(player => ( // TODO : Créer le composant tile
+      {players.filter(player => player.diceNumber > 0).map(player => ( // TODO : Créer le composant tile
         <div key={player.id} className="player-tile" onClick={() => onClick(player.id, hasLostTurn)}>
           {player.name}
         </div>

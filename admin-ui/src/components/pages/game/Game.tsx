@@ -23,9 +23,10 @@ export default function Game() {
   const gameService = getGlobalInstance(GameService);
   const game: Game | undefined = useObservable(gameService.getGame());
 
-  const [showMyDices, setShowMyDices] = useState(false);
-  const [isRevealDices, setIsRevealDices] = useState(false);
-  const [showFinishTurnPopin, setShowFinishTurnPopin] = useState(false);
+  const [showMyDices, setShowMyDices] = useState<boolean>(false);
+  const [isRevealDices, setIsRevealDices] = useState<boolean>(false);
+  const [showFinishTurnPopin, setShowFinishTurnPopin] = useState<boolean>(false);
+  const [playerIdFinishTurn, setPlayerIdFinishTurn] = useState<string>('');
 
   // const { messages } = useMessages();
   // const navigate = useNavigate();
@@ -67,8 +68,31 @@ export default function Game() {
   }
 
   const finishTurn = (playerId: string, hasLost: boolean) => {
+    setPlayerIdFinishTurn(playerId);
     gameService.finishTurn(game?.gameCode, playerId, hasLost);
   }
+
+  const whoStarts = (): string => {
+    if (!game?.players.length) { // error
+      console.error('No player found');
+      return 'Personne ne commence';
+    }
+
+    if (!playerIdFinishTurn) { // 1st tour
+      return 'À vous de choisir qui commence'
+    }
+
+    const currentPlayer: Player | undefined = game.players.find(player => player.id === playerIdFinishTurn);
+    if (!currentPlayer) { // error
+      console.error('No player found');
+      return 'Personne ne commence';
+    }
+    if (currentPlayer.diceNumber === 0) {
+      return `À gauche de ${currentPlayer.name}, tu commences`;
+    } else {
+      return `${currentPlayer.name}, tu commences`;
+    }
+  };
 
   if (!game) {
     return (<Navigate to={HOME} />);
@@ -79,6 +103,8 @@ export default function Game() {
     <Panel>
       <div className="game">
         <div className="game-header">
+          <div className="title">Pérudal</div>
+          <div>{whoStarts()}</div>
         </div>
         <div className="game-content">
           <div className="opponents-container">

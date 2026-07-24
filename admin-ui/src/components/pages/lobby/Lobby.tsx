@@ -34,16 +34,14 @@ export default function Lobby() {
     socketListener(ServerEvent.UPDATED_LOBBY, (response: LobbyType) => {
       gameService.setLobby(response);
       // TODO : stocker dans un localStorage
-    }),
-    [],
+    }), [],
   );
 
   const listenerCancelGame = useCallback( // TODO : ajouter une popin pour confirmer qu'on veut annuler la partie
     socketListener(ServerEvent.CANCEL_GAME, (response: String) => {
       console.log("CANCEL GAME : ", response);
       navigate(HOME); // TODO : rediriger avec vers HOME avec une popup d'information pour dire que la partie a été annulée
-    }),
-    [],
+    }), [],
   );
 
   const listenerStartGame = useCallback(
@@ -51,8 +49,7 @@ export default function Lobby() {
       gameService.setGame(response);
       console.log("START GAME : ", response);
       navigate(GAME);
-    }),
-    [],
+    }), [],
   );
 
   useOnComponentMounted(() => {

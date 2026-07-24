@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Dice from './Dice';
-import { Game, Player } from '../../../services/game/GameTypes';
+import { Game, Player } from '../../../../services/game/GameTypes';
 
 type Props = {
   game: Game;

@@ -6,6 +6,7 @@
 @use 'components/index' as *;
 @use 'components/dice/dice' as *;
 @use 'components/dice/dice-counter' as *;
+@use 'components/tile/player-tile' as *;
 
 @use 'pages/lobby' as *;
 @use 'pages/game' as *;

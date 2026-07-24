@@ -69,9 +69,9 @@ export default function Home() {
       return;
     }
     // TODO emit event lobby
-    // TODO : laisser le choix du nombre de dés
     gameService.createGame(username, 5)
       .then(() => {
+        console.log('createGame LALALAL')
         navigate(LOBBY);
       });
   };

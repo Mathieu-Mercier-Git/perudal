@@ -25,6 +25,10 @@
     .popin-title {
       color: $secondary-color;
       font-size: $font-size-large;
+
+      &.win {
+        color: $primary-color;
+      }
     }
 
     .popin-message {

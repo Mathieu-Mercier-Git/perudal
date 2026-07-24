@@ -55,7 +55,7 @@ export default class GameService {
     return game.players.find(player => player.id == getIdSocket());
   }
 
-  createGame(userName: string, diceNumber: number):void {
+  createGame(userName: string, diceNumber: number):Promise<void> {
     const userSocketId = getIdSocket();
     this.setIsMainPlayer(true);
     return this.gameApi.createGame({userSocketId, userName, diceNumber})
@@ -63,7 +63,7 @@ export default class GameService {
       .catch(() => console.error('ERROR CREATE GAME'))
   }
 
-  joinGame(userName: string, gameCode: string):void {
+  joinGame(userName: string, gameCode: string):Promise<void> {
     const userSocketId = getIdSocket();
     this.setIsMainPlayer(false);
     return this.gameApi.joinGame({userSocketId, userName, gameCode})
@@ -76,15 +76,19 @@ export default class GameService {
 
   quitGame(gameCode: string):void {
     const userSocketId = getIdSocket();
-    return this.gameApi.quitGame({userSocketId, gameCode})
+    this.gameApi.quitGame({userSocketId, gameCode})
       .then(() => this.setLobby(undefined))
   }
 
   cancelGame(gameCode: string):void {
     const userSocketId = getIdSocket();
     this.setIsMainPlayer(false);
-    return this.gameApi.cancelGame({userSocketId, gameCode})
+    this.gameApi.cancelGame({userSocketId, gameCode})
       .then(() => this.setLobby(undefined))
+  }
+
+  finishTurn(gameCode: string, playerId: string, hasLost: boolean): void {
+    this.gameApi.finishTurn({gameCode, playerId, hasLost});
   }
 
   sendRevealDices(gameCode: string):void {

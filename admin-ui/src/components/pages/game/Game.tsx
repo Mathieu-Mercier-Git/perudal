@@ -5,11 +5,11 @@ import { getGlobalInstance } from 'plume-ts-di';
 import { Panel } from '../../theme/layout/Panel';
 import GameService from '../../../services/game/GameService';
 import { Game, Player } from '../../../services/game/GameTypes';
-import { HOME } from '../../Routes';
-import Dice from './Dice';
+import { GAME, HOME } from '../../Routes';
+import Dice from './dice/Dice';
 import useToggle from '../../../lib/react-hook-toggle/ReactHookToggle';
 import { ActionButton } from '../../theme/action/Actions';
-import DiceCounter from './DiceCounter';
+import DiceCounter from './dice/DiceCounter';
 import {
   addOnMessage,
   removeOnMessage,
@@ -17,29 +17,43 @@ import {
 } from '../../../services/socket/SocketEngineService';
 import { ServerEvent } from '../../../services/socket/SocketTypes';
 import { useOnComponentMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
+import FinishTurnPopin from './popin/FinishTurnPopin';
 
 export default function Game() {
   const gameService = getGlobalInstance(GameService);
   const game: Game | undefined = useObservable(gameService.getGame());
 
-  const [showMyDices, toggleShowMyDices] = useToggle(false);
-  const [showTourResult, setShowTourResult] = useState(false);
+  const [showMyDices, setShowMyDices] = useState(false);
+  const [isRevealDices, setIsRevealDices] = useState(false);
+  const [showFinishTurnPopin, setShowFinishTurnPopin] = useState(false);
 
   // const { messages } = useMessages();
   // const navigate = useNavigate();
 
   const listenerRevealDices = useCallback(
     socketListener(ServerEvent.REVEAL_DICES, () => {
-      setShowTourResult(true);
-    }),
-    [],
+      setIsRevealDices(true);
+      setShowMyDices(true);
+    }), [],
+  );
+
+  const listenerFinishTurn = useCallback(
+    socketListener(ServerEvent.FINISH_TURN, (response: Game) => {
+      // TODO : Mettre à jour la personne qui commence le tour
+      setIsRevealDices(false);
+      setShowMyDices(false);
+      setShowFinishTurnPopin(false);
+      gameService.setGame(response);
+    }), [],
   );
 
   useOnComponentMounted(() => {
     addOnMessage(listenerRevealDices);
+    addOnMessage(listenerFinishTurn);
 
     return () => {
       removeOnMessage(listenerRevealDices);
+      removeOnMessage(listenerFinishTurn);
     };
   });
 
@@ -49,16 +63,11 @@ export default function Game() {
   const revealDices = () => {
     gameService.sendRevealDices(game?.gameCode);
     // TODO : accès à cette fonction uniquement si tu es admin
-    // TODO 1 : Afficher à tout le monde combien de chaque il y avait
-    // TODO 2 : afficher une popup qui propose de retirer ou d'ajouter des dés à un joueur
-    // TOOD : gérer le planificato
+    // TODO : gérer le planificato
   }
 
-  const finishTour = () => {
-    // TODO : accès à cette fonction uniquement si tu es admin
-    // TODO 1 : Afficher à tout le monde combien de chaque il y avait
-    // TODO 2 : afficher une popup qui propose de retirer ou d'ajouter des dés à un joueur
-    // TOOD : gérer le planificato
+  const finishTurn = (playerId: string, hasLost: boolean) => {
+    gameService.finishTurn(game?.gameCode, playerId, hasLost);
   }
 
   if (!game) {
@@ -78,13 +87,13 @@ export default function Game() {
                 {opponent.name}
                 <div className="opponent-dices">
                   {opponent.dices.map((dice, index) => (
-                    <Dice key={index} number={dice} show={showTourResult}/>
+                    <Dice key={index} number={dice} show={isRevealDices}/>
                   ))}
                 </div>
               </div>
             ))}
           </div>
-          {showTourResult && (<DiceCounter game={game} />)}
+          {isRevealDices && (<DiceCounter game={game} />)}
           <div className="main-player">
             {mainPlayer && (
               <div className="main-player-dices">
@@ -93,15 +102,18 @@ export default function Game() {
                 ))}
               </div>
             )}
-            <ActionButton onClick={toggleShowMyDices} icon={showMyDices ? 'visibility' : 'visibility_off'}/>
+            <ActionButton onClick={() => setShowMyDices(!showMyDices)} icon={showMyDices ? 'visibility' : 'visibility_off'}/>
             <span>Tu es maître du jeu, tes actions dictent la partie</span>
-            {showTourResult
-              ? (<ActionButton onClick={finishTour}>Fin du tour</ActionButton>)
+            {isRevealDices
+              ? (<ActionButton onClick={() => setShowFinishTurnPopin(true)}>Fin du tour</ActionButton>)
               : (<ActionButton onClick={revealDices}>Révéler tous les dés</ActionButton>)
             }
           </div>
         </div>
       </div>
+      {showFinishTurnPopin && (
+       <FinishTurnPopin onClick={finishTurn} onClose={() => setShowFinishTurnPopin(false)} players={game.players} />
+      )}
     </Panel>
   );
 }

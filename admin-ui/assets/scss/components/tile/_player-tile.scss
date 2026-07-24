@@ -1,0 +1,10 @@
+@use "../../variables" as *;
+
+.player-tile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: $spacer-3;
+  background: $gray-light;
+  border-radius: $tile-radius;
+}

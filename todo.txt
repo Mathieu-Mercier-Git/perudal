@@ -1,0 +1,8 @@
+o Dans la Game, prévoir une option d'aide pour retirer ou ajouter des dès à un joueur pendant la game en cas d'erreur
+-> demander au joueur admin s'il souhaite relancer les dés ou conserver le tirage
+
+o Ajouter un petit symbole pour les joueurs de la partie sachent qui est l'admin de la partie
+
+o Ajouter une page pour les règles
+
+o Préciser sur le plateau de jeu qui commence à jouer

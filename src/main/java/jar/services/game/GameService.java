@@ -9,7 +9,9 @@ import jar.services.game.beans.Lobby;
 import jar.services.game.beans.NewGame;
 import jar.services.game.beans.Player;
 import jar.services.game.beans.StartGame;
+import jar.services.game.beans.TurnInfo;
 import jar.services.socket.SocketService;
+import jar.services.utils.GameUtils;
 import jar.webservices.api.errors.CustomWsError;
 import lombok.Getter;
 
@@ -31,7 +33,7 @@ public class GameService {
     }
 
     public Lobby createGame(NewGame newGame) {
-        String gameCode = generateGameCode();
+        String gameCode = GameUtils.generateGameCode();
 
         socketService.createGame(gameCode, newGame.getUserSocketId());
 
@@ -63,23 +65,12 @@ public class GameService {
         currentGame.setDiceNumber(startGame.getDiceNumber());
         for (Player player : currentGame.getPlayers().values()) {
             player.setDiceNumber(startGame.getDiceNumber());
-            player.setDices(rollDices(startGame.getDiceNumber()));
+            player.setDices(GameUtils.rollDices(startGame.getDiceNumber()));
         }
 
         games.put(startGame.getGameCode(), currentGame);
-
         GameInfo gameInfo = GameInfo.of(new ArrayList<>(currentGame.getPlayers().values()), currentGame.getDiceNumber(), startGame.getGameCode());
-
         socketService.startGame(gameInfo);
-    }
-
-    private List<Integer> rollDices(int diceNumber) {
-        List<Integer> dices = new ArrayList<>();
-        Random random = new Random();
-        for (int i = 0; i < diceNumber; i++) {
-            dices.add(random.nextInt(6) + 1);
-        }
-        return dices;
     }
 
     public void quitGame(ActionGame actionGame) {
@@ -97,8 +88,39 @@ public class GameService {
         socketService.cancelGame(actionGame.getGameCode());
     }
 
+    public void finishTurn(TurnInfo turnInfo) {
+        if (!games.containsKey(turnInfo.getGameCode())) {
+            throw new WsException(CustomWsError.GAME_NOT_FOUND);
+        }
+        Game game = games.get(turnInfo.getGameCode());
+        Map<UUID, Player> players = game.getPlayers();
+
+        Player currentplayer = players.get(turnInfo.getPlayerId());
+        if (turnInfo.isHasLost()) {
+            currentplayer.setDiceNumber(currentplayer.getDiceNumber() - 1);
+        } else { // Cas d'un chiffre exact
+            if (currentplayer.getDiceNumber() < game.getDiceNumber()) {
+                currentplayer.setDiceNumber(currentplayer.getDiceNumber() + 1);
+            } else { // Si le joueur a déjà la max de dés, tous les autres joueurs perdent un dés
+                for (Player player : game.getPlayers().values()) {
+                    if (player.getId().equals(turnInfo.getPlayerId())) {
+                        continue;
+                    }
+                    player.setDiceNumber(player.getDiceNumber() - 1);
+                }
+            }
+        }
+
+        for (Player player : game.getPlayers().values()) {
+            player.setDices(GameUtils.rollDices(player.getDiceNumber()));
+        }
+        games.put(turnInfo.getGameCode(), game);
+        GameInfo gameInfo = GameInfo.of(new ArrayList<>(game.getPlayers().values()), game.getDiceNumber(), turnInfo.getGameCode());
+        socketService.finishTurn(gameInfo);
+    }
+
     // TODO : pas ouf de passer par le UUID, si la personne rafraichi la page, il perd la co
-    public List<Player> addPlayer(String gameCode, UUID userSocketId, String username, boolean isAdmin) {
+    private List<Player> addPlayer(String gameCode, UUID userSocketId, String username, boolean isAdmin) {
         Game game = games.get(gameCode);
         Map<UUID, Player> players = game.getPlayers();
         players.put(userSocketId, Player.of(userSocketId, username, game.getDiceNumber(), new ArrayList<>(), isAdmin));
@@ -108,7 +130,7 @@ public class GameService {
         return new ArrayList<>(games.get(gameCode).getPlayers().values());
     }
 
-    public List<Player> removePlayer(String gameCode, UUID userSocketId) {
+    private List<Player> removePlayer(String gameCode, UUID userSocketId) {
         Game game = games.get(gameCode);
         Map<UUID, Player> players = game.getPlayers();
         players.remove(userSocketId);
@@ -116,10 +138,5 @@ public class GameService {
         games.put(gameCode, Game.of(players, game.getDiceNumber()));
 
         return new ArrayList<>(games.get(gameCode).getPlayers().values());
-    }
-
-    private String generateGameCode() {
-        // TODO :
-        return "123";
     }
 }

@@ -19,3 +19,9 @@ export type StartGame = {
   gameCode: string,
   diceNumber: number,
 };
+
+export type TurnInfo = {
+  gameCode: string,
+  playerId: string, // userSocketId
+  hasLost: boolean,
+};

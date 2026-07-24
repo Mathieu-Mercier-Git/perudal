@@ -9,7 +9,7 @@ import Home from './pages/home/Home';
 import Lobby from './pages/lobby/Lobby';
 import LandingPage from './pages/LandingPage';
 import { initSocket } from '../services/socket/SocketEngineService';
-import Game from './pages/Game/Game';
+import Game from './pages/game/Game';
 
 const logger: Logger = new Logger('App');
 // To make the application have a base path that starts with /admin:

@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jar.services.game.GameService;
 import jar.services.game.beans.ActionGame;
+import jar.services.game.beans.TurnInfo;
 import jar.services.game.beans.JoinGame;
 import jar.services.game.beans.Lobby;
 import jar.services.game.beans.NewGame;
@@ -66,5 +67,12 @@ public class GameWs {
     @Operation(description = "Cancel a game")
     public void cancelGame(@RequestBody ActionGame actionGame) {
         gameService.cancelGame(actionGame);
+    }
+
+    @PUT
+    @Path("/finish-turn")
+    @Operation(description = "Finish a turn and update players")
+    public void finishTurn(@RequestBody TurnInfo turnInfo) {
+        gameService.finishTurn(turnInfo);
     }
 }

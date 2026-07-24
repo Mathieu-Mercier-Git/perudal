@@ -81,6 +81,15 @@ public class SocketService {
         sendStartGame(gameInfo);
     }
 
+    public void finishTurn(GameInfo gameInfo) {
+        List<WebSocket> sockets = socketsByGame.get(gameInfo.getGameCode());
+        for (WebSocket socket: sockets) {
+            IdAndGameCodebySocket.computeIfPresent(socket,
+                (key, passport) -> Passport.of(passport.getSocketId(), null));
+        }
+        sendFinishTurn(gameInfo);
+    }
+
     public void quitGame(UUID socketId, Lobby lobby) {
         WebSocket socket = socketById.get(socketId);
         Passport passport = IdAndGameCodebySocket.get(socket);
@@ -143,6 +152,14 @@ public class SocketService {
     private void sendStartGame(GameInfo gameInfo) {
         SocketResponse response = SocketResponse.of(
             ServerEvent.START_GAME,
+            gameInfo
+        );
+        broadcast(gameInfo.getGameCode(), response);
+    }
+
+    private void sendFinishTurn(GameInfo gameInfo) {
+        SocketResponse response = SocketResponse.of(
+            ServerEvent.FINISH_TURN,
             gameInfo
         );
         broadcast(gameInfo.getGameCode(), response);

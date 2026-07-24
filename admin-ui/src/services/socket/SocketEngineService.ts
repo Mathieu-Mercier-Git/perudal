@@ -4,7 +4,7 @@ import generateLobbyId from '../../utils/StringUtils';
 let socket: WebSocket;
 let idSocket: string;
 
-const WS_URL = 'ws://localhost:8080';
+const WS_URL = `ws://${window.location.hostname}:8080`;
 
 export const socketListener = (
   eventName: string,

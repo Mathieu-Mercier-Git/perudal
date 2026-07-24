@@ -44,6 +44,7 @@ public class GameService {
     }
 
     // TODO : ajouter une limite maximum de joueurs dans une partie, et gérer le cas où la partie est pleine
+    // TODO : gérer si la partie a déjà commencé
     public Lobby joinGame(JoinGame joinGame) {
         if (!games.containsKey(joinGame.getGameCode())) {
             throw new WsException(CustomWsError.GAME_NOT_FOUND);

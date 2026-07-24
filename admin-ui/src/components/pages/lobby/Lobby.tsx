@@ -11,6 +11,7 @@ import GameService from '../../../services/game/GameService';
 import { Game, LobbyType } from '../../../services/game/GameTypes';
 import {
   addOnMessage,
+  getIdSocket,
   removeOnMessage,
   socketListener
 } from '../../../services/socket/SocketEngineService';
@@ -23,12 +24,18 @@ const MAX_DICE_NUMBER: number = 9;
 export default function Lobby() {
   const gameService = getGlobalInstance(GameService);
   const lobby: LobbyType | undefined = useObservable(gameService.getLobby());
-  const isMainPlayer: boolean = useObservable(gameService.getIsMainPlayer()); // TODO : peut être mutualiser avec la liste des joueurs remontés dans l'objet Lobby
 
   const [diceNumber, setDiceNumber] = useState<number>(DICE_NUMBER);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   const { messages } = useMessages();
   const navigate = useNavigate();
+
+  useOnComponentMounted(() => {
+    if (lobby) {
+      setIsAdmin(!!lobby.players.find(player => player.id === getIdSocket() && player.isAdmin));
+    }
+  });
 
   const listenerUpdateLobby = useCallback(
     socketListener(ServerEvent.UPDATED_LOBBY, (response: LobbyType) => {
@@ -93,7 +100,7 @@ export default function Lobby() {
         <span>{messages.lobby.perucode}</span>
         <span>{lobby.gameCode}</span>
       </div>
-      {isMainPlayer && (
+      {isAdmin && (
         <div className="lobby-dice-number-container">
           <span>{messages.lobby.dice_number}</span>
           <div className="lobby-dice-number">
@@ -112,10 +119,12 @@ export default function Lobby() {
           </div>
         )))}
       </div>
-      <ActionButton onClick={startGame}>
-        {messages.action.start_game}
-      </ActionButton>
-      {isMainPlayer
+      {isAdmin && (
+        <ActionButton onClick={startGame}>
+          {messages.action.start_game}
+        </ActionButton>
+      )}
+      {isAdmin
         ? (
           <ActionButton onClick={() => gameService.cancelGame(lobby!.gameCode)}>
             {messages.action.cancel_game}

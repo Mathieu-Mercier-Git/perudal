@@ -6,13 +6,11 @@ import { sendRevealDices, getIdSocket } from '../socket/SocketEngineService';
 export default class GameService {
   private lobby: WritableObservable<LobbyType | undefined>;
   private game: WritableObservable<Game | undefined>;
-  private isMainPlayer: WritableObservable<boolean>;
 
   // TODO : c'est dans le constructeur qu'on devra alimenter avec le localStorage
   constructor(private readonly gameApi: GameApi) {
     this.lobby = observable(undefined); // pas sûr que ça soit utile de l'avoir en observable
     this.game = observable(undefined); // pas sûr que ça soit utile de l'avoir en observable
-    this.isMainPlayer = observable(false);
   }
 
   getLobby(): Observable<LobbyType | undefined> {
@@ -29,14 +27,6 @@ export default class GameService {
 
   setGame(currentGame: Game | undefined): void {
     this.game.set(currentGame);
-  }
-
-  getIsMainPlayer(): Observable<boolean> {
-    return this.isMainPlayer.readOnly();
-  }
-
-  setIsMainPlayer(isCurrentPlayer: boolean): void {
-    this.isMainPlayer.set(isCurrentPlayer);
   }
 
   getOpponents(): Player[] { // TODO : checker comment rejouter cette fonction uniquement quand l'observable bouge
@@ -57,7 +47,6 @@ export default class GameService {
 
   createGame(userName: string, diceNumber: number):Promise<void> {
     const userSocketId = getIdSocket();
-    this.setIsMainPlayer(true);
     return this.gameApi.createGame({userSocketId, userName, diceNumber})
       .then((lobby) => this.setLobby(lobby))
       .catch(() => console.error('ERROR CREATE GAME'))
@@ -65,7 +54,6 @@ export default class GameService {
 
   joinGame(userName: string, gameCode: string):Promise<void> {
     const userSocketId = getIdSocket();
-    this.setIsMainPlayer(false);
     return this.gameApi.joinGame({userSocketId, userName, gameCode})
       .then((lobby) => this.setLobby(lobby))
   }
@@ -82,7 +70,6 @@ export default class GameService {
 
   cancelGame(gameCode: string):void {
     const userSocketId = getIdSocket();
-    this.setIsMainPlayer(false);
     this.gameApi.cancelGame({userSocketId, gameCode})
       .then(() => this.setLobby(undefined))
   }

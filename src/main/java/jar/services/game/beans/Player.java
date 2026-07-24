@@ -15,5 +15,5 @@ public class Player { // TODO : Peut être créer un type PlayerLobby et Player 
     private String name;
     private int diceNumber;
     private List<Integer> dices;
-    private boolean isAdmin;
+    private Boolean isAdmin;
 }

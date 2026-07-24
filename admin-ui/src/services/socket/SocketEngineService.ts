@@ -71,23 +71,6 @@ export const getIdSocket = () => {
   return idSocket;
 };
 
-export const createGame = (name: string, diceNumber: number) => {
-  const gameCode = generateLobbyId();
-  socket.send(`create_game/${gameCode}/${name}/${diceNumber}`);
-}
-
-export const joinGame = (gameCode: string, name: string) => {
-  socket.send(`join_game/${gameCode}/${name}/6`);
-}
-
-export const quitGame = (gameCode: string) => {
-  socket.send(`quit_game/${gameCode}`);
-}
-
-export const cancelGame = (gameCode: string) => {
-  socket.send(`cancel_game/${gameCode}`);
-}
-
 export const sendRevealDices = (gameCode: string) => {
   socket.send(`reveal_dices/${gameCode}`);
 }

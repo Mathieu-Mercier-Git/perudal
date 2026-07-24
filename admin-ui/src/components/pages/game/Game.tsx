@@ -1,17 +1,17 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useObservable } from 'micro-observables';
 import { getGlobalInstance } from 'plume-ts-di';
 import { Panel } from '../../theme/layout/Panel';
 import GameService from '../../../services/game/GameService';
 import { Game, Player } from '../../../services/game/GameTypes';
-import { GAME, HOME } from '../../Routes';
+import { HOME } from '../../Routes';
 import Dice from './dice/Dice';
-import useToggle from '../../../lib/react-hook-toggle/ReactHookToggle';
 import { ActionButton } from '../../theme/action/Actions';
 import DiceCounter from './dice/DiceCounter';
 import {
   addOnMessage,
+  getIdSocket,
   removeOnMessage,
   socketListener
 } from '../../../services/socket/SocketEngineService';
@@ -23,6 +23,7 @@ export default function Game() {
   const gameService = getGlobalInstance(GameService);
   const game: Game | undefined = useObservable(gameService.getGame());
 
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [showMyDices, setShowMyDices] = useState<boolean>(false);
   const [isRevealDices, setIsRevealDices] = useState<boolean>(false);
   const [showFinishTurnPopin, setShowFinishTurnPopin] = useState<boolean>(false);
@@ -30,6 +31,12 @@ export default function Game() {
 
   // const { messages } = useMessages();
   // const navigate = useNavigate();
+  useOnComponentMounted(() => {
+    if (game) {
+      setIsAdmin(!!game.players.find(player => player.id === getIdSocket() && player.isAdmin));
+    }
+  });
+
 
   const listenerRevealDices = useCallback(
     socketListener(ServerEvent.REVEAL_DICES, () => {
@@ -63,7 +70,6 @@ export default function Game() {
 
   const revealDices = () => {
     gameService.sendRevealDices(game?.gameCode);
-    // TODO : accès à cette fonction uniquement si tu es admin
     // TODO : gérer le planificato
   }
 
@@ -110,7 +116,10 @@ export default function Game() {
           <div className="opponents-container">
             {opponents.map((opponent) => (
               <div key={opponent.id} className="opponent">
-                {opponent.name}
+                <span>{opponent.name}</span>
+                {opponent.isAdmin && (
+                  <span> (boss)</span>
+                )}
                 <div className="opponent-dices">
                   {opponent.dices.map((dice, index) => (
                     <Dice key={index} number={dice} show={isRevealDices}/>
@@ -129,11 +138,15 @@ export default function Game() {
               </div>
             )}
             <ActionButton onClick={() => setShowMyDices(!showMyDices)} icon={showMyDices ? 'visibility' : 'visibility_off'}/>
-            <span>Tu es maître du jeu, tes actions dictent la partie</span>
-            {isRevealDices
-              ? (<ActionButton onClick={() => setShowFinishTurnPopin(true)}>Fin du tour</ActionButton>)
-              : (<ActionButton onClick={revealDices}>Révéler tous les dés</ActionButton>)
-            }
+            {isAdmin && (
+              <>
+                <span>Tu es maître du jeu, tes actions dictent la partie</span>
+                {isRevealDices
+                  ? (<ActionButton onClick={() => setShowFinishTurnPopin(true)}>Fin du tour</ActionButton>)
+                  : (<ActionButton onClick={revealDices}>Révéler tous les dés</ActionButton>)
+                }
+              </>
+            )}
           </div>
         </div>
       </div>

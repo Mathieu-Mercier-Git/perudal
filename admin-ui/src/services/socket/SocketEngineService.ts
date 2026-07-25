@@ -1,10 +1,18 @@
+import { Logger } from 'simple-logging-system';
 import { SocketResponse } from './SocketTypes';
-import generateLobbyId from '../../utils/StringUtils';
+
+const logger: Logger = new Logger('SocketEngineService');
 
 let socket: WebSocket;
 let idSocket: string;
 
-const WS_URL = `ws://${window.location.hostname}:8080`;
+// The socket is served on the same origin as the application:
+// - in development, Vite proxies /socket to the backend (see vite.config.ts)
+// - in production, the reverse proxy (nginx) forwards /socket to the backend
+// The `wss` scheme is mandatory when the application is served over HTTPS,
+// otherwise the browser blocks the connection as mixed content
+const WS_PROTOCOL = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const WS_URL = `${WS_PROTOCOL}//${window.location.host}`;
 
 export const socketListener = (
   eventName: string,
@@ -33,10 +41,10 @@ export const removeOnMessage = (listener: any) => {
 export const initSocket = () => {
   return new Promise((resolve, reject) => {
     socket = new WebSocket(`${WS_URL}/socket`);
-    console.log("Initialisation socket", socket);
+    logger.info(`Initialisation socket ${WS_URL}/socket`);
     // Événement appelé lors de l'ouverture de la connexion
     socket.onopen = function () {
-      console.log("Connected to the WebSocket server");
+      logger.info('Connected to the WebSocket server');
       resolve(socket);
     };
 
@@ -49,13 +57,13 @@ export const initSocket = () => {
 
     // Événement appelé en cas d'erreur de la connexion WebSocket
     socket.onerror = function (error) {
-      console.log("WebSocket error: ", error);
+      logger.error('WebSocket error', { error });
       reject(error);
     };
 
     // Événement appelé lorsque la connexion est fermée
     socket.onclose = function () {
-      console.log("WebSocket connection closed");
+      logger.info('WebSocket connection closed');
     };
   });
 };

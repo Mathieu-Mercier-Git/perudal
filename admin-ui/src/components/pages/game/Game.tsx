@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useObservable } from 'micro-observables';
 import { getGlobalInstance } from 'plume-ts-di';
+import { Logger } from 'simple-logging-system';
 import { Panel } from '../../theme/layout/Panel';
 import GameService from '../../../services/game/GameService';
 import { Game, Player } from '../../../services/game/GameTypes';
@@ -19,6 +20,8 @@ import { ServerEvent } from '../../../services/socket/SocketTypes';
 import { useOnComponentMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
 import FinishTurnPopin from './popin/FinishTurnPopin';
 import FinishGamePopin from './popin/FinishGamePopin';
+
+const logger: Logger = new Logger('Game');
 
 export default function Game() {
   const gameService = getGlobalInstance(GameService);
@@ -55,7 +58,7 @@ export default function Game() {
       setShowMyDices(false);
       setShowFinishTurnPopin(false);
       gameService.setGame(response);
-      console.log('EVENT FINISH_TURN', response);
+      logger.debug('EVENT FINISH_TURN', { response });
     }), [],
   );
 
@@ -103,7 +106,7 @@ export default function Game() {
 
   const whoStarts = (): string => {
     if (!game?.players.length) { // error
-      console.error('No player found');
+      logger.error('No player found');
       return 'Personne ne commence';
     }
 
@@ -113,7 +116,7 @@ export default function Game() {
 
     const currentPlayer: Player | undefined = game.players.find(player => player.id === playerIdFinishTurn);
     if (!currentPlayer) { // error
-      console.error('No player found');
+      logger.error('No player found');
       return 'Personne ne commence';
     }
 

@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useObservable } from 'micro-observables';
+import { Logger } from 'simple-logging-system';
 import { Panel } from '../../theme/layout/Panel';
 import useMessages from '../../../i18n/hooks/messagesHook';
 import { ActionButton } from '../../theme/action/Actions';
@@ -15,6 +16,8 @@ import { LOBBY } from '../../Routes';
 import ValidationPopin from '../../theme/popin/ValidationPopin';
 import useToggle from '../../../lib/react-hook-toggle/ReactHookToggle';
 import UserService from '../../../services/user/UserService';
+
+const logger: Logger = new Logger('Home');
 
 enum UsernameError {
   MISSING='MISSING', TOO_SHORT='TOO_SHORT'
@@ -86,7 +89,7 @@ export default function Home() {
       .then(() => {
         navigate(LOBBY);
       })
-      .catch((error) => console.error({ error }));
+      .catch((error) => logger.error('ERROR JOIN GAME', { error }));
   };
 
   const onChangeUsername = (event) => {

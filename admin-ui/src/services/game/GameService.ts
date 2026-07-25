@@ -1,7 +1,10 @@
 import { Observable, observable, WritableObservable } from 'micro-observables';
+import { Logger } from 'simple-logging-system';
 import { Game, LobbyType, Player } from './GameTypes';
 import GameApi from '../../api/game/GameApi';
 import { sendRevealDices, getIdSocket } from '../socket/SocketEngineService';
+
+const logger: Logger = new Logger('GameService');
 
 export default class GameService {
   private lobby: WritableObservable<LobbyType | undefined>;
@@ -49,7 +52,7 @@ export default class GameService {
     const userSocketId = getIdSocket();
     return this.gameApi.createGame({userSocketId, userName, diceNumber})
       .then((lobby) => this.setLobby(lobby))
-      .catch(() => console.error('ERROR CREATE GAME'))
+      .catch(() => logger.error('ERROR CREATE GAME'))
   }
 
   joinGame(userName: string, gameCode: string):Promise<void> {

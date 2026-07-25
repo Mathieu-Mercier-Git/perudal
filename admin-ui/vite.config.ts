@@ -14,6 +14,11 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': 'http://localhost:8080',
+      // the game WebSocket is mounted on /socket by the backend, outside of the /api context path
+      '/socket': {
+        target: 'ws://localhost:8080',
+        ws: true,
+      },
     },
   },
 });

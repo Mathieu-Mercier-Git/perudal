@@ -2,15 +2,24 @@
 <configuration>
   <turboFilter class="jar.jersey.JerseyLogbackFilter" />
 
+  <!--
+    Log levels default to development values and can be lowered in production
+    with the PERUDAL_LOG_LEVEL / PERUDAL_ROOT_LOG_LEVEL environment variables.
+    Logs are written to the standard output on purpose: under systemd, journald
+    collects and rotates them, so no file appender is needed here.
+  -->
+  <property name="APP_LOG_LEVEL" value="${PERUDAL_LOG_LEVEL:-DEBUG}" />
+  <property name="ROOT_LOG_LEVEL" value="${PERUDAL_ROOT_LOG_LEVEL:-INFO}" />
+
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
     </encoder>
   </appender>
-  
-  <logger name="jar" level="DEBUG"/>
-  
-  <root level="INFO">
+
+  <logger name="jar" level="${APP_LOG_LEVEL}"/>
+
+  <root level="${ROOT_LOG_LEVEL}">
     <appender-ref ref="STDOUT" />
   </root>
 </configuration>

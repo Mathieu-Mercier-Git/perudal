@@ -1,6 +1,5 @@
 package jar.guice;
 
-import com.coreoz.plume.db.querydsl.guice.GuiceQuerydslModule;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import jar.jersey.JerseyConfigProvider;
@@ -18,8 +17,8 @@ public class ApplicationModule extends AbstractModule {
 	protected void configure() {
 		install(new GuiceConfModule());
 		install(new GuiceJacksonWithMetricsModule());
-		// Database & Querydsl installation
-		 install(new GuiceQuerydslModule());
+		// Database & Querydsl installation is disabled: the database is not used by the project yet
+		// install(new GuiceQuerydslModule());
         // Data source exposure for Flyway
         // install(new DataSourceModule());
 

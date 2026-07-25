@@ -14,7 +14,26 @@
       "Bash(mvn -o compile)",
       "Bash(yarn typescript *)",
       "Bash(ipconfig getifaddr *)",
-      "Bash(xargs -I{} sh -c 'echo ==={}===; cat {}')"
+      "Bash(xargs -I{} sh -c 'echo ==={}===; cat {}')",
+      "Bash(grep -nA6 -iE \"build|deploy|production|proxy|port\" admin-ui/README.md)",
+      "Read(//Users/macbookpro/.m2/repository/com/coreoz/**)",
+      "Read(//Users/macbookpro/.m2/repository/com/coreoz/plume-conf/**)",
+      "Read(//private/tmp/**)",
+      "Bash(unzip -o -q ~/.m2/repository/com/coreoz/plume-conf/4.2.3/plume-conf-4.2.3.jar -d /private/tmp/claude-501/-Users-macbookpro-Desktop-Freelance-Projets-perudal/72304adc-bcd7-462b-87fe-afa6ba0674a3/scratchpad/plumeconf)",
+      "Bash(javap -p -c /private/tmp/claude-501/-Users-macbookpro-Desktop-Freelance-Projets-perudal/72304adc-bcd7-462b-87fe-afa6ba0674a3/scratchpad/plumeconf/com/coreoz/plume/conf/ConfigProvider.class)",
+      "Bash(unzip -l target/perudal.jar)",
+      "WebSearch",
+      "Read(//Users/macbookpro/.nvm/versions/node/**)",
+      "Read(//opt/homebrew/**)",
+      "Bash(git add *)",
+      "Bash(curl -s -o /dev/null -m 2 http://localhost:8080/api/monitoring/health)",
+      "Bash(lsof -nP -iTCP:8080 -sTCP:LISTEN)",
+      "Bash(ps -p 79872 -o lstart=,command=)",
+      "Bash(curl -s -o /dev/null -m 2 http://localhost:8081/api/monitoring/health)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" -u internal-api:test-override-42 http://localhost:8081/api/monitoring/health)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" -u internal-api:PZyTg8XURj5hM2Lf63MOZFXzB0JMtjdq84KlqOPA5jaP59V0SJ http://localhost:8081/api/monitoring/health)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" -u internal-api:dev-only-password-change-me http://localhost:8081/api/monitoring/health)",
+      "Bash(curl -s -i -m 5 -N -H \"Connection: Upgrade\" -H \"Upgrade: websocket\" -H \"Sec-WebSocket-Version: 13\" -H \"Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\" http://localhost:8081/socket)"
     ]
   }
 }

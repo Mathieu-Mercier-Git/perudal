@@ -12,10 +12,11 @@ import { ServerEvent } from '../../../services/socket/SocketTypes';
 import { getGlobalInstance } from 'plume-ts-di';
 import { LobbyType } from '../../../services/game/GameTypes';
 import GameService from '../../../services/game/GameService';
-import { LOBBY, RULES } from '../../Routes';
+import { LOBBY } from '../../Routes';
 import ValidationPopin from '../../theme/popin/ValidationPopin';
 import useToggle from '../../../lib/react-hook-toggle/ReactHookToggle';
 import UserService from '../../../services/user/UserService';
+import RulesOverlayService from '../../../services/rules/RulesOverlayService';
 import ActionStyle from '../../../lib/plume-admin-theme/action/ActionStyle';
 
 const logger: Logger = new Logger('Home');
@@ -29,6 +30,7 @@ enum UsernameError {
 export default function Home() {
   const gameService = getGlobalInstance(GameService);
   const userService = getGlobalInstance(UserService);
+  const rulesOverlayService = getGlobalInstance(RulesOverlayService);
   const username: string = useObservable(userService.getUsername());
 
   const { messages } = useMessages();
@@ -109,7 +111,7 @@ export default function Home() {
         <button
           type="button"
           className="home__rules-link"
-          onClick={() => navigate(RULES)}
+          onClick={() => rulesOverlayService.open()}
           aria-label="Règles du jeu"
         >
           <Icon>menu_book</Icon>

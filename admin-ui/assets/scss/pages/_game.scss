@@ -18,6 +18,37 @@
       justify-content: space-between;
       gap: $spacer-3;
     }
+
+    &-actions {
+      display: flex;
+      align-items: center;
+      gap: $spacer-2;
+    }
+  }
+
+  // Accès aux règles pendant la partie (ouvre la surcouche sans quitter la partie)
+  &__rules-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    background: var(--surf);
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    color: var(--ink);
+    cursor: pointer;
+    transition: filter .18s ease, border-color .18s ease;
+
+    &:hover {
+      border-color: var(--accent-line);
+      filter: brightness(1.1);
+    }
+
+    .MuiIcon-root {
+      font-size: 20px;
+    }
   }
 
   &__title {

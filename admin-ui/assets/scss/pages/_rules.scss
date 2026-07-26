@@ -1,5 +1,15 @@
 @use "../variables" as *;
 
+// Surcouche plein écran : se superpose au contexte courant (accueil, lobby, partie).
+// z-index au-dessus des popins (.popin = 100+) pour rester consultable en toutes circonstances.
+.rules-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  // Fond opaque : réutilise le dégradé de l'app pour masquer le contexte sans le démonter
+  background: var(--bg-app);
+}
+
 .rules {
   display: flex;
   flex-direction: column;

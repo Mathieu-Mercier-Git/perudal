@@ -1,21 +1,26 @@
 import React from 'react';
 import { Icon } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { Panel } from '../../theme/layout/Panel';
-import { HOME } from '../../Routes';
+import { getGlobalInstance } from 'plume-ts-di';
+import { useObservable } from 'micro-observables';
+import RulesOverlayService from '../../../services/rules/RulesOverlayService';
 
 export default function Rules() {
-  const navigate = useNavigate();
+  const rulesOverlayService = getGlobalInstance(RulesOverlayService);
+  const isOpen: boolean = useObservable(rulesOverlayService.isRulesOpen());
+
+  if (!isOpen) {
+    return null;
+  }
 
   return (
-    <Panel>
+    <div className="rules-overlay" role="dialog" aria-modal="true" aria-label="Règles du jeu">
       <div className="rules">
         <header className="rules__header">
           <button
             type="button"
             className="rules__back"
-            onClick={() => navigate(HOME)}
-            aria-label="Retour à l'accueil"
+            onClick={() => rulesOverlayService.close()}
+            aria-label="Fermer les règles"
           >
             <Icon>arrow_back</Icon>
           </button>
@@ -211,6 +216,6 @@ export default function Rules() {
           </section>
         </div>
       </div>
-    </Panel>
+    </div>
   );
 }

@@ -22,11 +22,13 @@ import { ServerEvent } from '../../../services/socket/SocketTypes';
 import { useOnComponentMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
 import FinishTurnPopin from './popin/FinishTurnPopin';
 import FinishGamePopin from './popin/FinishGamePopin';
+import RulesOverlayService from '../../../services/rules/RulesOverlayService';
 
 const logger: Logger = new Logger('Game');
 
 export default function Game() {
   const gameService = getGlobalInstance(GameService);
+  const rulesOverlayService = getGlobalInstance(RulesOverlayService);
   const game: Game | undefined = useObservable(gameService.getGame());
 
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
@@ -146,9 +148,19 @@ export default function Game() {
         <header className="game__header">
           <div className="game__header-top">
             <h1 className="game__title">{isPlanificato ? 'Pla pla planificato' : 'Partie en cours'}</h1>
-            <div className="game__total">
-              <span className="game__total-num">{diceTotalQuantity}</span>
-              <span className="game__total-label">dés</span>
+            <div className="game__header-actions">
+              <div className="game__total">
+                <span className="game__total-num">{diceTotalQuantity}</span>
+                <span className="game__total-label">dés</span>
+              </div>
+              <button
+                type="button"
+                className="game__rules-link"
+                onClick={() => rulesOverlayService.open()}
+                aria-label="Règles du jeu"
+              >
+                <Icon>menu_book</Icon>
+              </button>
             </div>
           </div>
           <div className="game__info">{whoStarts()}</div>

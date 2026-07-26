@@ -6,6 +6,7 @@ import ObservableNotificationEngine from '../lib/plume-notification/ObservableNo
 import NotificationEngine from '../lib/plume-notification/NotificationEngine';
 import GameService from './game/GameService';
 import UserService from './user/UserService';
+import RulesOverlayService from './rules/RulesOverlayService';
 
 export default function installServicesModule(injector: Injector) {
   // browser dependent services
@@ -17,5 +18,6 @@ export default function installServicesModule(injector: Injector) {
   injector.registerSingleton(ObservableNotificationEngine, NotificationEngine);
   injector.registerSingleton(GameService);
   injector.registerSingleton(UserService);
+  injector.registerSingleton(RulesOverlayService);
   injector.registerSingleton(Scheduler);
 }

@@ -3,6 +3,8 @@ import { Popin } from '../../../theme/popin/Popin';
 import ActionStyle from '../../../../lib/plume-admin-theme/action/ActionStyle';
 import { ActionButton, ActionsContainer } from '../../../theme/action/Actions';
 
+const toucanImage: string = '/assets/images/toucan_blanc.png';
+
 type Props = {
   onClick: () => void,
   playerName: string,
@@ -11,13 +13,13 @@ type Props = {
 export default function FinishGamePopin({ onClick, playerName }: Props) {
   return (
     <Popin>
-      <div className="popin-title">
-        Partie terminée
-      </div>
-      <div className="popin-message">
-        <span>Le grand vainqueur est </span>
-        <span>{playerName}</span>
-        <span> !!!</span>
+      <div className="finish-popin">
+        <img className="finish-popin__toucan" src={toucanImage} alt="" />
+        <span className="finish-popin__label">Partie terminée</span>
+        <div className="finish-popin__winner">{playerName}</div>
+        <p className="finish-popin__subtitle">
+          Grand vainqueur. Les autres peuvent rentrer se coucher.
+        </p>
       </div>
       <div className="popin-buttons">
         <ActionsContainer>

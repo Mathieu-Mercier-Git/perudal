@@ -58,8 +58,8 @@
     &::before {
       content: '';
       position: absolute;
-      inset: -20%;
-      background: radial-gradient(circle at 50% 45%, var(--halo), transparent 70%);
+      inset: -25%;
+      background: radial-gradient(circle at 50% 50%, var(--halo), transparent 70%);
       z-index: 0;
     }
   }

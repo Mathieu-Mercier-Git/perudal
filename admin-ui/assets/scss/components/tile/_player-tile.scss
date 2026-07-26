@@ -3,8 +3,9 @@
 // Joueur sélectionnable dans une popin (« Qui a perdu ? »)
 .player-tile {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
+  gap: $spacer-3;
   padding: 14px;
   background: var(--t-surf); // opaque sur le fond du modal
   border: 1px solid var(--t-line);
@@ -19,5 +20,21 @@
   &:hover {
     border-color: var(--t-accent-line);
     filter: brightness(1.1);
+  }
+
+  &__name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  // nombre de dés restants, aligné à droite
+  &__dices {
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink3);
   }
 }

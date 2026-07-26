@@ -22,7 +22,10 @@ export default function FinishTurnPopin({ onClose, onClick, players }: Props) {
       <div className="popin-content popin-content--tiles">
         {players.filter(player => player.diceNumber > 0).map(player => (
           <div key={player.id} className="player-tile" onClick={() => onClick(player.id, hasLostTurn)}>
-            {player.name}
+            <span className="player-tile__name">{player.name}</span>
+            <span className="player-tile__dices">
+              {player.diceNumber} {player.diceNumber > 1 ? 'dés' : 'dé'}
+            </span>
           </div>
         ))}
       </div>

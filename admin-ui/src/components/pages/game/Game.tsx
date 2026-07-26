@@ -82,7 +82,9 @@ export default function Game() {
     };
   });
 
-  const opponents: Player[] = gameService.getOpponents(game);
+  // Les joueurs éliminés (plus aucun dé) sont affichés en dernier dans la liste
+  const opponents: Player[] = [...gameService.getOpponents(game)]
+    .sort((a, b) => Number(b.dices.length > 0) - Number(a.dices.length > 0));
   const mainPlayer: Player | undefined = gameService.getMainPlayer();
 
   const processIsGameFinished = (currentGame: Game) => {
@@ -160,17 +162,16 @@ export default function Game() {
                 <div className="tile__head">
                   <span className="tile__name">{opponent.name}</span>
                   {opponent.isAdmin && (<Icon className="tile__crown">star</Icon>)}
+                  {opponent.dices.length === 0
+                    && (<span className="tile__lost">a lamentablement perdu</span>)}
                 </div>
-                {opponent.dices.length > 0
-                  ? (
-                    <div className="tile__dices">
-                      {opponent.dices.map((dice, index) => (
-                        <Dice key={index} number={dice} show={isRevealDices} isPlanificato={isPlanificato} />
-                      ))}
-                    </div>
-                  )
-                  : (<span className="tile__lost">a lamentablement perdu</span>)
-                }
+                {opponent.dices.length > 0 && (
+                  <div className="tile__dices">
+                    {opponent.dices.map((dice, index) => (
+                      <Dice key={index} number={dice} show={isRevealDices} isPlanificato={isPlanificato} />
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>

@@ -60,6 +60,20 @@
       .text-field {
         margin: $spacer-3 0;
       }
+
+      // Menu de la partie : options empilées, chacune sur toute la largeur
+      &.game-menu {
+        gap: $spacer-3;
+
+        .action-container {
+          width: 100%;
+        }
+
+        .MuiButton-root {
+          width: 100%;
+          justify-content: flex-start;
+        }
+      }
     }
 
     .popin-buttons {

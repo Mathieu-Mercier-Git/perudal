@@ -22,6 +22,7 @@ import { ServerEvent } from '../../../services/socket/SocketTypes';
 import { useOnComponentMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
 import FinishTurnPopin from './popin/FinishTurnPopin';
 import FinishGamePopin from './popin/FinishGamePopin';
+import GameMenuPopin from './popin/GameMenuPopin';
 import RulesOverlayService from '../../../services/rules/RulesOverlayService';
 
 const logger: Logger = new Logger('Game');
@@ -35,6 +36,7 @@ export default function Game() {
   const [showMyDices, setShowMyDices] = useState<boolean>(false);
   const [isRevealDices, setIsRevealDices] = useState<boolean>(false);
   const [showFinishTurnPopin, setShowFinishTurnPopin] = useState<boolean>(false);
+  const [showMenuPopin, setShowMenuPopin] = useState<boolean>(false);
   const [playerWinner, setPlayerWinner] = useState<Player | undefined>(undefined);
 
   // const { messages } = useMessages();
@@ -108,6 +110,23 @@ export default function Game() {
     gameService.cancelGame(game?.gameCode);
   };
 
+  const openRulesFromMenu = () => {
+    setShowMenuPopin(false);
+    rulesOverlayService.open();
+  };
+
+  // Admin : annule la partie pour tout le monde ; joueur : quitte la partie.
+  // Ces actions déclenchent des évènements côté backend (comme dans le lobby).
+  const leaveGame = () => {
+    // TODO : gérer les évènements côté backend
+    setShowMenuPopin(false);
+    if (isAdmin) {
+      gameService.cancelGame(game?.gameCode);
+    } else {
+      gameService.quitGame(game?.gameCode);
+    }
+  };
+
   const whoStarts = (): string => {
     if (!game?.players.length) { // error
       logger.error('No player found');
@@ -154,10 +173,10 @@ export default function Game() {
               <button
                 type="button"
                 className="game__rules-link"
-                onClick={() => rulesOverlayService.open()}
-                aria-label="Règles du jeu"
+                onClick={() => setShowMenuPopin(true)}
+                aria-label="Menu"
               >
-                <Icon>menu_book</Icon>
+                <Icon>menu</Icon>
               </button>
             </div>
           </div>
@@ -224,6 +243,14 @@ export default function Game() {
           </div>
         </div>
       </div>
+      {showMenuPopin && (
+        <GameMenuPopin
+          isAdmin={isAdmin}
+          onShowRules={openRulesFromMenu}
+          onLeaveGame={leaveGame}
+          onClose={() => setShowMenuPopin(false)}
+        />
+      )}
       {showFinishTurnPopin && (
        <FinishTurnPopin onClick={finishTurn} onClose={() => setShowFinishTurnPopin(false)} players={game.players} />
       )}

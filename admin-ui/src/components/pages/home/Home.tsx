@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { TextField } from '@mui/material';
+import { Icon, TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useObservable } from 'micro-observables';
 import { Logger } from 'simple-logging-system';
@@ -12,7 +12,7 @@ import { ServerEvent } from '../../../services/socket/SocketTypes';
 import { getGlobalInstance } from 'plume-ts-di';
 import { LobbyType } from '../../../services/game/GameTypes';
 import GameService from '../../../services/game/GameService';
-import { LOBBY } from '../../Routes';
+import { LOBBY, RULES } from '../../Routes';
 import ValidationPopin from '../../theme/popin/ValidationPopin';
 import useToggle from '../../../lib/react-hook-toggle/ReactHookToggle';
 import UserService from '../../../services/user/UserService';
@@ -106,6 +106,14 @@ export default function Home() {
   return (
     <Panel>
       <div className="home">
+        <button
+          type="button"
+          className="home__rules-link"
+          onClick={() => navigate(RULES)}
+          aria-label="Règles du jeu"
+        >
+          <Icon>menu_book</Icon>
+        </button>
         <div className="home__hero">
           <div className="home__logo">
             <img className="home__toucan" src={toucanImage} alt="" />

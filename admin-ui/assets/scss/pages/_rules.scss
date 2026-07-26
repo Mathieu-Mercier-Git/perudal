@@ -1,0 +1,161 @@
+@use "../variables" as *;
+
+.rules {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100dvh;
+
+  // En-tête fixe : retour + titre
+  &__header {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: $spacer-3;
+    padding: calc(18px + env(safe-area-inset-top)) 20px 14px;
+  }
+
+  &__back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    background-color: var(--btn2);
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    color: var(--ink);
+    cursor: pointer;
+    transition: filter .18s ease, border-color .18s ease;
+
+    &:hover {
+      border-color: var(--accent-line);
+      filter: brightness(1.1);
+    }
+
+    .MuiIcon-root {
+      font-size: 22px;
+    }
+  }
+
+  &__title {
+    margin: 0;
+    font-family: var(--font-title);
+    font-weight: 900;
+    font-size: 26px;
+    letter-spacing: -.03em;
+    color: var(--ink);
+  }
+
+  // Contenu scrollable
+  &__content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 6px 20px calc(28px + env(safe-area-inset-bottom));
+  }
+
+  &__section {
+    & + & {
+      margin-top: $spacer-5;
+    }
+
+    p {
+      margin: 0 0 $spacer-3;
+      font-size: 15px;
+      line-height: 1.55;
+      color: var(--ink2);
+    }
+  }
+
+  &__section-title {
+    margin: 0 0 $spacer-3;
+    font-family: var(--font-title);
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: -.01em;
+    color: var(--ink);
+  }
+
+  &__subtitle {
+    margin: $spacer-4 0 $spacer-2;
+    font-family: var(--font-title);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--t-accent);
+  }
+
+  &__subtitle-aside {
+    margin-left: $spacer-2;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--ink3);
+  }
+
+  &__list {
+    margin: 0 0 $spacer-3;
+    padding-left: 20px;
+
+    li {
+      margin-bottom: $spacer-2;
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--ink2);
+    }
+
+    strong {
+      color: var(--ink);
+    }
+  }
+
+  p strong {
+    color: var(--ink);
+  }
+
+  // Encadré d'exemple
+  &__example {
+    margin: 0 0 $spacer-3;
+    padding: 12px 14px;
+    background: var(--surf);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent-line);
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink2);
+  }
+
+  &__example-label {
+    display: block;
+    margin-bottom: 4px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink3);
+  }
+
+  // Avertissement « ne pas changer la valeur des dés »
+  &__note {
+    display: flex;
+    align-items: center;
+    gap: $spacer-2;
+    padding: 10px 14px;
+    background: var(--terra-soft);
+    border: 1px solid var(--terra-line);
+    border-radius: 10px;
+    // surcharge le style de paragraphe
+    font-size: 14px !important;
+    color: var(--terra-txt) !important;
+  }
+
+  &__note-icon.MuiIcon-root {
+    flex: none;
+    font-size: 18px;
+    color: var(--terra-txt);
+  }
+}

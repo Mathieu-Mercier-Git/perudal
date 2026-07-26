@@ -97,8 +97,16 @@ export default function Home() {
       .catch((error) => logger.error('ERROR JOIN GAME', { error }));
   };
 
+  const sanitizeUsername = (value: string): string => {
+    const lettersAndSpaces = value.replace(/[^\p{L} ]/gu, '').replace(/^ +/, '');
+    if (lettersAndSpaces.length === 0) {
+      return lettersAndSpaces;
+    }
+    return lettersAndSpaces.charAt(0).toUpperCase() + lettersAndSpaces.slice(1);
+  };
+
   const onChangeUsername = (event) => {
-    userService.setUsername(event.target.value);
+    userService.setUsername(sanitizeUsername(event.target.value));
   };
 
   const onChangePerucode = (event) => {
@@ -131,8 +139,8 @@ export default function Home() {
             type="text"
             onChange={onChangeUsername}
             autoComplete="off"
-            defaultValue={username}
-            // inputProps={{ maxLength }}
+            value={username}
+            inputProps={{ maxLength: 25 }}
           />
           {!!usernameError && (
             <div className="error-message">

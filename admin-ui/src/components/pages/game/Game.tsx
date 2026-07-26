@@ -35,7 +35,6 @@ export default function Game() {
   const [showMyDices, setShowMyDices] = useState<boolean>(false);
   const [isRevealDices, setIsRevealDices] = useState<boolean>(false);
   const [showFinishTurnPopin, setShowFinishTurnPopin] = useState<boolean>(false);
-  const [playerIdFinishTurn, setPlayerIdFinishTurn] = useState<string>('');
   const [playerWinner, setPlayerWinner] = useState<Player | undefined>(undefined);
 
   // const { messages } = useMessages();
@@ -102,7 +101,6 @@ export default function Game() {
   }
 
   const finishTurn = (playerId: string, hasLost: boolean) => {
-    setPlayerIdFinishTurn(playerId);
     gameService.finishTurn(game?.gameCode, playerId, hasLost);
   }
 
@@ -116,11 +114,11 @@ export default function Game() {
       return 'Personne ne commence';
     }
 
-    if (!playerIdFinishTurn) { // 1st tour
+    if (!game.playerIdFinishTurn) { // 1st tour
       return 'À vous de choisir qui commence'
     }
 
-    const currentPlayer: Player | undefined = game.players.find(player => player.id === playerIdFinishTurn);
+    const currentPlayer: Player | undefined = game.players.find(player => player.id === game.playerIdFinishTurn);
     if (!currentPlayer) { // error
       logger.error('No player found');
       return 'Personne ne commence';

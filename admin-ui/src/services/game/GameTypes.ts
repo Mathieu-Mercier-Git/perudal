@@ -16,4 +16,5 @@ export type Game = {
   diceNumber: number,
   gameCode: string,
   isPlanificato: boolean,
+  playerIdFinishTurn?: string | null,
 }

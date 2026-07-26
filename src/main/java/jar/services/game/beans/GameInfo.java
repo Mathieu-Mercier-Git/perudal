@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -16,4 +17,5 @@ public class GameInfo {
     private int diceNumber;
     private String gameCode;
     private Boolean isPlanificato;
+    private UUID playerIdFinishTurn;
 }

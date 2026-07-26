@@ -70,7 +70,7 @@ public class GameService {
         }
 
         games.put(startGame.getGameCode(), currentGame);
-        GameInfo gameInfo = GameInfo.of(new ArrayList<>(currentGame.getPlayers().values()), currentGame.getDiceNumber(), startGame.getGameCode(), false);
+        GameInfo gameInfo = GameInfo.of(new ArrayList<>(currentGame.getPlayers().values()), currentGame.getDiceNumber(), startGame.getGameCode(), false, null);
         socketService.startGame(gameInfo);
     }
 
@@ -118,7 +118,7 @@ public class GameService {
             player.setDices(GameUtils.rollDices(player.getDiceNumber()));
         }
         games.put(turnInfo.getGameCode(), game);
-        GameInfo gameInfo = GameInfo.of(new ArrayList<>(game.getPlayers().values()), game.getDiceNumber(), turnInfo.getGameCode(), isPlanificato);
+        GameInfo gameInfo = GameInfo.of(new ArrayList<>(game.getPlayers().values()), game.getDiceNumber(), turnInfo.getGameCode(), isPlanificato, turnInfo.getPlayerId());
         socketService.finishTurn(gameInfo);
     }
 

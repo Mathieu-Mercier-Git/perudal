@@ -23,8 +23,7 @@
     padding: $spacer-6;
     // popin OPAQUE, sans transparence
     background-color: var(--surf-modal);
-    //border: 1px solid var(--modal-line);
-    border: 1px solid var(--ink);
+    border: 1px solid var(--ink3);
     border-radius: 20px;
     box-shadow: 0 20px 50px var(--modal-shadow);
     overflow: auto;
@@ -56,6 +55,23 @@
         gap: $spacer-2;
         max-height: 42dvh;
         overflow-y: auto;
+      }
+
+      // Champ de saisie dans une popin (ex : pérucode) :
+      // plus d'espace vertical avec les autres éléments + bordure blanche adoucie
+      .text-field {
+        margin: $spacer-3 0;
+      }
+
+      .MuiOutlinedInput-notchedOutline {
+        border-color: var(--ink3);
+      }
+
+      .MuiOutlinedInput-root {
+        &:hover .MuiOutlinedInput-notchedOutline,
+        &.Mui-focused .MuiOutlinedInput-notchedOutline {
+          border-color: var(--ink);
+        }
       }
     }
 

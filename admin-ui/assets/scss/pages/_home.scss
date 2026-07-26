@@ -1,0 +1,97 @@
+@use "../variables" as *;
+
+// Écran d'attente de connexion au serveur
+.landing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacer-4;
+  width: 100%;
+  height: 100dvh;
+  padding: 24px;
+  text-align: center;
+
+  &__title {
+    margin: 0;
+    font-family: var(--font-title);
+    font-weight: 900;
+    font-size: 44px;
+    letter-spacing: -.03em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  &__error {
+    font-size: 14px;
+    color: var(--terra-txt);
+  }
+}
+
+.home {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100dvh;
+  padding: 58px 24px 38px;
+
+  // Logo + titre + tagline, centrés dans l'espace disponible
+  &__hero {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: $spacer-3;
+    text-align: center;
+  }
+
+  &__logo {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 180px;
+    height: 180px;
+
+    // Halo lumineux derrière le toucan
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -20%;
+      background: radial-gradient(circle at 50% 45%, var(--halo), transparent 70%);
+      z-index: 0;
+    }
+  }
+
+  &__toucan {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  &__title {
+    margin: 0;
+    font-family: var(--font-title);
+    font-weight: 900;
+    font-size: 48px;
+    letter-spacing: -.03em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  &__tagline {
+    margin: 0;
+    font-size: 15px;
+    color: var(--ink2);
+  }
+
+  // Champ pseudo + boutons, collés en bas
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: $spacer-3;
+  }
+}

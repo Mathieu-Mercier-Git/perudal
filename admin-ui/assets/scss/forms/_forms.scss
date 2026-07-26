@@ -12,3 +12,8 @@ form {
 .form-errors {
   margin-bottom: $spacer-4;
 }
+
+.error-message {
+  font-size: 13px;
+  color: var(--terra-txt);
+}

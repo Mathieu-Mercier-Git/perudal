@@ -1,30 +1,172 @@
 @use "../variables" as *;
 
-// TODO : changer la structure pour avoir des composants Page et non Panel
-
-.lobby-dice-number-container {
+.lobby {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  height: 100dvh;
+  padding: 40px 24px 32px;
+  gap: $spacer-5;
 
-  .lobby-dice-number {
+  &__title {
+    margin: 0;
+    font-family: var(--font-title);
+    font-weight: 900;
+    font-size: 34px;
+    letter-spacing: -.03em;
+    color: var(--ink);
+  }
+
+  // Pérucode : encart une seule ligne
+  &__code {
     display: flex;
     align-items: center;
-    margin-left: $spacer-2;
-    gap: $spacer-2;
-  }
-}
+    gap: $spacer-3;
+    padding: 12px 14px;
+    background: var(--surf);
+    border: 1px solid var(--line);
+    border-radius: 14px;
 
-.players {
-  .players-title {
-    margin-bottom: $spacer-2;
-  }
+    &-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--ink3);
+    }
 
-  .player {
-    display: flex;
+    &-value {
+      flex: 1;
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      color: var(--accent-txt);
+    }
 
-    .player-name {
-      margin-left: $spacer-2;
+    &-copy {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      background: var(--btn2);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--ink);
+      transition: filter .18s ease;
+
+      &:hover {
+        filter: brightness(1.15);
+      }
+
+      .MuiIcon-root {
+        font-size: 18px;
+      }
     }
   }
-}
 
+  // Sélecteur du nombre de dés (admin)
+  &__dice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacer-3;
+
+    &-label {
+      font-size: 14px;
+      color: var(--ink2);
+    }
+
+    &-stepper {
+      display: flex;
+      align-items: center;
+      gap: $spacer-3;
+    }
+
+    &-value {
+      min-width: 24px;
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 600;
+      text-align: center;
+      color: var(--ink);
+    }
+  }
+
+  // Liste des participants
+  &__players {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    gap: $spacer-2;
+
+    &-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--ink3);
+    }
+
+    &-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      overflow-y: auto;
+    }
+  }
+
+  &__player {
+    display: flex;
+    align-items: center;
+    gap: $spacer-2;
+    padding: 7px 9px;
+    background: var(--surf);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+
+    &-avatar {
+      display: flex;
+      flex: none;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-line);
+      border-radius: 50%;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-txt);
+    }
+
+    &-name {
+      overflow: hidden;
+      font-size: 14px;
+      color: var(--ink);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &-crown {
+      margin-left: auto;
+      color: var(--t-accent);
+
+      &.MuiIcon-root {
+        font-size: 16px;
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: $spacer-3;
+  }
+}

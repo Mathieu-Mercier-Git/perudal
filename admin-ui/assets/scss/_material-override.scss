@@ -3,16 +3,25 @@
 
 .app {
 
-  /* BUTTONS */
+  /* BUTTONS — habillage « Sorbet » appliqué aux boutons MUI (ActionButton) */
   .MuiButton-root {
     width: 100%;
-    height: 45px;
+    min-height: 44px;
+    padding: 14px 16px;
     line-height: 1;
+    border: 0;
+    border-radius: 14px;
+    font-family: var(--font-title);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: .06em;
     text-transform: uppercase;
     box-shadow: none;
+    transition: filter .18s ease;
 
     &:hover, &:active, &:focus {
-      @include box-shadow-button();
+      box-shadow: none;
+      filter: brightness(1.05);
     }
 
     .MuiButton-startIcon {
@@ -23,49 +32,106 @@
     }
   }
 
+  // primaire : crème sur l'orange
+  .MuiButton-containedPrimary, /* stylelint-disable-line selector-class-pattern */
+  .MuiButton-containedInherit { /* stylelint-disable-line selector-class-pattern */
+    background-color: var(--accent);
+    color: var(--accent-ink);
+    box-shadow: 0 5px 0 var(--accent-deep);
+
+    &:hover {
+      background-color: var(--accent);
+      box-shadow: 0 5px 0 var(--accent-deep);
+    }
+  }
+
+  // secondaire : translucide bordé
   .MuiButton-containedSecondary {
-    background-color: white;
-    border: 1px solid $secondary-color;
-    color: $secondary-color;
+    background-color: var(--btn2);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    box-shadow: 0 5px 0 var(--btn2-deep);
 
     &:hover {
-      background-color: white;
+      background-color: var(--btn2);
+      box-shadow: 0 5px 0 var(--btn2-deep);
     }
   }
 
-  .MuiButton-containedPrimary { /* stylelint-disable-line selector-class-pattern */
-    background-color: $primary-color;
+  // danger / annuler : terracotta clair
+  .MuiButton-containedError { /* stylelint-disable-line selector-class-pattern */
+    background-color: var(--terra-soft);
+    border: 1.5px solid var(--terra-line);
+    color: var(--terra-txt);
+    box-shadow: none;
 
     &:hover {
-      background-color: darken($primary-color, 10%);
+      background-color: var(--terra-soft);
     }
   }
 
+  // bouton icône seul (œil, +/- dés) : pastille neutre compacte
+  .action-container--icon .MuiButton-root {
+    width: 44px;
+    min-width: 44px;
+    padding: 0;
+    border-radius: 50%;
+    background-color: var(--btn2);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    box-shadow: none;
+
+    &:hover {
+      background-color: var(--btn2);
+      box-shadow: none;
+    }
+
+    .MuiButton-startIcon {
+      margin: 0;
+    }
+  }
+
+  .MuiCircularProgress-colorInherit, /* stylelint-disable-line selector-class-pattern */
   .MuiCircularProgress-colorPrimary { /* stylelint-disable-line selector-class-pattern */
-    color: $primary-color;
+    color: var(--accent-ink);
   }
 
   // TEXT INPUT
   .MuiFilledInput-root {
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-    font-size: 14px;
+    border-radius: 14px;
+    font-family: var(--font-title);
+    font-size: 15px;
+    color: var(--ink);
+
+    input::placeholder {
+      color: var(--ink3);
+      opacity: 1;
+    }
 
     &:hover {
-      background-color: rgba($gray-dark, 0.1);
+      background-color: var(--hover2);
     }
 
     &, &.Mui-focused {
-      background-color: rgba($gray-dark, 0.05);
+      background-color: var(--field);
+      box-shadow: inset 0 0 0 1px var(--line);
+    }
+
+    &.Mui-focused {
+      box-shadow: inset 0 0 0 1px var(--line-strong);
     }
 
     &.Mui-disabled {
-      background-color: rgba($gray-dark, 0.15);
+      background-color: var(--field);
     }
 
     &::before, &::after {
       content: none;
     }
+  }
+
+  .MuiInputBase-input {
+    color: var(--ink);
   }
 
   .MuiInputLabel-root.Mui-focused {

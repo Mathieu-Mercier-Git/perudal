@@ -1,10 +1,23 @@
 @use "../../variables" as *;
 
+// Joueur sélectionnable dans une popin (« Qui a perdu ? »)
 .player-tile {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: $spacer-3;
-  background: $gray-light;
-  border-radius: $tile-radius;
+  padding: 14px;
+  background: var(--t-surf); // opaque sur le fond du modal
+  border: 1px solid var(--t-line);
+  border-radius: 12px;
+  font-family: var(--font-title);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--t-ink);
+  cursor: pointer;
+  transition: filter .18s ease, border-color .18s ease;
+
+  &:hover {
+    border-color: var(--t-accent-line);
+    filter: brightness(1.1);
+  }
 }

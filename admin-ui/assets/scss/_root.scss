@@ -5,6 +5,8 @@ html {
   font-family: $base-font-family;
   font-size: $base-font-size;
   box-sizing: border-box;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
 }
 
 *,

@@ -21,13 +21,21 @@ export default function FinishTurnPopin({ onClose, onClick, players }: Props) {
       <div className={`popin-title ${hasLostTurn ? '' : 'win'}`}>
         {hasLostTurn ? 'Qui a perdu ce tour ?' : 'Qui a trouvé le chiffre exact ?'}
       </div>
-      {players.filter(player => player.diceNumber > 0).map(player => ( // TODO : Créer le composant tile
-        <div key={player.id} className="player-tile" onClick={() => onClick(player.id, hasLostTurn)}>
-          {player.name}
-        </div>
-      ))}
+      <div className="popin-content popin-content--tiles">
+        {players.filter(player => player.diceNumber > 0).map(player => (
+          <div key={player.id} className="player-tile" onClick={() => onClick(player.id, hasLostTurn)}>
+            {player.name}
+          </div>
+        ))}
+      </div>
       <div className="popin-buttons">
         <ActionsContainer>
+          <ActionButton
+            style={ActionStyle.SECONDARY}
+            onClick={onClose}
+          >
+            Fermer
+          </ActionButton>
           <ActionButton
             style={hasLostTurn ? ActionStyle.PRIMARY : ActionStyle.DANGER}
             onClick={toggleHasLostTurn}

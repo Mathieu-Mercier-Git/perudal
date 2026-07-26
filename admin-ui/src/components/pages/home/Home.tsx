@@ -16,8 +16,11 @@ import { LOBBY } from '../../Routes';
 import ValidationPopin from '../../theme/popin/ValidationPopin';
 import useToggle from '../../../lib/react-hook-toggle/ReactHookToggle';
 import UserService from '../../../services/user/UserService';
+import ActionStyle from '../../../lib/plume-admin-theme/action/ActionStyle';
 
 const logger: Logger = new Logger('Home');
+
+const toucanImage: string = '/assets/images/toucan.png';
 
 enum UsernameError {
   MISSING='MISSING', TOO_SHORT='TOO_SHORT'
@@ -102,28 +105,38 @@ export default function Home() {
 
   return (
     <Panel>
-      <h1>{messages.home.title}</h1>
-      <TextField
-        className="text-field"
-        name="username"
-        placeholder="Saisie ton pseudo"
-        type="text"
-        onChange={onChangeUsername}
-        autoComplete="off"
-        defaultValue={username}
-        // inputProps={{ maxLength }}
-      />
-      {!!usernameError && (
-        <div className="error-message">
-          {usernameErrorLabel()}
+      <div className="home">
+        <div className="home__hero">
+          <div className="home__logo">
+            <img className="home__toucan" src={toucanImage} alt="" />
+          </div>
+          <h1 className="home__title">{messages.home.title}</h1>
+          <p className="home__tagline">Le grand jeu de dés et de bluff</p>
         </div>
-      )}
-      <ActionButton onClick={createLobby}>
-        {messages.action.create_game}
-      </ActionButton>
-      <ActionButton onClick={openJoinLobbyPopin}>
-        {messages.action.join_game}
-      </ActionButton>
+        <div className="home__actions">
+          <TextField
+            className="text-field"
+            name="username"
+            placeholder="Saisis ton pseudo"
+            type="text"
+            onChange={onChangeUsername}
+            autoComplete="off"
+            defaultValue={username}
+            // inputProps={{ maxLength }}
+          />
+          {!!usernameError && (
+            <div className="error-message">
+              {usernameErrorLabel()}
+            </div>
+          )}
+          <ActionButton style={ActionStyle.PRIMARY} onClick={createLobby}>
+            {messages.action.create_game}
+          </ActionButton>
+          <ActionButton style={ActionStyle.SECONDARY} onClick={openJoinLobbyPopin}>
+            {messages.action.join_game}
+          </ActionButton>
+        </div>
+      </div>
       {showJoinGamePopin && (
         <ValidationPopin
           title="Saisie le pérucode de la partie"

@@ -30,10 +30,10 @@
     width: 64px;
     height: 64px;
     margin: 8px;
-    border: 6px solid black;
+    border: 6px solid var(--ink);
     border-radius: 50%;
     animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-    border-color: black transparent transparent;
+    border-color: var(--ink) transparent transparent;
   }
 
   &.small-size {

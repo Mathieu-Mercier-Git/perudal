@@ -33,7 +33,10 @@
       "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" -u internal-api:test-override-42 http://localhost:8081/api/monitoring/health)",
       "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" -u internal-api:PZyTg8XURj5hM2Lf63MOZFXzB0JMtjdq84KlqOPA5jaP59V0SJ http://localhost:8081/api/monitoring/health)",
       "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" -u internal-api:dev-only-password-change-me http://localhost:8081/api/monitoring/health)",
-      "Bash(curl -s -i -m 5 -N -H \"Connection: Upgrade\" -H \"Upgrade: websocket\" -H \"Sec-WebSocket-Version: 13\" -H \"Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\" http://localhost:8081/socket)"
+      "Bash(curl -s -i -m 5 -N -H \"Connection: Upgrade\" -H \"Upgrade: websocket\" -H \"Sec-WebSocket-Version: 13\" -H \"Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\" http://localhost:8081/socket)",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\(JSON.stringify\\(p.scripts,null,1\\)\\); console.log\\('deps:', Object.keys\\(p.dependencies\\).join\\(', '\\)\\)\")",
+      "Bash(command -v nvm)",
+      "Read(//usr/local/bin/**)"
     ]
   }
 }

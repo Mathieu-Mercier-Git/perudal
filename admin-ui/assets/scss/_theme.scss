@@ -1,0 +1,73 @@
+// Design « Sorbet » — tokens partagés.
+// Aucune logique applicative ne dépend de ce fichier : uniquement l'apparence.
+// Voir INTEGRATION.md pour la référence complète.
+
+:root {
+  /* Fond de l'app — dégradé, appliqué une seule fois sur le conteneur racine */
+  --bg-app: linear-gradient(160deg, #B85F14 0%, #A2431D 55%, #7E2A16 100%);
+
+  /* Surfaces posées sur le dégradé : translucides, le fond reste visible */
+  --surf: rgba(48, 17, 7, .42);
+  --tray: rgba(48, 17, 7, .58); /* barre basse « Tes dés » */
+  --surf-modal: #3A1409; /* popins : OPAQUE, pas de flou */
+  --field: rgba(48, 17, 7, .42);
+
+  /* Texte */
+  --ink: #FFF7EE;
+  --ink2: rgba(255, 247, 238, .76);
+  --ink3: rgba(255, 247, 238, .62);
+  --line: rgba(255, 247, 238, .12);
+  --line-strong: rgba(255, 247, 238, .24);
+  --modal-line: rgba(255, 247, 238, .16);
+  --hover: rgba(255, 247, 238, .06);
+  --hover2: rgba(255, 247, 238, .12);
+
+  /* Actions */
+  --accent: #FFF4E4; /* bouton principal (crème sur l'orange) */
+  --accent-ink: #7A3410; /* texte DANS le bouton principal */
+  --accent-txt: #FFEBD2; /* accent en texte */
+  --accent-deep: rgba(0, 0, 0, .3); /* ombre pleine sous le bouton */
+  --accent-soft: rgba(255, 244, 228, .16);
+  --accent-line: rgba(255, 244, 228, .42);
+  --btn2: rgba(255, 255, 255, .16); /* bouton secondaire */
+  --btn2-deep: rgba(0, 0, 0, .28);
+
+  /* États */
+  --terra-txt: #FFD9C2; /* danger / annuler */
+  --terra-soft: rgba(255, 217, 194, .14);
+  --terra-line: rgba(255, 217, 194, .45);
+  --jade: #BFF0D6; /* succès / chiffre exact */
+  --jade-soft: rgba(191, 240, 214, .16);
+  --jade-line: rgba(191, 240, 214, .5);
+
+  /* Tuiles joueur (page Jeu) */
+  --t-surf: rgba(52, 18, 8, .42);
+  --t-ink: #FFF7EE;
+  --t-ink2: rgba(255, 247, 238, .76);
+  --t-ink3: rgba(255, 247, 238, .62);
+  --t-line: rgba(255, 247, 238, .16);
+  --t-accent: #FFD48F;
+  --t-accent-soft: rgba(255, 212, 143, .16);
+  --t-accent-line: rgba(255, 212, 143, .42);
+
+  /* Dés (utilisés par le composant Dé, conservé pour plus tard) */
+  --die-bg: #FFFFFF;
+  --die-dot: #8A3812;
+  --die-line: rgba(0, 0, 0, .16);
+  --die-shadow: rgba(0, 0, 0, .3);
+  --hidden-bg: rgba(255, 255, 255, .3); /* dé masqué */
+  --hidden-line: rgba(255, 247, 238, .2);
+
+  /* Halo derrière le toucan (Home) */
+  --halo: rgba(255, 224, 189, .55);
+
+  /* Voiles de popin */
+  --overlay: rgba(0, 0, 0, .72);
+  --overlay-strong: rgba(0, 0, 0, .82);
+  --modal-shadow: rgba(0, 0, 0, .5);
+  --tray-shadow: rgba(0, 0, 0, .5);
+
+  /* Rayons & polices */
+  --font-title: 'Chivo', sans-serif;
+  --font-mono: 'Chivo Mono', monospace;
+}

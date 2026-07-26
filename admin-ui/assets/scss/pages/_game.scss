@@ -4,38 +4,176 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
+  height: 100dvh;
 
-  .game-content {
+  // 1. Header transparent — toujours visible
+  &__header {
+    flex: none;
+    padding: 24px 20px 14px;
+    background: transparent;
+
+    &-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: $spacer-3;
+    }
+  }
+
+  &__title {
+    margin: 0;
+    font-family: var(--font-title);
+    font-weight: 900;
+    font-size: 26px;
+    letter-spacing: -.03em;
+    color: var(--ink);
+  }
+
+  // Pastille total de dés
+  &__total {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    padding: 6px 12px;
+    background: var(--surf);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+
+    &-num {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--accent-txt);
+    }
+
+    &-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--ink3);
+    }
+  }
+
+  &__info {
+    margin-top: $spacer-2;
+    font-size: 14px;
+    color: var(--ink2);
+  }
+
+  // 2. Seule zone qui défile
+  &__scroll {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    gap: $spacer-4;
+    padding: 6px 20px 18px;
+    overflow-y: auto;
+  }
+
+  &__opponents {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
+    gap: $spacer-3;
+  }
 
-    .opponents-container {
-      display: flex;
-      flex-direction: column;
-      gap: $spacer-4;
+  // 3. Tray bas fixe — toujours visible
+  &__tray {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: $spacer-3;
+    padding: 14px 20px calc(18px + env(safe-area-inset-bottom));
+    background: var(--tray);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -6px 20px var(--tray-shadow);
+  }
 
-      .opponent {
-        .opponent-dices {
-          display: flex;
-          gap: $spacer-2;
-        }
-      }
+  &__mydice {
+    display: flex;
+    flex-direction: column;
+    gap: $spacer-2;
+    padding: 12px;
+    background: var(--t-surf);
+    border: 1px solid var(--t-line);
+    border-radius: 14px;
+
+    &-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--ink3);
     }
 
-    .main-player {
+    &-list {
       display: flex;
-      flex-direction: column;
-      gap: $spacer-3;
-
-      .main-player-dices {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-        gap: $spacer-2;
-      }
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: $spacer-2;
     }
+
+    &-empty {
+      font-size: 13px;
+      color: var(--ink2);
+    }
+  }
+
+  &__tray-actions {
+    display: flex;
+    align-items: center;
+    gap: $spacer-3;
+
+    // le bouton d'action admin occupe le reste de la ligne
+    .action-container:not(.action-container--icon) {
+      flex: 1;
+    }
+  }
+}
+
+// Tuile adversaire
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: $spacer-2;
+  padding: 12px 14px;
+  background: var(--t-surf);
+  border: 1px solid var(--t-line);
+  border-radius: 14px;
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: $spacer-2;
+  }
+
+  &__name {
+    font-family: var(--font-title);
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--t-ink);
+  }
+
+  &__crown {
+    color: var(--t-accent);
+
+    &.MuiIcon-root {
+      font-size: 16px;
+    }
+  }
+
+  &__dices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacer-2;
+  }
+
+  &__lost {
+    font-size: 13px;
+    font-style: italic;
+    color: var(--ink3);
   }
 }

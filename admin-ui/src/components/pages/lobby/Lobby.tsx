@@ -2,9 +2,11 @@ import React, { useState, useCallback } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { getGlobalInstance } from 'plume-ts-di';
 import { useObservable } from 'micro-observables';
+import { Icon } from '@mui/material';
 import { Panel } from '../../theme/layout/Panel';
 import useMessages from '../../../i18n/hooks/messagesHook';
 import { ActionButton } from '../../theme/action/Actions';
+import ActionStyle from '../../../lib/plume-admin-theme/action/ActionStyle';
 import { GAME, HOME } from '../../Routes';
 import { useOnComponentMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
 import GameService from '../../../services/game/GameService';
@@ -27,6 +29,7 @@ export default function Lobby() {
 
   const [diceNumber, setDiceNumber] = useState<number>(DICE_NUMBER);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [isCodeCopied, setIsCodeCopied] = useState<boolean>(false);
 
   const { messages } = useMessages();
   const navigate = useNavigate();
@@ -87,53 +90,75 @@ export default function Lobby() {
     }
   };
 
+  const copyCode = (): void => {
+    navigator.clipboard?.writeText(lobby!.gameCode)
+      .then(() => {
+        setIsCodeCopied(true);
+        setTimeout(() => setIsCodeCopied(false), 1500);
+      });
+  };
+
   if (!lobby) {
     return (<Navigate to={HOME} />);
   }
 
   return (
     <Panel>
-      <h1>{messages.lobby.title}</h1>
-      <div>
-        <span>{messages.lobby.perucode}</span>
-        <span>{lobby.gameCode}</span>
-      </div>
-      {isAdmin && (
-        <div className="lobby-dice-number-container">
-          <span>{messages.lobby.dice_number}</span>
-          <div className="lobby-dice-number">
-            <ActionButton onClick={removeDice} icon='remove'/>
-            <span>{diceNumber}</span>
-            <ActionButton onClick={addDice} icon='add'/>
+      <div className="lobby">
+        <h1 className="lobby__title">{messages.lobby.title}</h1>
+
+        <div className="lobby__code">
+          <span className="lobby__code-label">Pérucode</span>
+          <span className="lobby__code-value">{lobby.gameCode}</span>
+          <button type="button" className="lobby__code-copy" onClick={copyCode}>
+            <Icon>{isCodeCopied ? 'check' : 'content_copy'}</Icon>
+          </button>
+        </div>
+
+        {isAdmin && (
+          <div className="lobby__dice">
+            <span className="lobby__dice-label">{messages.lobby.dice_number}</span>
+            <div className="lobby__dice-stepper">
+              <ActionButton cssClasses="action-container--icon" onClick={removeDice} icon="remove" />
+              <span className="lobby__dice-value">{diceNumber}</span>
+              <ActionButton cssClasses="action-container--icon" onClick={addDice} icon="add" />
+            </div>
+          </div>
+        )}
+
+        <div className="lobby__players">
+          <div className="lobby__players-title">{messages.lobby.player_list}</div>
+          <div className="lobby__players-grid">
+            {React.Children.toArray(lobby.players.map((player) => (
+              <div className="lobby__player">
+                <span className="lobby__player-avatar">{player.name.charAt(0).toUpperCase()}</span>
+                <span className="lobby__player-name">{player.name}</span>
+                {player.isAdmin && (<Icon className="lobby__player-crown">star</Icon>)}
+              </div>
+            )))}
           </div>
         </div>
-      )}
-      <div className="players">
-        <div className="players-title">{messages.lobby.player_list}</div>
-        {React.Children.toArray(lobby.players.map((player) => (
-          <div className="player">
-            <span>-</span>
-            <div className="player-name">{player.name}</div>
-          </div>
-        )))}
+
+        <div className="lobby__actions">
+          {isAdmin && (
+            <ActionButton style={ActionStyle.PRIMARY} onClick={startGame}>
+              {messages.action.start_game}
+            </ActionButton>
+          )}
+          {isAdmin
+            ? (
+              <ActionButton style={ActionStyle.DANGER} onClick={() => gameService.cancelGame(lobby!.gameCode)}>
+                {messages.action.cancel_game}
+              </ActionButton>
+            )
+            : (
+              <ActionButton style={ActionStyle.DANGER} onClick={() => gameService.quitGame(lobby!.gameCode)}>
+                {messages.action.quit_game}
+              </ActionButton>
+            )
+          }
+        </div>
       </div>
-      {isAdmin && (
-        <ActionButton onClick={startGame}>
-          {messages.action.start_game}
-        </ActionButton>
-      )}
-      {isAdmin
-        ? (
-          <ActionButton onClick={() => gameService.cancelGame(lobby!.gameCode)}>
-            {messages.action.cancel_game}
-          </ActionButton>
-        )
-        : (
-          <ActionButton onClick={() => gameService.quitGame(lobby!.gameCode)}>
-            {messages.action.quit_game}
-          </ActionButton>
-        )
-      }
     </Panel>
   );
 }

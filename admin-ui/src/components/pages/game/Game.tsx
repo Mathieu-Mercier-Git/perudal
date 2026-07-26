@@ -3,12 +3,14 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { useObservable } from 'micro-observables';
 import { getGlobalInstance } from 'plume-ts-di';
 import { Logger } from 'simple-logging-system';
+import { Icon } from '@mui/material';
 import { Panel } from '../../theme/layout/Panel';
 import GameService from '../../../services/game/GameService';
 import { Game, Player } from '../../../services/game/GameTypes';
 import { HOME } from '../../Routes';
 import Dice from './dice/Dice';
 import { ActionButton } from '../../theme/action/Actions';
+import ActionStyle from '../../../lib/plume-admin-theme/action/ActionStyle';
 import DiceCounter from './dice/DiceCounter';
 import {
   addOnMessage,
@@ -139,58 +141,74 @@ export default function Game() {
   return (
     <Panel>
       <div className="game">
-        <div className="game-header">
-          <h1>{isPlanificato ? 'Pla pla planificato' : 'Partie en cours'}</h1>
-          <div>{whoStarts()}</div>
-          <div>
-            <span>Nombre total de dés : </span>
-            <span>{diceTotalQuantity}</span>
+        <header className="game__header">
+          <div className="game__header-top">
+            <h1 className="game__title">{isPlanificato ? 'Pla pla planificato' : 'Partie en cours'}</h1>
+            <div className="game__total">
+              <span className="game__total-num">{diceTotalQuantity}</span>
+              <span className="game__total-label">dés</span>
+            </div>
           </div>
-        </div>
-        <div className="game-content">
-          <div className="opponents-container">
+          <div className="game__info">{whoStarts()}</div>
+        </header>
+
+        <div className="game__scroll">
+          {isRevealDices && (<DiceCounter game={game} isPlanificato={isPlanificato} />)}
+          <div className="game__opponents">
             {opponents.map((opponent) => (
-              <div key={opponent.id} className="opponent">
-                <span>{opponent.name}</span>
-                {opponent.isAdmin && (
-                  <span> (boss)</span>
-                )}
+              <div key={opponent.id} className="tile">
+                <div className="tile__head">
+                  <span className="tile__name">{opponent.name}</span>
+                  {opponent.isAdmin && (<Icon className="tile__crown">star</Icon>)}
+                </div>
                 {opponent.dices.length > 0
                   ? (
-                    <div className="opponent-dices">
+                    <div className="tile__dices">
                       {opponent.dices.map((dice, index) => (
                         <Dice key={index} number={dice} show={isRevealDices} isPlanificato={isPlanificato} />
                       ))}
                     </div>
                   )
-                  : (<span> a lamentablement perdu</span>)
+                  : (<span className="tile__lost">a lamentablement perdu</span>)
                 }
-
               </div>
             ))}
           </div>
-          {isRevealDices && (<DiceCounter game={game} isPlanificato={isPlanificato} />)}
-          <div className="main-player">
+        </div>
+
+        <div className="game__tray">
+          <div className="game__mydice">
+            <span className="game__mydice-label">Tes dés</span>
             {mainPlayer && (
               mainPlayer.dices.length > 0
                 ? (
-                  <div className="main-player-dices">
+                  <div className="game__mydice-list">
                     {mainPlayer.dices.map((dice, index) => (
                       <Dice key={index} number={dice} show={showMyDices} isPlanificato={isPlanificato} />
                     ))}
                   </div>
                 )
-              : (<div>Ils sont où tes dés ? Remets toi en question bonhomme.</div>)
+                : (<div className="game__mydice-empty">Ils sont où tes dés ? Remets toi en question bonhomme.</div>)
             )}
-            <ActionButton onClick={() => setShowMyDices(!showMyDices)} icon={showMyDices ? 'visibility' : 'visibility_off'}/>
+          </div>
+          <div className="game__tray-actions">
+            <ActionButton
+              cssClasses="action-container--icon"
+              onClick={() => setShowMyDices(!showMyDices)}
+              icon={showMyDices ? 'visibility' : 'visibility_off'}
+            />
             {isAdmin && (
-              <>
-                <span>Tu es maître du jeu, tes actions dictent la partie</span>
-                {isRevealDices
-                  ? (<ActionButton onClick={() => setShowFinishTurnPopin(true)}>Fin du tour</ActionButton>)
-                  : (<ActionButton onClick={revealDices}>Révéler tous les dés</ActionButton>)
-                }
-              </>
+              isRevealDices
+                ? (
+                  <ActionButton style={ActionStyle.PRIMARY} onClick={() => setShowFinishTurnPopin(true)}>
+                    Fin du tour
+                  </ActionButton>
+                )
+                : (
+                  <ActionButton style={ActionStyle.PRIMARY} onClick={revealDices}>
+                    Révéler tous les dés
+                  </ActionButton>
+                )
             )}
           </div>
         </div>

@@ -12,9 +12,13 @@ export default function LandingPage({ isLoading, hasSocketError }: props) {
 
   return (
     <Panel>
-      <h1>{messages.home.title}</h1>
-      {hasSocketError && (<div>Une erreur est survenue lors de la connexion au serveur</div>)}
-      {isLoading && (<AnimatedLoader/>)}
+      <div className="landing">
+        <h1 className="landing__title">{messages.home.title}</h1>
+        {hasSocketError && (
+          <div className="landing__error">Une erreur est survenue lors de la connexion au serveur</div>
+        )}
+        {isLoading && (<AnimatedLoader />)}
+      </div>
     </Panel>
   );
 }

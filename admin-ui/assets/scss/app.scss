@@ -1,4 +1,5 @@
 @use 'variables' as *;
+@use 'theme' as *;
 
 @use 'layouts/index' as *;
 @use 'features/index' as *;
@@ -8,6 +9,7 @@
 @use 'components/dice/dice-counter' as *;
 @use 'components/tile/player-tile' as *;
 
+@use 'pages/home' as *;
 @use 'pages/lobby' as *;
 @use 'pages/game' as *;
 

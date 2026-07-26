@@ -1,7 +1,9 @@
 @use "../variables" as *;
 
 body {
-  background: $active-background-color;
+  background: var(--bg-app);
+  background-attachment: fixed;
+  color: var(--ink);
   overflow: hidden;
   height: 100%;
 }
@@ -23,13 +25,13 @@ body {
   }
 }
 
+// Conteneur de page neutre : chaque écran (Home / Lobby / Game) gère
+// lui-même son padding et sa mise en page interne.
 .panel {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
-  gap: $spacer-6;
-  padding: $spacer-6;
+  height: 100dvh;
 }
 
 .page-title {

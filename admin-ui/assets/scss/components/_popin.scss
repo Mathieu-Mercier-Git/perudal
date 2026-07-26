@@ -6,37 +6,56 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: rgba(#000000, .4);
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: $spacer-5;
+  background-color: var(--overlay);
+  backdrop-filter: blur(6px);
 
   .popin-container {
     display: flex;
     flex-direction: column;
+    width: 100%;
+    max-width: 420px;
     max-height: 100%;
-    gap: $spacer-7;
+    gap: $spacer-4;
     padding: $spacer-6;
-    background-color: #ffffff;
-    box-shadow: 0 3px 5px 1px rgba(#000000, .25);
-    border-radius: 3px;
+    // popin OPAQUE, sans transparence
+    background-color: var(--surf-modal);
+    border: 1px solid var(--modal-line);
+    border-radius: 20px;
+    box-shadow: 0 20px 50px var(--modal-shadow);
     overflow: auto;
 
     .popin-title {
-      color: $secondary-color;
-      font-size: $font-size-large;
+      font-family: var(--font-title);
+      font-weight: 900;
+      font-size: 22px;
+      letter-spacing: -.02em;
+      color: var(--ink);
 
       &.win {
-        color: $primary-color;
+        color: var(--jade);
       }
     }
 
     .popin-message {
-      margin: $spacer-6 0;
+      margin: $spacer-2 0;
+      font-size: 15px;
+      color: var(--ink2);
       white-space: pre-wrap;
     }
 
     .popin-content {
+      display: flex;
+      flex-direction: column;
+
+      &--tiles {
+        gap: $spacer-2;
+        max-height: 42dvh;
+        overflow-y: auto;
+      }
     }
 
     .popin-buttons {
@@ -48,7 +67,7 @@
         width: 100%;
 
         .action-container {
-          width: 50%;
+          flex: 1;
         }
       }
     }

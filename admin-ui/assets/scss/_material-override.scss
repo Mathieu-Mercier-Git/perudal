@@ -130,6 +130,18 @@
     }
   }
 
+  // TEXT FIELD
+  .MuiOutlinedInput-notchedOutline {
+    border-color: var(--ink3);
+  }
+
+  .MuiOutlinedInput-root {
+    &:hover .MuiOutlinedInput-notchedOutline,
+    &.Mui-focused .MuiOutlinedInput-notchedOutline {
+      border-color: var(--ink);
+    }
+  }
+
   .MuiInputBase-input {
     color: var(--ink);
     // 16px minimum : en dessous, iOS Safari zoome sur le champ au focus (mobile)

@@ -57,21 +57,8 @@
         overflow-y: auto;
       }
 
-      // Champ de saisie dans une popin (ex : pérucode) :
-      // plus d'espace vertical avec les autres éléments + bordure blanche adoucie
       .text-field {
         margin: $spacer-3 0;
-      }
-
-      .MuiOutlinedInput-notchedOutline {
-        border-color: var(--ink3);
-      }
-
-      .MuiOutlinedInput-root {
-        &:hover .MuiOutlinedInput-notchedOutline,
-        &.Mui-focused .MuiOutlinedInput-notchedOutline {
-          border-color: var(--ink);
-        }
       }
     }
 

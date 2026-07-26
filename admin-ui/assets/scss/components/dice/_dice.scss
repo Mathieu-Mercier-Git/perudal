@@ -33,6 +33,15 @@
     }
   }
 
+  // Dés cachés : la face reste construite (image du toucan déjà chargée) mais invisible.
+  // visibility (et non display:none) garde l'image décodée pour un affichage instantané au toggle.
+  &--hidden {
+    .dice-dot,
+    img {
+      visibility: hidden;
+    }
+  }
+
   &--1 {
     .dice-dot:nth-child(1) {
       grid-column: 2;

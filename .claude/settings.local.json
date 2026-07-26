@@ -36,7 +36,9 @@
       "Bash(curl -s -i -m 5 -N -H \"Connection: Upgrade\" -H \"Upgrade: websocket\" -H \"Sec-WebSocket-Version: 13\" -H \"Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\" http://localhost:8081/socket)",
       "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\(JSON.stringify\\(p.scripts,null,1\\)\\); console.log\\('deps:', Object.keys\\(p.dependencies\\).join\\(', '\\)\\)\")",
       "Bash(command -v nvm)",
-      "Read(//usr/local/bin/**)"
+      "Read(//usr/local/bin/**)",
+      "Bash(grep -iE '\\\\.\\(css|scss|sass|less|styl\\)$')",
+      "Bash(grep -iE '\\\\.\\(css|scss\\)$')"
     ]
   }
 }

@@ -7,6 +7,10 @@ html {
   box-sizing: border-box;
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
+  // La zone d'overscroll (rubber-band) et le canvas au zoom iOS n'affichent QUE
+  // la couleur unie de l'élément racine (jamais un dégradé ni un background fixed).
+  // On pose donc une couleur pleine ici pour supprimer le blanc, le dégradé restant sur le body.
+  background-color: #7E2A16;
 }
 
 *,

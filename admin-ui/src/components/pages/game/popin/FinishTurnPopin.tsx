@@ -11,8 +11,6 @@ type Props = {
   players: Player[],
 };
 
-// TODO : Inspiré du code de ValidationPopin
-
 export default function FinishTurnPopin({ onClose, onClick, players }: Props) {
   const [hasLostTurn, toggleHasLostTurn] = useToggle(true);
 
@@ -40,10 +38,7 @@ export default function FinishTurnPopin({ onClose, onClick, players }: Props) {
             style={hasLostTurn ? ActionStyle.PRIMARY : ActionStyle.DANGER}
             onClick={toggleHasLostTurn}
           >
-            {hasLostTurn
-              ? 'Mode : Chiffre exact'
-              : 'Mode : Défaite classique'
-            }
+            {hasLostTurn ? 'Chiffre exact' : 'Défaite'}
           </ActionButton>
         </ActionsContainer>
       </div>

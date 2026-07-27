@@ -1,9 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useObservable } from 'micro-observables';
 import { getGlobalInstance } from 'plume-ts-di';
 import { Logger } from 'simple-logging-system';
-import { Icon } from '@mui/material';
+import { Button, Icon } from '@mui/material';
+import classNames from '../../../lib/class-names/ClassNames';
 import { Panel } from '../../theme/layout/Panel';
 import GameService from '../../../services/game/GameService';
 import { Game, Player } from '../../../services/game/GameTypes';
@@ -19,7 +20,7 @@ import {
   socketListener
 } from '../../../services/socket/SocketEngineService';
 import { ServerEvent } from '../../../services/socket/SocketTypes';
-import { useOnComponentMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
+import { useOnComponentMounted, useOnComponentUnMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
 import FinishTurnPopin from './popin/FinishTurnPopin';
 import FinishGamePopin from './popin/FinishGamePopin';
 import GameMenuPopin from './popin/GameMenuPopin';
@@ -33,6 +34,9 @@ type ConfirmAction = {
 
 const logger: Logger = new Logger('Game');
 
+// Délai (ms) pendant lequel « Révéler tous les dés » peut être annulé avant que l'action ne parte
+const REVEAL_COUNTDOWN_MS: number = 2500;
+
 export default function Game() {
   const gameService = getGlobalInstance(GameService);
   const rulesOverlayService = getGlobalInstance(RulesOverlayService);
@@ -44,7 +48,10 @@ export default function Game() {
   const [showFinishTurnPopin, setShowFinishTurnPopin] = useState<boolean>(false);
   const [showMenuPopin, setShowMenuPopin] = useState<boolean>(false);
   const [confirmAction, setConfirmAction] = useState<ConfirmAction | undefined>(undefined);
+  const [isRevealPending, setIsRevealPending] = useState<boolean>(false);
   const [playerWinner, setPlayerWinner] = useState<Player | undefined>(undefined);
+
+  const revealTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // const { messages } = useMessages();
   const navigate = useNavigate();
@@ -108,6 +115,35 @@ export default function Game() {
     gameService.sendRevealDices(game?.gameCode);
     // TODO : gérer le planificato
   }
+
+  // Révélation différée : un compte à rebours annulable évite de révéler les dés sur un clic non voulu.
+  const cancelRevealCountdown = () => {
+    if (revealTimeoutRef.current) {
+      clearTimeout(revealTimeoutRef.current);
+      revealTimeoutRef.current = undefined;
+    }
+    setIsRevealPending(false);
+  };
+
+  const handleRevealClick = () => {
+    if (isRevealPending) {
+      // Le joueur annule : le clic initial n'était pas volontaire
+      cancelRevealCountdown();
+      return;
+    }
+    setIsRevealPending(true);
+    revealTimeoutRef.current = setTimeout(() => {
+      revealTimeoutRef.current = undefined;
+      setIsRevealPending(false);
+      revealDices();
+    }, REVEAL_COUNTDOWN_MS);
+  };
+
+  useOnComponentUnMounted(() => {
+    if (revealTimeoutRef.current) {
+      clearTimeout(revealTimeoutRef.current);
+    }
+  });
 
   const finishTurn = (playerId: string, hasLost: boolean) => {
     gameService.finishTurn(game?.gameCode, playerId, hasLost);
@@ -256,9 +292,25 @@ export default function Game() {
                   </ActionButton>
                 )
                 : (
-                  <ActionButton style={ActionStyle.PRIMARY} onClick={revealDices}>
-                    Révéler tous les dés
-                  </ActionButton>
+                  <div
+                    className={classNames(
+                      'action-container',
+                      'reveal-button',
+                      { 'reveal-button--pending': isRevealPending },
+                    )}
+                  >
+                    <Button variant="contained" color="primary" onClick={handleRevealClick}>
+                      {isRevealPending && (
+                        <span
+                          className="reveal-button__progress"
+                          style={{ animationDuration: `${REVEAL_COUNTDOWN_MS}ms` }}
+                        />
+                      )}
+                      <span className="reveal-button__label">
+                        {isRevealPending ? 'Annuler' : 'Révéler tous les dés'}
+                      </span>
+                    </Button>
+                  </div>
                 )
             )}
           </div>

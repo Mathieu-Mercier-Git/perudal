@@ -179,6 +179,42 @@
   }
 }
 
+// Bouton « Révéler tous les dés » : compte à rebours annulable avant l'action.
+// Pendant le délai (REVEAL_COUNTDOWN_MS dans Game.tsx), le libellé devient « Annuler »
+// et une barre de progression remplit le fond du bouton.
+.reveal-button {
+  .MuiButton-root {
+    position: relative;
+    overflow: hidden;
+  }
+
+  &__progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: rgba(0, 0, 0, .16);
+    // la durée est fournie en style inline (constante configurable côté React)
+    animation: reveal-countdown linear forwards;
+  }
+
+  &__label {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+@keyframes reveal-countdown {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 100%;
+  }
+}
+
 // Tuile adversaire
 .tile {
   display: flex;

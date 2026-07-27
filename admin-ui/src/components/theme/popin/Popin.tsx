@@ -4,12 +4,13 @@ import ActionStyle from '../../../lib/plume-admin-theme/action/ActionStyle';
 import { PopinCloseWithoutSavingProps, PopinProps } from '../../../lib/plume-admin-theme/popin/PopinProps';
 import { Panel } from '../layout/Panel';
 import useMessages from '../../../i18n/hooks/messagesHook';
+import classNames from '../../../lib/class-names/ClassNames';
 
 export function Popin({
-  children, zIndex, height, width,
+  children, zIndex, height, width, className,
 }: PopinProps) {
   return (
-    <div className="popin" style={{ zIndex: zIndex ?? 100 }}>
+    <div className={classNames('popin', className)} style={{ zIndex: zIndex ?? 100 }}>
       <div className="popin-container" style={{ height, width }}>
         {children}
       </div>

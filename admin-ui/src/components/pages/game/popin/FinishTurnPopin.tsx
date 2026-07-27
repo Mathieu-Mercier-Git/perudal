@@ -15,7 +15,7 @@ export default function FinishTurnPopin({ onClose, onClick, players }: Props) {
   const [hasLostTurn, toggleHasLostTurn] = useToggle(true);
 
   return (
-    <Popin>
+    <Popin className={hasLostTurn ? '' : 'popin--exact'}>
       <div className={`popin-title ${hasLostTurn ? '' : 'win'}`}>
         {hasLostTurn ? 'Qui a perdu ce tour ?' : 'Qui a trouvé le chiffre exact ?'}
       </div>

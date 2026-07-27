@@ -4,6 +4,7 @@ export type PopinProps = {
   zIndex?: number,
   height?: string,
   width?: string,
+  className?: string,
   children?: React.ReactNode,
 };
 

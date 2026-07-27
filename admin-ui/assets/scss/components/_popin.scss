@@ -92,6 +92,28 @@
   }
 }
 
+// Contexte « chiffre exact » : on repeint la popin dans la teinte jade (succès)
+// pour signaler visuellement qu'on n'est plus dans le contexte « défaite ».
+.popin--exact {
+  .popin-container {
+    border-color: var(--jade-line);
+    box-shadow: 0 20px 50px var(--modal-shadow), 0 0 0 1px var(--jade-soft) inset;
+    background-color: var(--jade-soft);
+  }
+
+  .player-tile {
+    border-color: var(--jade-line);
+
+    &:hover {
+      border-color: var(--jade);
+    }
+
+    &__dices {
+      color: var(--jade);
+    }
+  }
+}
+
 // Popin de fin de partie : logo toucan + nom du vainqueur mis en avant, le tout centré
 .finish-popin {
   display: flex;

@@ -9,7 +9,6 @@
   /* Surfaces posées sur le dégradé : translucides, le fond reste visible */
   --surf: rgba(48, 17, 7, .42);
   --tray: rgba(48, 17, 7, .58); /* barre basse « Tes dés » */
-  //--surf-modal: #A2431D; /* popins : OPAQUE, pas de flou */
   --surf-modal: #3A1409; /* popins : OPAQUE, pas de flou */
   --field: rgba(48, 17, 7, .42);
 
@@ -38,7 +37,7 @@
   --terra-soft: rgba(255, 217, 194, .14);
   --terra-line: rgba(255, 217, 194, .45);
   --jade: #BFF0D6; /* succès / chiffre exact */
-  --jade-soft: rgba(191, 240, 214, .16);
+  --jade-soft: rgba(191, 240, 214, .4);
   --jade-line: rgba(191, 240, 214, .5);
 
   /* Tuiles joueur (page Jeu) */

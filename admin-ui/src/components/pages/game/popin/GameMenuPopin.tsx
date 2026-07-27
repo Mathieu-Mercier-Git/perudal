@@ -7,21 +7,25 @@ type Props = {
   isAdmin: boolean,
   onShowRules: () => void,
   onLeaveGame: () => void,
+  onRollDices: () => void,
   onClose: () => void,
 };
 
 export default function GameMenuPopin({
-  isAdmin, onShowRules, onLeaveGame, onClose,
+  isAdmin, onShowRules, onLeaveGame, onClose, onRollDices
 }: Props) {
   return (
     <Popin zIndex={110}>
       <div className="popin-title">Menu</div>
       <div className="popin-content game-menu">
-        <ActionButton style={ActionStyle.SECONDARY} icon="menu_book" onClick={onShowRules}>
+        <ActionButton style={ActionStyle.PRIMARY} icon="menu_book" onClick={onShowRules}>
           Règles du jeu
         </ActionButton>
+        <ActionButton style={ActionStyle.PRIMARY} icon="replay" onClick={onRollDices}>
+          Relancer les dés
+        </ActionButton>
         <ActionButton
-          style={ActionStyle.DANGER}
+          style={ActionStyle.PRIMARY}
           icon={isAdmin ? 'cancel' : 'logout'}
           onClick={onLeaveGame}
         >
@@ -30,7 +34,7 @@ export default function GameMenuPopin({
       </div>
       <div className="popin-buttons">
         <ActionsContainer>
-          <ActionButton style={ActionStyle.SECONDARY} onClick={onClose}>
+          <ActionButton style={ActionStyle.DANGER} onClick={onClose}>
             Fermer
           </ActionButton>
         </ActionsContainer>

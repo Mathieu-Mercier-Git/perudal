@@ -127,6 +127,10 @@ export default function Game() {
     }
   };
 
+  const onRollDices = () => {
+    // TODO
+  }
+
   const whoStarts = (): string => {
     if (!game?.players.length) { // error
       logger.error('No player found');
@@ -248,6 +252,7 @@ export default function Game() {
           isAdmin={isAdmin}
           onShowRules={openRulesFromMenu}
           onLeaveGame={leaveGame}
+          onRollDices={onRollDices}
           onClose={() => setShowMenuPopin(false)}
         />
       )}

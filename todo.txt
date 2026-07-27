@@ -26,14 +26,8 @@ o Limiter le nombre maximum et minimum de joueurs dans une partie et gérer le c
 o Générer un vrai code de partie (actuellement toujours "123" en dur)
   - Back : src/main/java/jar/services/utils/GameUtils.java:13-14
 
-o Ajouter une popin de confirmation avant d'annuler la partie
-  - Front : admin-ui/src/components/pages/lobby/Lobby.tsx:40
-
 o Rediriger vers HOME avec une popup d'information quand la partie a été annulée
   - Front : admin-ui/src/components/pages/lobby/Lobby.tsx:43
-
-o Ajouter des conditions + une popin de confirmation avant de quitter/annuler
-  - Front : admin-ui/src/components/pages/lobby/Lobby.tsx:68
 
 o Idée : bouton avec chargement de 5s et possibilité d'annuler pendant ce laps de temps
   - Front : admin-ui/src/components/pages/lobby/Lobby.tsx:69

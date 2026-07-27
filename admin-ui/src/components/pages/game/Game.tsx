@@ -24,6 +24,12 @@ import FinishTurnPopin from './popin/FinishTurnPopin';
 import FinishGamePopin from './popin/FinishGamePopin';
 import GameMenuPopin from './popin/GameMenuPopin';
 import RulesOverlayService from '../../../services/rules/RulesOverlayService';
+import ValidationPopin from '../../theme/popin/ValidationPopin';
+
+type ConfirmAction = {
+  title: string,
+  onValidation: () => void,
+};
 
 const logger: Logger = new Logger('Game');
 
@@ -37,6 +43,7 @@ export default function Game() {
   const [isRevealDices, setIsRevealDices] = useState<boolean>(false);
   const [showFinishTurnPopin, setShowFinishTurnPopin] = useState<boolean>(false);
   const [showMenuPopin, setShowMenuPopin] = useState<boolean>(false);
+  const [confirmAction, setConfirmAction] = useState<ConfirmAction | undefined>(undefined);
   const [playerWinner, setPlayerWinner] = useState<Player | undefined>(undefined);
 
   // const { messages } = useMessages();
@@ -119,16 +126,26 @@ export default function Game() {
   // Ces actions déclenchent des évènements côté backend (comme dans le lobby).
   const leaveGame = () => {
     // TODO : gérer les évènements côté backend
-    setShowMenuPopin(false);
     if (isAdmin) {
-      gameService.cancelGame(game?.gameCode);
+      setConfirmAction({
+        title: 'Es-tu sûr de vouloir annuler la partie ?',
+        onValidation: () => gameService.cancelGame(game?.gameCode),
+      });
     } else {
-      gameService.quitGame(game?.gameCode);
+      setConfirmAction({
+        title: 'Es-tu sûr de vouloir quitter la partie ?',
+        onValidation: () => gameService.quitGame(game?.gameCode),
+      });
     }
   };
 
   const onRollDices = () => {
-    // TODO
+    setConfirmAction({
+      title: 'Es-tu sûr de vouloir relancer tous les dés ?',
+      onValidation: () => {
+        // TODO
+      },
+    });
   }
 
   const whoStarts = (): string => {
@@ -254,6 +271,18 @@ export default function Game() {
           onLeaveGame={leaveGame}
           onRollDices={onRollDices}
           onClose={() => setShowMenuPopin(false)}
+        />
+      )}
+      {confirmAction && (
+        <ValidationPopin
+          zIndex={115}
+          title={confirmAction.title}
+          onValidation={() => {
+            confirmAction.onValidation();
+            setConfirmAction(undefined);
+            setShowMenuPopin(false);
+          }}
+          onClose={() => setConfirmAction(undefined)}
         />
       )}
       {showFinishTurnPopin && (

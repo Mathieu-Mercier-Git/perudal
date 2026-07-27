@@ -42,7 +42,10 @@
       "Bash(awk '/__toucan|__logo/{f=1} f{print NR\": \"$0} /^  }/{if\\(f\\)c++; if\\(c>=2\\)f=0}' assets/scss/pages/_home.scss)",
       "Bash(grep -vE \"\\\\.\\(tsx|ts\\)$\")",
       "Bash(grep -v \"\\\\.tsx$\")",
-      "Bash(node_modules/.bin/tsc --noEmit -p .)"
+      "Bash(node_modules/.bin/tsc --noEmit -p .)",
+      "Bash(node_modules/.bin/tsc --noEmit -p tsconfig.json)",
+      "Bash(echo \"---EXIT: $?---\")",
+      "Bash(node node_modules/typescript/bin/tsc --noEmit -p tsconfig.json)"
     ]
   }
 }

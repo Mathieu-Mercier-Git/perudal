@@ -18,10 +18,16 @@ import {
   socketListener
 } from '../../../services/socket/SocketEngineService';
 import { ServerEvent } from '../../../services/socket/SocketTypes';
+import ValidationPopin from '../../theme/popin/ValidationPopin';
 
 const DICE_NUMBER: number = 5;
 const MIN_DICE_NUMBER: number = 1;
 const MAX_DICE_NUMBER: number = 9;
+
+type ConfirmAction = {
+  title: string,
+  onValidation: () => void,
+};
 
 export default function Lobby() {
   const gameService = getGlobalInstance(GameService);
@@ -30,6 +36,7 @@ export default function Lobby() {
   const [diceNumber, setDiceNumber] = useState<number>(DICE_NUMBER);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [isCodeCopied, setIsCodeCopied] = useState<boolean>(false);
+  const [confirmAction, setConfirmAction] = useState<ConfirmAction | undefined>(undefined);
 
   const { messages } = useMessages();
   const navigate = useNavigate();
@@ -90,6 +97,20 @@ export default function Lobby() {
     }
   };
 
+  const askCancelGame = (): void => {
+    setConfirmAction({
+      title: 'Es-tu sûr de vouloir annuler la partie ?',
+      onValidation: () => gameService.cancelGame(lobby!.gameCode),
+    });
+  };
+
+  const askQuitGame = (): void => {
+    setConfirmAction({
+      title: 'Es-tu sûr de vouloir quitter la partie ?',
+      onValidation: () => gameService.quitGame(lobby!.gameCode),
+    });
+  };
+
   const copyCode = (): void => {
     navigator.clipboard?.writeText(lobby!.gameCode)
       .then(() => {
@@ -147,18 +168,28 @@ export default function Lobby() {
           )}
           {isAdmin
             ? (
-              <ActionButton style={ActionStyle.DANGER} onClick={() => gameService.cancelGame(lobby!.gameCode)}>
+              <ActionButton style={ActionStyle.DANGER} onClick={askCancelGame}>
                 {messages.action.cancel_game}
               </ActionButton>
             )
             : (
-              <ActionButton style={ActionStyle.DANGER} onClick={() => gameService.quitGame(lobby!.gameCode)}>
+              <ActionButton style={ActionStyle.DANGER} onClick={askQuitGame}>
                 {messages.action.quit_game}
               </ActionButton>
             )
           }
         </div>
       </div>
+      {confirmAction && (
+        <ValidationPopin
+          title={confirmAction.title}
+          onValidation={() => {
+            confirmAction.onValidation();
+            setConfirmAction(undefined);
+          }}
+          onClose={() => setConfirmAction(undefined)}
+        />
+      )}
     </Panel>
   );
 }

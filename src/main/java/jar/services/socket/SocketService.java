@@ -131,6 +131,25 @@ public class SocketService {
         socketsByGame.remove(gameCode);
     }
 
+    /**
+     * Ferme une room lors de la purge d'une partie abandonnée.
+     * <p>
+     * Si des sockets y sont encore connectées (onglet resté ouvert), on les prévient
+     * avant de tout supprimer : sans ça, ces clients resteraient sur un écran de partie
+     * qui n'existe plus côté serveur.
+     */
+    public void closeRoom(String gameCode) {
+        List<WebSocket> sockets = socketsByGame.get(gameCode);
+        if (sockets != null && !sockets.isEmpty()) {
+            sendCancelGame(gameCode);
+            for (WebSocket socket : sockets) {
+                IdAndGameCodebySocket.computeIfPresent(socket,
+                    (key, passport) -> Passport.of(passport.getSocketId(), null));
+            }
+        }
+        socketsByGame.remove(gameCode);
+    }
+
     private void joinRoom(String gameCode, UUID socketId) {
         WebSocket socket = socketById.get(socketId);
         if (socket == null) {

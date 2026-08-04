@@ -138,6 +138,11 @@
             <groupId>com.coreoz</groupId>
             <artifactId>plume-web-jersey-monitoring</artifactId>
         </dependency>
+        <!-- Scheduled jobs (Wisp), used to purge the abandoned games kept in memory -->
+        <dependency>
+            <groupId>com.coreoz</groupId>
+            <artifactId>plume-scheduler</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-grizzly2-http</artifactId>
@@ -189,13 +194,11 @@
 			<artifactId>plume-db-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-        <!-- Used for the TimeProviderForTest sample class -->
-        <!-- This dependency can be removed if plume-services is already imported, -->
-        <!-- or if the sample time test is deleted -->
+        <!-- Used for the TimeProviderForTest sample class, and required at runtime by
+             plume-scheduler: GuiceSchedulerModule installs GuiceServicesModule -->
         <dependency>
             <groupId>com.coreoz</groupId>
             <artifactId>plume-services</artifactId>
-            <scope>test</scope>
         </dependency>
 	</dependencies>
 

@@ -47,7 +47,10 @@
       "Bash(echo \"---EXIT: $?---\")",
       "Bash(node node_modules/typescript/bin/tsc --noEmit -p tsconfig.json)",
       "Bash(xargs sed -n '1,25p')",
-      "Bash(echo \"=== EXIT: $? ===\")"
+      "Bash(echo \"=== EXIT: $? ===\")",
+      "Bash(unzip -l wisp-2.3.0.jar)",
+      "Bash(unzip -l ~/.m2/repository/com/coreoz/plume-scheduler/4.1.1/plume-scheduler-4.1.1.jar)",
+      "Bash(break)"
     ]
   }
 }

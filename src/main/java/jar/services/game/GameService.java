@@ -20,6 +20,8 @@ import lombok.Getter;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -57,12 +59,49 @@ public class GameService {
     private String reserveGameCode(int diceNumber) {
         for (int attempt = 0; attempt < MAX_GAME_CODE_ATTEMPTS; attempt++) {
             String gameCode = GameUtils.generateGameCode();
-            Game game = Game.of(new ConcurrentHashMap<>(), diceNumber, GameStatus.LOBBY, false, null);
+            Game game = Game.of(
+                new ConcurrentHashMap<>(), diceNumber, GameStatus.LOBBY, false, null, Instant.now()
+            );
             if (games.putIfAbsent(gameCode, game) == null) {
                 return gameCode;
             }
         }
         throw new WsException(CustomWsError.NO_GAME_CODE_AVAILABLE);
+    }
+
+    /**
+     * Supprime les parties abandonnées : elles ne sont retirées de la mémoire que
+     * lorsqu'un admin annule sa partie, donc sans cette purge elles s'accumulent
+     * indéfiniment. Appelée par {@link GamePurgeService}.
+     *
+     * @return le nombre de parties supprimées
+     */
+    public int purgeExpiredGames(Instant now, Duration inGameRetention, Duration lobbyRetention) {
+        List<String> expiredGameCodes = games.entrySet().stream()
+            .filter(entry -> isExpired(entry.getValue(), now, inGameRetention, lobbyRetention))
+            .map(Map.Entry::getKey)
+            .toList();
+
+        expiredGameCodes.forEach(this::removeGame);
+        return expiredGameCodes.size();
+    }
+
+    /** Supprime une partie de la mémoire, room de sockets comprise */
+    private void removeGame(String gameCode) {
+        games.remove(gameCode);
+        socketService.closeRoom(gameCode);
+    }
+
+    /** Une partie expire selon son âge, avec un délai plus court pour un lobby jamais démarré */
+    private static boolean isExpired(Game game, Instant now, Duration inGameRetention, Duration lobbyRetention) {
+        if (game.getPlayers().isEmpty()) { // plus personne dedans : elle ne peut plus servir
+            return true;
+        }
+        if (game.getCreatedAt() == null) { // partie créée avant l'ajout de l'horodatage
+            return true;
+        }
+        Duration retention = game.getStatus() == GameStatus.IN_GAME ? inGameRetention : lobbyRetention;
+        return game.getCreatedAt().plus(retention).isBefore(now);
     }
 
     // TODO : ajouter une limite maximum de joueurs dans une partie, et gérer le cas où la partie est pleine
@@ -137,6 +176,14 @@ public class GameService {
 
         Lobby lobby = Lobby.of(actionGame.getGameCode(), players);
         socketService.quitGame(actionGame.getPlayerId(), lobby);
+
+        // Le dernier joueur est parti : la partie ne peut plus servir à personne, on la
+        // supprime sans attendre la purge quotidienne. Aucun risque de viser une partie
+        // encore vivante : une déconnexion ne retire jamais un joueur (c'est ce qui
+        // permet la reconnexion), seul un départ explicite le fait.
+        if (players.isEmpty()) {
+            removeGame(actionGame.getGameCode());
+        }
     }
 
     public void cancelGame(ActionGame actionGame) {

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 
@@ -22,4 +23,6 @@ public class Game {
     // le restituer à un joueur qui se reconnecte
     private Boolean isPlanificato;
     private UUID playerIdFinishTurn;
+    /** Date de création, utilisée par la purge des parties abandonnées */
+    private Instant createdAt;
 }

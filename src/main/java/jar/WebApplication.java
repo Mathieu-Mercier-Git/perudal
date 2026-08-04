@@ -1,6 +1,7 @@
 package jar;
 
 import com.coreoz.plume.jersey.guice.JerseyGuiceFeature;
+import com.coreoz.wisp.Scheduler;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Stage;
@@ -52,9 +53,7 @@ public class WebApplication {
 			);
 
 			// Add a shutdown hook to execute some code when the JVM receive a kill signal before it stops
-			addShutDownListener(httpServer);
-			// If Plume Scheduler / Wisp is used, uncomment next line
-			// addShutDownListerner(httpServer, injector.getInstance(Scheduler.class));
+			addShutDownListener(httpServer, injector.getInstance(Scheduler.class));
 
 			logger.info("Server started in {} ms", System.currentTimeMillis() - startTimestamp);
 		} catch (Throwable e) {
@@ -76,15 +75,14 @@ public class WebApplication {
 		}
 	}
 
-	private static void addShutDownListener(HttpServer httpServer) { // If scheduler is used, add arg: Scheduler scheduler
+	private static void addShutDownListener(HttpServer httpServer, Scheduler scheduler) {
 		Runtime.getRuntime().addShutdownHook(new Thread(
 			() -> {
 				logger.info("Stopping signal received, shutting down server and scheduler...");
 				GrizzlyFuture<HttpServer> grizzlyServerShutdownFuture = httpServer.shutdown(GRACEFUL_SHUTDOWN_TIMEOUT.toSeconds(), TimeUnit.SECONDS);
                 try {
                     logger.info("Waiting for server to shut down... Shutdown timeout is {} seconds", GRACEFUL_SHUTDOWN_TIMEOUT.toSeconds());
-                    // If scheduler is used, uncomment next line
-                    // scheduler.gracefullyShutdown(GRACEFUL_SHUTDOWN_TIMEOUT);
+                    scheduler.gracefullyShutdown(GRACEFUL_SHUTDOWN_TIMEOUT);
                     grizzlyServerShutdownFuture.get();
                     logger.info("Server and scheduler stopped.");
                 } catch(Exception e) {

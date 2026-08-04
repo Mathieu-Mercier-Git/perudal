@@ -1,5 +1,6 @@
 package jar.services.game.beans;
 
+import jar.services.game.enums.GameStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,12 @@ import java.util.UUID;
 @AllArgsConstructor(staticName="of")
 @NoArgsConstructor
 public class Game {
+    /** Joueurs indexés par leur identité durable (playerId), pas par leur socket */
     private Map<UUID, Player> players;
     private int diceNumber;
+    private GameStatus status;
+    // État du tour courant : conservé ici (et plus seulement diffusé) pour pouvoir
+    // le restituer à un joueur qui se reconnecte
+    private Boolean isPlanificato;
+    private UUID playerIdFinishTurn;
 }

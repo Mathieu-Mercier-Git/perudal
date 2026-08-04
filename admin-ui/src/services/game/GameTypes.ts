@@ -18,3 +18,18 @@ export type Game = {
   isPlanificato: boolean,
   playerIdFinishTurn?: string | null,
 }
+
+export enum GameStatus {
+  LOBBY = 'LOBBY',
+  IN_GAME = 'IN_GAME',
+}
+
+/**
+ * Réponse adressée au joueur courant : son identité durable (`playerId`, à
+ * conserver pour pouvoir reprendre la partie) et l'état de la partie.
+ */
+export type GameSession = {
+  playerId: string,
+  status: GameStatus,
+  game: Game,
+}

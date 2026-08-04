@@ -13,12 +13,12 @@ import GameService from '../../../services/game/GameService';
 import { Game, LobbyType } from '../../../services/game/GameTypes';
 import {
   addOnMessage,
-  getIdSocket,
   removeOnMessage,
   socketListener
 } from '../../../services/socket/SocketEngineService';
 import { ServerEvent } from '../../../services/socket/SocketTypes';
 import ValidationPopin from '../../theme/popin/ValidationPopin';
+import AnimatedLoader from '../../layout/AnimatedLoader';
 
 const DICE_NUMBER: number = 5;
 const MIN_DICE_NUMBER: number = 1;
@@ -32,20 +32,20 @@ type ConfirmAction = {
 export default function Lobby() {
   const gameService = getGlobalInstance(GameService);
   const lobby: LobbyType | undefined = useObservable(gameService.getLobby());
+  const game: Game | undefined = useObservable(gameService.getGame());
+  const playerId: string | undefined = useObservable(gameService.getPlayerId());
+  const isRestoringSession: boolean = useObservable(gameService.getIsRestoringSession());
 
   const [diceNumber, setDiceNumber] = useState<number>(DICE_NUMBER);
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [isCodeCopied, setIsCodeCopied] = useState<boolean>(false);
   const [confirmAction, setConfirmAction] = useState<ConfirmAction | undefined>(undefined);
 
   const { messages } = useMessages();
   const navigate = useNavigate();
 
-  useOnComponentMounted(() => {
-    if (lobby) {
-      setIsAdmin(!!lobby.players.find(player => player.id === getIdSocket() && player.isAdmin));
-    }
-  });
+  // Dérivé de l'état et non figé au montage : après une reprise de session,
+  // le lobby n'est connu qu'une fois la réponse du serveur reçue
+  const isAdmin: boolean = !!lobby?.players.find(player => player.id === playerId && player.isAdmin);
 
   const listenerUpdateLobby = useCallback(
     socketListener(ServerEvent.UPDATED_LOBBY, (response: LobbyType) => {
@@ -54,8 +54,9 @@ export default function Lobby() {
     }), [],
   );
 
-  const listenerCancelGame = useCallback( // TODO : ajouter une popin pour confirmer qu'on veut annuler la partie
+  const listenerCancelGame = useCallback(
     socketListener(ServerEvent.CANCEL_GAME, () => {
+      gameService.clearSession(); // la partie n'existe plus : on oublie l'identité locale
       navigate(HOME); // TODO : rediriger avec vers HOME avec une popup d'information pour dire que la partie a été annulée
     }), [],
   );
@@ -118,6 +119,20 @@ export default function Lobby() {
         setTimeout(() => setIsCodeCopied(false), 1500);
       });
   };
+
+  // Reprise de session en cours : on attend la réponse du serveur avant de décider
+  // où envoyer le joueur, sinon on le renvoie à l'accueil alors qu'il a une partie
+  if (isRestoringSession) {
+    return (
+      <Panel>
+        <div className="lobby"><AnimatedLoader /></div>
+      </Panel>
+    );
+  }
+
+  if (game) { // la partie a démarré pendant la coupure
+    return (<Navigate to={GAME} />);
+  }
 
   if (!lobby) {
     return (<Navigate to={HOME} />);

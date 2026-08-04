@@ -11,8 +11,14 @@ export type JoinGameRequestBody = {
 };
 
 export type ActionGame = {
-  userSocketId: string,
+  playerId: string,
   gameCode: string,
+};
+
+export type ReconnectRequestBody = {
+  gameCode: string,
+  playerId: string,
+  socketId: string,
 };
 
 export type StartGame = {
@@ -22,6 +28,6 @@ export type StartGame = {
 
 export type TurnInfo = {
   gameCode: string,
-  playerId: string, // userSocketId
+  playerId: string,
   hasLost: boolean,
 };

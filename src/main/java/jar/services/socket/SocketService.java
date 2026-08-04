@@ -21,6 +21,14 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+/**
+ * Achemine les évènements vers les sockets d'une partie.
+ * <p>
+ * La socket n'est qu'un moyen de transport : elle change à chaque reconnexion.
+ * L'identité durable du joueur est le {@code playerId}, et {@link #socketByPlayer}
+ * fait le lien entre les deux — c'est ce qui permet à un joueur de retrouver sa
+ * place après un verrouillage du téléphone.
+ */
 @Singleton
 public class SocketService {
     private static final Logger logger = LoggerFactory.getLogger(SocketService.class);
@@ -29,6 +37,7 @@ public class SocketService {
     private final Map<String, List<WebSocket>> socketsByGame;
     private final Map<UUID, WebSocket> socketById;
     private final Map<WebSocket, Passport> IdAndGameCodebySocket;
+    private final Map<UUID, WebSocket> socketByPlayer;
 
     @Inject
     public SocketService(ParserService parserService) {
@@ -36,6 +45,7 @@ public class SocketService {
         this.socketsByGame = new HashMap<>();
         this.socketById = new HashMap<>();
         this.IdAndGameCodebySocket = new HashMap<>();
+        this.socketByPlayer = new HashMap<>();
     }
 
     public void onConnect(WebSocket socket, UUID socketId) {
@@ -44,14 +54,16 @@ public class SocketService {
     }
 
     public void onClose(WebSocket socket) {
-        Passport passport = IdAndGameCodebySocket.get(socket); // TODO : test si passport != null
+        Passport passport = IdAndGameCodebySocket.get(socket);
         if (passport == null) {
             return;
         }
         socketById.remove(passport.getSocketId()); // On supprime la socket de sa liste de référence
+        // Le joueur reste dans la partie : seule sa socket disparait, il pourra la reprendre
+        // via reconnect(). On nettoie juste la référence morte.
+        socketByPlayer.values().removeIf(knownSocket -> knownSocket == socket);
         leaveRoom(socket, passport);
         IdAndGameCodebySocket.remove(socket);
-
     }
 
     public void createGame(String gameCode, UUID socketId) {
@@ -72,52 +84,71 @@ public class SocketService {
         sendLobby(lobby);
     }
 
-    public void startGame(GameInfo gameInfo) {
-        List<WebSocket> sockets = socketsByGame.get(gameInfo.getGameCode());
-        for (WebSocket socket: sockets) {
-            IdAndGameCodebySocket.computeIfPresent(socket,
-                (key, passport) -> Passport.of(passport.getSocketId(), null));
+    /** Associe une identité de joueur à sa connexion courante */
+    public void bindPlayer(UUID playerId, UUID socketId) {
+        WebSocket socket = socketById.get(socketId);
+        if (socket == null) {
+            logger.error("Cannot bind player {}: unknown socket {}", playerId, socketId);
+            return;
         }
+        socketByPlayer.put(playerId, socket);
+    }
+
+    /** Rattache une nouvelle socket à la room et à l'identité du joueur qui revient */
+    public void reconnect(String gameCode, UUID playerId, UUID socketId) {
+        joinRoom(gameCode, socketId);
+        bindPlayer(playerId, socketId);
+    }
+
+    public void startGame(GameInfo gameInfo) {
         sendStartGame(gameInfo);
     }
 
     public void finishTurn(GameInfo gameInfo) {
-        List<WebSocket> sockets = socketsByGame.get(gameInfo.getGameCode());
-        for (WebSocket socket: sockets) {
-            IdAndGameCodebySocket.computeIfPresent(socket,
-                (key, passport) -> Passport.of(passport.getSocketId(), null));
-        }
         sendFinishTurn(gameInfo);
     }
 
-    public void quitGame(UUID socketId, Lobby lobby) {
-        WebSocket socket = socketById.get(socketId);
-        Passport passport = IdAndGameCodebySocket.get(socket);
-        leaveRoom(socket, passport);
+    public void quitGame(UUID playerId, Lobby lobby) {
+        WebSocket socket = socketByPlayer.remove(playerId);
+        if (socket != null) {
+            Passport passport = IdAndGameCodebySocket.get(socket);
+            if (passport != null) {
+                leaveRoom(socket, passport);
+            }
+        }
         sendLobby(lobby);
     }
 
     public void cancelGame(String gameCode) {
         List<WebSocket> sockets = socketsByGame.get(gameCode);
-        for (WebSocket socket: sockets) {
-            IdAndGameCodebySocket.computeIfPresent(socket,
-                (key, passport) -> Passport.of(passport.getSocketId(), null));
+        if (sockets != null) {
+            for (WebSocket socket : sockets) {
+                IdAndGameCodebySocket.computeIfPresent(socket,
+                    (key, passport) -> Passport.of(passport.getSocketId(), null));
+            }
         }
         sendCancelGame(gameCode); // On envoie les informations avant de supprimer l'élément (Important)
         socketsByGame.remove(gameCode);
     }
 
     private void joinRoom(String gameCode, UUID socketId) {
-        WebSocket socket = socketById.get(socketId); // TODO : test si socket != null
+        WebSocket socket = socketById.get(socketId);
+        if (socket == null) {
+            logger.error("Cannot join room {}: unknown socket {}", gameCode, socketId);
+            return;
+        }
 
-        IdAndGameCodebySocket.computeIfPresent(socket, // TODO : test si passport != null
+        IdAndGameCodebySocket.computeIfPresent(socket,
             (key, passport) -> Passport.of(passport.getSocketId(), gameCode));
 
-        socketsByGame.computeIfAbsent(gameCode, k -> new ArrayList<>());
+        List<WebSocket> roomSockets = socketsByGame.computeIfAbsent(gameCode, k -> new ArrayList<>());
+        if (roomSockets.contains(socket)) { // une reconnexion ne doit pas dupliquer la socket dans la room
+            return;
+        }
         socketsByGame.put(
             gameCode,
             Stream.concat(
-                socketsByGame.get(gameCode).stream(),
+                roomSockets.stream(),
                 Stream.of(socket)
             ).toList()
         );
@@ -125,8 +156,13 @@ public class SocketService {
 
     private void leaveRoom(WebSocket socket, Passport passport) {
         String gameCode = passport.getGameCode();
-        socketsByGame.computeIfAbsent(gameCode, k -> new ArrayList<>());
-        socketsByGame.put(gameCode, socketsByGame.get(gameCode).stream().filter(s -> s != socket).toList());
+        if (gameCode == null) { // socket qui n'a rejoint aucune partie
+            return;
+        }
+        List<WebSocket> roomSockets = socketsByGame.get(gameCode);
+        if (roomSockets != null) {
+            socketsByGame.put(gameCode, roomSockets.stream().filter(s -> s != socket).toList());
+        }
 
         IdAndGameCodebySocket.put(socket, Passport.of(passport.socketId, null));
     }
@@ -173,36 +209,17 @@ public class SocketService {
         broadcast(gameCode, response);
     }
 
-//    private WebSocket retrieveSocketFromId(UUID idSocket) {
-//        for (Map.Entry<WebSocket, WebSocketApp.SocketInfo> entry : gameService.getSockets().entrySet()) {
-//            if (entry.getValue().getId().equals(idSocket)) return entry.getKey();
-//        }
-//        return null;
-//    }
-
-//    private void joinRoom(String gameCode, WebSocket socket) {
-//        leaveRooms(socket); // Delete to be sure that the socket will be updated with its proper gameCode
-//        roomSockets.computeIfAbsent(gameCode, k -> new ArrayList<>());
-//        roomSockets.put(
-//            gameCode,
-//            Stream.concat(
-//                roomSockets.get(gameCode).stream(),
-//                Stream.of(socket)
-//            ).toList()
-//        );
-//
-//        socketRoom.put(socket, gameCode);
-//    }
-
     public void broadcast(String gameCode, SocketResponse response) {
-        String stringBody = parserService.parseObject(response);
-        for (WebSocket socket : socketsByGame.get(gameCode)) {
-            socket.send(stringBody);
-        }
+        broadcast(gameCode, parserService.parseObject(response));
     }
 
     public void broadcast(String gameCode, String message) {
-        for (WebSocket socket : socketsByGame.get(gameCode)) {
+        List<WebSocket> sockets = socketsByGame.get(gameCode);
+        if (sockets == null) {
+            logger.warn("Cannot broadcast: no room for the game {}", gameCode);
+            return;
+        }
+        for (WebSocket socket : sockets) {
             socket.send(message);
         }
     }

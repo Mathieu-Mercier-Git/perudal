@@ -1,8 +1,10 @@
 import { HttpMethod } from 'simple-http-request-builder';
 import { HttpPromise } from 'simple-http-rest-client';
 import ApiHttpClient from '../ApiHttpClient';
-import { ActionGame, TurnInfo, JoinGameRequestBody, NewGameRequestBody, StartGame } from './GameApiType';
-import { LobbyType } from '../../services/game/GameTypes';
+import {
+  ActionGame, TurnInfo, JoinGameRequestBody, NewGameRequestBody, ReconnectRequestBody, StartGame,
+} from './GameApiType';
+import { GameSession, LobbyType } from '../../services/game/GameTypes';
 
 export default class GameApi {
   private static readonly BASE_PATH = '/game';
@@ -10,18 +12,26 @@ export default class GameApi {
   constructor(private readonly httpClient: ApiHttpClient) {
   }
 
-  createGame(body: NewGameRequestBody): HttpPromise<LobbyType> {
+  createGame(body: NewGameRequestBody): HttpPromise<GameSession> {
     return this
       .httpClient
-      .restRequest<LobbyType>(HttpMethod.POST, `${GameApi.BASE_PATH}`)
+      .restRequest<GameSession>(HttpMethod.POST, `${GameApi.BASE_PATH}`)
       .jsonBody(body)
       .execute();
   }
 
-  joinGame(body: JoinGameRequestBody): HttpPromise<LobbyType> {
+  joinGame(body: JoinGameRequestBody): HttpPromise<GameSession> {
     return this
       .httpClient
-      .restRequest<LobbyType>(HttpMethod.PUT, `${GameApi.BASE_PATH}/join`)
+      .restRequest<GameSession>(HttpMethod.PUT, `${GameApi.BASE_PATH}/join`)
+      .jsonBody(body)
+      .execute();
+  }
+
+  reconnect(body: ReconnectRequestBody): HttpPromise<GameSession> {
+    return this
+      .httpClient
+      .restRequest<GameSession>(HttpMethod.PUT, `${GameApi.BASE_PATH}/reconnect`)
       .jsonBody(body)
       .execute();
   }

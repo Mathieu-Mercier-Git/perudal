@@ -7,18 +7,18 @@ import { Button, Icon } from '@mui/material';
 import classNames from '../../../lib/class-names/ClassNames';
 import { Panel } from '../../theme/layout/Panel';
 import GameService from '../../../services/game/GameService';
-import { Game, Player } from '../../../services/game/GameTypes';
-import { HOME } from '../../Routes';
+import { Game, LobbyType, Player } from '../../../services/game/GameTypes';
+import { HOME, LOBBY } from '../../Routes';
 import Dice from './dice/Dice';
 import { ActionButton } from '../../theme/action/Actions';
 import ActionStyle from '../../../lib/plume-admin-theme/action/ActionStyle';
 import DiceCounter from './dice/DiceCounter';
 import {
   addOnMessage,
-  getIdSocket,
   removeOnMessage,
   socketListener
 } from '../../../services/socket/SocketEngineService';
+import AnimatedLoader from '../../layout/AnimatedLoader';
 import { ServerEvent } from '../../../services/socket/SocketTypes';
 import { useOnComponentMounted, useOnComponentUnMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
 import FinishTurnPopin from './popin/FinishTurnPopin';
@@ -41,8 +41,10 @@ export default function Game() {
   const gameService = getGlobalInstance(GameService);
   const rulesOverlayService = getGlobalInstance(RulesOverlayService);
   const game: Game | undefined = useObservable(gameService.getGame());
+  const lobby: LobbyType | undefined = useObservable(gameService.getLobby());
+  const playerId: string | undefined = useObservable(gameService.getPlayerId());
+  const isRestoringSession: boolean = useObservable(gameService.getIsRestoringSession());
 
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [showMyDices, setShowMyDices] = useState<boolean>(false);
   const [isRevealDices, setIsRevealDices] = useState<boolean>(false);
   const [showFinishTurnPopin, setShowFinishTurnPopin] = useState<boolean>(false);
@@ -56,12 +58,9 @@ export default function Game() {
   // const { messages } = useMessages();
   const navigate = useNavigate();
 
-  useOnComponentMounted(() => {
-    if (game) {
-      setIsAdmin(!!game.players.find(player => player.id === getIdSocket() && player.isAdmin));
-    }
-  });
-
+  // Dérivé de l'état et non figé au montage : après une reprise de session,
+  // la partie n'est connue qu'une fois la réponse du serveur reçue
+  const isAdmin: boolean = !!game?.players.find(player => player.id === playerId && player.isAdmin);
 
   const listenerRevealDices = useCallback(
     socketListener(ServerEvent.REVEAL_DICES, () => {
@@ -81,8 +80,9 @@ export default function Game() {
     }), [],
   );
 
-  const listenerCancelGame = useCallback( // TODO : ajouter une popin pour confirmer qu'on veut annuler la partie
+  const listenerCancelGame = useCallback(
     socketListener(ServerEvent.CANCEL_GAME, () => {
+      gameService.clearSession(); // la partie n'existe plus : on oublie l'identité locale
       navigate(HOME);
     }), [],
   );
@@ -100,7 +100,7 @@ export default function Game() {
   });
 
   // Les joueurs éliminés (plus aucun dé) sont affichés en dernier dans la liste
-  const opponents: Player[] = [...gameService.getOpponents(game)]
+  const opponents: Player[] = [...gameService.getOpponents()]
     .sort((a, b) => Number(b.dices.length > 0) - Number(a.dices.length > 0));
   const mainPlayer: Player | undefined = gameService.getMainPlayer();
 
@@ -212,8 +212,19 @@ export default function Game() {
   const diceTotalQuantity: number = game?.players.reduce((total, player) => total + player.dices.length, 0) ?? 0;
   const isPlanificato: boolean | undefined = game?.isPlanificato;
 
+  // Reprise de session en cours : on attend la réponse du serveur avant de décider
+  // où envoyer le joueur, sinon on le renvoie à l'accueil alors qu'il a une partie
+  if (isRestoringSession) {
+    return (
+      <Panel>
+        <div className="game"><AnimatedLoader /></div>
+      </Panel>
+    );
+  }
+
   if (!game) {
-    return (<Navigate to={HOME} />);
+    // La partie n'a pas (re)démarré : si on a toujours un lobby, on y retourne
+    return (<Navigate to={lobby ? LOBBY : HOME} />);
   } // TODO : ajouter le total de dés sur la table
 
   return (

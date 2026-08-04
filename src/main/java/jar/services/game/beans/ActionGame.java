@@ -10,6 +10,6 @@ import java.util.UUID;
 @AllArgsConstructor(staticName="of")
 @NoArgsConstructor
 public class ActionGame {
-    private UUID userSocketId;
+    private UUID playerId;
     private String gameCode;
 }

@@ -6,10 +6,11 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jar.services.game.GameService;
 import jar.services.game.beans.ActionGame;
+import jar.services.game.beans.GameSession;
 import jar.services.game.beans.TurnInfo;
 import jar.services.game.beans.JoinGame;
-import jar.services.game.beans.Lobby;
 import jar.services.game.beans.NewGame;
+import jar.services.game.beans.ReconnectGame;
 import jar.services.game.beans.StartGame;
 
 import javax.inject.Inject;
@@ -37,15 +38,22 @@ public class GameWs {
 
 	@POST
 	@Operation(description = "Create a game")
-	public Lobby createGame(@RequestBody NewGame newGame) { // TODO : ajouter dans la signature du WS le socketId
+	public GameSession createGame(@RequestBody NewGame newGame) {
 		return gameService.createGame(newGame);
 	}
 
     @PUT
     @Path("/join")
     @Operation(description = "Join a game")
-    public Lobby joinGame(@RequestBody JoinGame joinGame) {
+    public GameSession joinGame(@RequestBody JoinGame joinGame) {
         return gameService.joinGame(joinGame);
+    }
+
+    @PUT
+    @Path("/reconnect")
+    @Operation(description = "Resume a game after a connection loss")
+    public GameSession reconnect(@RequestBody ReconnectGame reconnectGame) {
+        return gameService.reconnect(reconnectGame);
     }
 
     @PUT

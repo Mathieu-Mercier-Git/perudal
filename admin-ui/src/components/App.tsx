@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
+import { getGlobalInstance } from 'plume-ts-di';
 import { Logger } from 'simple-logging-system';
 import GlobalErrorBoundary from './theme/GlobalErrorBoundary';
 import { useOnComponentMounted } from '../lib/react-hooks-alias/ReactHooksAlias';
@@ -8,9 +9,10 @@ import { GAME, HOME, LOBBY } from './Routes';
 import Home from './pages/home/Home';
 import Lobby from './pages/lobby/Lobby';
 import LandingPage from './pages/LandingPage';
-import { initSocket } from '../services/socket/SocketEngineService';
+import { addOnConnected, initSocket, removeOnConnected } from '../services/socket/SocketEngineService';
 import Game from './pages/game/Game';
 import Rules from './pages/rules/Rules';
+import GameService from '../services/game/GameService';
 
 const logger: Logger = new Logger('App');
 // To make the application have a base path that starts with /admin:
@@ -24,14 +26,24 @@ if (window && !window.location.pathname.startsWith(basePath)) {
 }
 
 export default function App() {
+  const gameService = getGlobalInstance(GameService);
   const [isSocketInitLoading, setIsSocketInitLoading] = useState<boolean>(false);
   const [isSocktetInitSuccess, setIsSocktetInitSuccess] = useState<boolean>(false);
   const [hasSocketError, setHasSocketError] = useState<boolean>(false);
 
   useOnComponentMounted(() => {
-    initSocket()
-      .then(() => setIsSocktetInitSuccess(true))
-      .catch(() => setHasSocketError(true));
+    // Déclenché à chaque connexion établie, reconnexions comprises : on ne repasse
+    // donc jamais par l'écran de chargement une fois la partie démarrée
+    const onSocketConnected = () => {
+      setIsSocktetInitSuccess(true);
+      setHasSocketError(false);
+      gameService.restoreSession();
+    };
+    addOnConnected(onSocketConnected);
+
+    initSocket().catch(() => setHasSocketError(true));
+
+    return () => removeOnConnected(onSocketConnected);
   });
 
   logger.info('Render App');

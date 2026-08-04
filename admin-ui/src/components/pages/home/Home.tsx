@@ -110,7 +110,8 @@ export default function Home() {
   };
 
   const onChangePerucode = (event) => {
-    setPerucode(event.target.value);
+    // Le pérucode contient une lettre : on la remet en majuscule à la saisie
+    setPerucode(event.target.value.toUpperCase());
   };
 
   return (
@@ -168,6 +169,8 @@ export default function Home() {
               type="text"
               onChange={onChangePerucode}
               autoComplete="off"
+              value={perucode}
+              inputProps={{ maxLength: 5 }}
             />
         </ValidationPopin>
       )}

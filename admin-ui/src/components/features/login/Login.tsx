@@ -28,11 +28,14 @@ export default function Login() {
   };
 
   const isAuthenticated: boolean = useObservable(sessionService.isAuthenticated());
+  // useOnDependenciesChange(() => {
+  //   if (isAuthenticated) {
+  //     navigate({ pathname: HOME });
+  //   }
+  // }, [isAuthenticated, navigate]);
   useOnDependenciesChange(() => {
-    if (isAuthenticated) {
-      navigate({ pathname: HOME });
-    }
-  }, [isAuthenticated, navigate]);
+    navigate({ pathname: HOME });
+  }, [navigate]);
 
   return (
     <div className="login-layout">

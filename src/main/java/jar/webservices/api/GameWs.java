@@ -86,6 +86,13 @@ public class GameWs {
     }
 
     @PUT
+    @Path("/roll-dices")
+    @Operation(description = "Roll again the dices of every player")
+    public void rollDices(@RequestBody ActionGame actionGame) {
+        gameService.rollDices(actionGame);
+    }
+
+    @PUT
     @Path("/finish-turn")
     @Operation(description = "Finish a turn and update players")
     public void finishTurn(@RequestBody TurnInfo turnInfo) {

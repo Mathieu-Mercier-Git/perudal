@@ -68,6 +68,14 @@ export default class GameApi {
       .execute();
   }
 
+  rollDices(body: ActionGame): HttpPromise<void> {
+    return this
+      .httpClient
+      .restRequest<void>(HttpMethod.PUT, `${GameApi.BASE_PATH}/roll-dices`)
+      .jsonBody(body)
+      .execute();
+  }
+
   finishTurn(body: TurnInfo): HttpPromise<LobbyType> {
     return this
       .httpClient

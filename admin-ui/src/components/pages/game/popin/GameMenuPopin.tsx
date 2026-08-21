@@ -21,9 +21,11 @@ export default function GameMenuPopin({
         <ActionButton style={ActionStyle.PRIMARY} icon="menu_book" onClick={onShowRules}>
           Règles du jeu
         </ActionButton>
-        <ActionButton style={ActionStyle.PRIMARY} icon="replay" onClick={onRollDices}>
-          Relancer les dés
-        </ActionButton>
+        {isAdmin && (
+          <ActionButton style={ActionStyle.PRIMARY} icon="replay" onClick={onRollDices}>
+            Relancer les dés
+          </ActionButton>
+        )}
         <ActionButton
           style={ActionStyle.PRIMARY}
           icon={isAdmin ? 'cancel' : 'logout'}

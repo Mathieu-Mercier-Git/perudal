@@ -6,5 +6,6 @@ public enum ServerEvent {
     START_GAME,
     FINISH_TURN,
     REVEAL_DICES,
+    ROLL_DICES,
     KICKED;
 }

@@ -151,6 +151,15 @@ export default class GameService {
       .then(() => this.clearSession());
   }
 
+  rollDices(gameCode: string): void {
+    const playerId: string | undefined = this.playerId.get();
+    if (!playerId) {
+      return;
+    }
+    // Le jeu mis à jour arrivera par l'évènement socket ROLL_DICES
+    this.gameApi.rollDices({ playerId, gameCode });
+  }
+
   finishTurn(gameCode: string, playerId: string, hasLost: boolean): void {
     this.gameApi.finishTurn({ gameCode, playerId, hasLost });
   }

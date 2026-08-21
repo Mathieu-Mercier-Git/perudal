@@ -108,6 +108,14 @@ public class SocketService {
         sendFinishTurn(gameInfo);
     }
 
+    public void rollDices(GameInfo gameInfo) {
+        SocketResponse response = SocketResponse.of(
+            ServerEvent.ROLL_DICES,
+            gameInfo
+        );
+        broadcast(gameInfo.getGameCode(), response);
+    }
+
     public void quitGame(UUID playerId, Lobby lobby) {
         WebSocket socket = socketByPlayer.remove(playerId);
         if (socket != null) {

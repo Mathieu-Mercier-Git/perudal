@@ -212,6 +212,26 @@ public class GameService {
         socketService.cancelGame(actionGame.getGameCode());
     }
 
+    /**
+     * Relance les dés de tous les joueurs sans toucher au reste de l'état du tour
+     * (nombre de dés, planificato, joueur qui commence). Réservée à l'admin.
+     */
+    public void rollDices(ActionGame actionGame) {
+        Game game = games.get(actionGame.getGameCode());
+        if (game == null) {
+            throw new WsException(CustomWsError.GAME_NOT_FOUND);
+        }
+        Player actor = game.getPlayers().get(actionGame.getPlayerId());
+        if (actor == null || !Boolean.TRUE.equals(actor.getIsAdmin())) {
+            throw new WsException(CustomWsError.NOT_GAME_ADMIN);
+        }
+
+        for (Player player : game.getPlayers().values()) {
+            player.setDices(GameUtils.rollDices(player.getDiceNumber()));
+        }
+        socketService.rollDices(toGameInfo(actionGame.getGameCode(), game));
+    }
+
     public void finishTurn(TurnInfo turnInfo) {
         Game game = games.get(turnInfo.getGameCode());
         if (game == null) {

@@ -10,7 +10,8 @@ import GameService from '../../../services/game/GameService';
 import { Game, LobbyType, Player } from '../../../services/game/GameTypes';
 import { HOME, LOBBY } from '../../Routes';
 import Dice from './dice/Dice';
-import { ActionButton } from '../../theme/action/Actions';
+import { ActionButton, ActionsContainer } from '../../theme/action/Actions';
+import { Popin } from '../../theme/popin/Popin';
 import ActionStyle from '../../../lib/plume-admin-theme/action/ActionStyle';
 import DiceCounter from './dice/DiceCounter';
 import {
@@ -52,6 +53,7 @@ export default function Game() {
   const [confirmAction, setConfirmAction] = useState<ConfirmAction | undefined>(undefined);
   const [isRevealPending, setIsRevealPending] = useState<boolean>(false);
   const [playerWinner, setPlayerWinner] = useState<Player | undefined>(undefined);
+  const [showRollDicesInfo, setShowRollDicesInfo] = useState<boolean>(false);
 
   const revealTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -80,6 +82,17 @@ export default function Game() {
     }), [],
   );
 
+  const listenerRollDices = useCallback(
+    socketListener(ServerEvent.ROLL_DICES, (response: Game) => {
+      // Les dés relancés repartent masqués, comme en début de tour
+      setIsRevealDices(false);
+      setShowMyDices(false);
+      setShowRollDicesInfo(true); // tout le monde est prévenu que les dés ont changé
+      gameService.setGame(response);
+      logger.debug('EVENT ROLL_DICES', { response });
+    }), [],
+  );
+
   const listenerCancelGame = useCallback(
     socketListener(ServerEvent.CANCEL_GAME, () => {
       gameService.clearSession(); // la partie n'existe plus : on oublie l'identité locale
@@ -89,11 +102,13 @@ export default function Game() {
 
   useOnComponentMounted(() => {
     addOnMessage(listenerRevealDices);
+    addOnMessage(listenerRollDices);
     addOnMessage(listenerFinishTurn);
     addOnMessage(listenerCancelGame);
 
     return () => {
       removeOnMessage(listenerRevealDices);
+      removeOnMessage(listenerRollDices);
       removeOnMessage(listenerFinishTurn);
       removeOnMessage(listenerCancelGame);
     };
@@ -191,7 +206,10 @@ export default function Game() {
     setConfirmAction({
       title: 'Es-tu sûr de vouloir relancer tous les dés ?',
       onValidation: () => {
-        // TODO
+        if (!game) {
+          return;
+        }
+        gameService.rollDices(game.gameCode);
       },
     });
   }
@@ -370,6 +388,18 @@ export default function Game() {
           }}
           onClose={() => setConfirmAction(undefined)}
         />
+      )}
+      {showRollDicesInfo && (
+        <Popin zIndex={120}>
+          <div className="popin-title">Tous les dés ont été relancés !</div>
+          <div className="popin-buttons">
+            <ActionsContainer>
+              <ActionButton style={ActionStyle.PRIMARY} onClick={() => setShowRollDicesInfo(false)}>
+                C&apos;est noté
+              </ActionButton>
+            </ActionsContainer>
+          </div>
+        </Popin>
       )}
       {showFinishTurnPopin && (
        <FinishTurnPopin onClick={finishTurn} onClose={() => setShowFinishTurnPopin(false)} players={game.players} />

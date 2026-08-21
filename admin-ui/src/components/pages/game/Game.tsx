@@ -302,11 +302,22 @@ export default function Game() {
             )}
           </div>
           <div className="game__tray-actions">
-            <ActionButton
-              cssClasses="action-container--icon"
-              onClick={() => setShowMyDices(!showMyDices)}
-              icon={showMyDices ? 'visibility' : 'visibility_off'}
-            />
+            {isAdmin
+              ? (
+                <ActionButton
+                  style={ActionStyle.SECONDARY}
+                  onClick={() => setShowMyDices(!showMyDices)}
+                >
+                  {showMyDices ? 'Masquer mes dés' : 'Révéler mes dés'}
+                </ActionButton>
+              )
+              : (
+                <ActionButton
+                  cssClasses="action-container--icon"
+                  onClick={() => setShowMyDices(!showMyDices)}
+                  icon={showMyDices ? 'visibility' : 'visibility_off'}
+                />
+              )}
             {isAdmin && (
               isRevealDices
                 ? (

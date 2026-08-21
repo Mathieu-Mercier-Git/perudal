@@ -6,6 +6,7 @@ import jar.services.game.beans.Game;
 import jar.services.game.beans.GameInfo;
 import jar.services.game.beans.GameSession;
 import jar.services.game.beans.JoinGame;
+import jar.services.game.beans.KickPlayer;
 import jar.services.game.beans.Lobby;
 import jar.services.game.beans.NewGame;
 import jar.services.game.beans.Player;
@@ -186,6 +187,24 @@ public class GameService {
         if (players.isEmpty()) {
             removeGame(actionGame.getGameCode());
         }
+    }
+
+    /** Exclusion d'un joueur du lobby : réservée à l'admin de la partie */
+    public void kickPlayer(KickPlayer kickPlayer) {
+        Game game = games.get(kickPlayer.getGameCode());
+        if (game == null) {
+            throw new WsException(CustomWsError.GAME_NOT_FOUND);
+        }
+        Player actor = game.getPlayers().get(kickPlayer.getPlayerId());
+        if (actor == null || !Boolean.TRUE.equals(actor.getIsAdmin())) {
+            throw new WsException(CustomWsError.NOT_GAME_ADMIN);
+        }
+        if (!game.getPlayers().containsKey(kickPlayer.getKickedPlayerId())) {
+            throw new WsException(CustomWsError.PLAYER_NOT_FOUND);
+        }
+
+        List<Player> players = removePlayer(kickPlayer.getGameCode(), kickPlayer.getKickedPlayerId());
+        socketService.kickPlayer(kickPlayer.getKickedPlayerId(), Lobby.of(kickPlayer.getGameCode(), players));
     }
 
     public void cancelGame(ActionGame actionGame) {

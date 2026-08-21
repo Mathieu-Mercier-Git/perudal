@@ -5,5 +5,6 @@ public enum ServerEvent {
     CANCEL_GAME,
     START_GAME,
     FINISH_TURN,
-    REVEAL_DICES;
+    REVEAL_DICES,
+    KICKED;
 }

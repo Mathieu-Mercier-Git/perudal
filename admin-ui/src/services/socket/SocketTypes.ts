@@ -17,4 +17,5 @@ export enum ServerEvent {
   START_GAME = 'START_GAME',
   REVEAL_DICES = 'REVEAL_DICES',
   FINISH_TURN = 'FINISH_TURN',
+  KICKED = 'KICKED',
 }

@@ -2,7 +2,7 @@ import { HttpMethod } from 'simple-http-request-builder';
 import { HttpPromise } from 'simple-http-rest-client';
 import ApiHttpClient from '../ApiHttpClient';
 import {
-  ActionGame, TurnInfo, JoinGameRequestBody, NewGameRequestBody, ReconnectRequestBody, StartGame,
+  ActionGame, TurnInfo, JoinGameRequestBody, KickPlayer, NewGameRequestBody, ReconnectRequestBody, StartGame,
 } from './GameApiType';
 import { GameSession, LobbyType } from '../../services/game/GameTypes';
 
@@ -48,6 +48,14 @@ export default class GameApi {
     return this
       .httpClient
       .restRequest<LobbyType>(HttpMethod.PUT, `${GameApi.BASE_PATH}/quit`)
+      .jsonBody(body)
+      .execute();
+  }
+
+  kickPlayer(body: KickPlayer): HttpPromise<void> {
+    return this
+      .httpClient
+      .restRequest<void>(HttpMethod.PUT, `${GameApi.BASE_PATH}/kick`)
       .jsonBody(body)
       .execute();
   }

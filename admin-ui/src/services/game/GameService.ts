@@ -133,6 +133,15 @@ export default class GameService {
       .then(() => this.clearSession());
   }
 
+  kickPlayer(gameCode: string, kickedPlayerId: string): void {
+    const playerId: string | undefined = this.playerId.get();
+    if (!playerId) {
+      return;
+    }
+    // Le lobby mis à jour arrivera par l'évènement socket UPDATED_LOBBY
+    this.gameApi.kickPlayer({ playerId, kickedPlayerId, gameCode });
+  }
+
   cancelGame(gameCode: string): void {
     const playerId: string | undefined = this.playerId.get();
     if (!playerId) {

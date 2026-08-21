@@ -15,6 +15,12 @@ export type ActionGame = {
   gameCode: string,
 };
 
+export type KickPlayer = {
+  playerId: string,
+  kickedPlayerId: string,
+  gameCode: string,
+};
+
 export type ReconnectRequestBody = {
   gameCode: string,
   playerId: string,

@@ -9,6 +9,7 @@ import jar.services.game.beans.ActionGame;
 import jar.services.game.beans.GameSession;
 import jar.services.game.beans.TurnInfo;
 import jar.services.game.beans.JoinGame;
+import jar.services.game.beans.KickPlayer;
 import jar.services.game.beans.NewGame;
 import jar.services.game.beans.ReconnectGame;
 import jar.services.game.beans.StartGame;
@@ -68,6 +69,13 @@ public class GameWs {
     @Operation(description = "Quit a game")
     public void quitGame(@RequestBody ActionGame actionGame) {
         gameService.quitGame(actionGame);
+    }
+
+    @PUT
+    @Path("/kick")
+    @Operation(description = "Kick a player from a game (admin only)")
+    public void kickPlayer(@RequestBody KickPlayer kickPlayer) {
+        gameService.kickPlayer(kickPlayer);
     }
 
     @PUT

@@ -10,7 +10,7 @@ import ActionStyle from '../../../lib/plume-admin-theme/action/ActionStyle';
 import { GAME, HOME } from '../../Routes';
 import { useOnComponentMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
 import GameService from '../../../services/game/GameService';
-import { Game, LobbyType } from '../../../services/game/GameTypes';
+import { Game, LobbyType, Player } from '../../../services/game/GameTypes';
 import {
   addOnMessage,
   removeOnMessage,
@@ -61,6 +61,13 @@ export default function Lobby() {
     }), [],
   );
 
+  const listenerKicked = useCallback(
+    socketListener(ServerEvent.KICKED, () => {
+      gameService.clearSession(); // l'admin nous a exclu : on oublie l'identité locale
+      navigate(HOME); // TODO : rediriger vers HOME avec une popup d'information pour dire qu'on a été exclu
+    }), [],
+  );
+
   const listenerStartGame = useCallback(
     socketListener(ServerEvent.START_GAME, (response: Game) => {
       gameService.setGame(response);
@@ -71,11 +78,13 @@ export default function Lobby() {
   useOnComponentMounted(() => {
     addOnMessage(listenerUpdateLobby);
     addOnMessage(listenerCancelGame);
+    addOnMessage(listenerKicked);
     addOnMessage(listenerStartGame);
 
     return () => {
       removeOnMessage(listenerUpdateLobby);
       removeOnMessage(listenerCancelGame);
+      removeOnMessage(listenerKicked);
       removeOnMessage(listenerStartGame);
     };
   });
@@ -109,6 +118,13 @@ export default function Lobby() {
     setConfirmAction({
       title: 'Es-tu sûr de vouloir quitter la partie ?',
       onValidation: () => gameService.quitGame(lobby!.gameCode),
+    });
+  };
+
+  const askKickPlayer = (player: Player): void => {
+    setConfirmAction({
+      title: `Es-tu sûr de vouloir exclure ${player.name} de la partie ?`,
+      onValidation: () => gameService.kickPlayer(lobby!.gameCode, player.id),
     });
   };
 
@@ -170,6 +186,11 @@ export default function Lobby() {
                 <span className="lobby__player-avatar">{player.name.charAt(0).toUpperCase()}</span>
                 <span className="lobby__player-name">{player.name}</span>
                 {player.isAdmin && (<Icon className="lobby__player-crown">star</Icon>)}
+                {isAdmin && !player.isAdmin && (
+                  <button type="button" className="lobby__player-kick" onClick={() => askKickPlayer(player)}>
+                    <Icon>close</Icon>
+                  </button>
+                )}
               </div>
             )))}
           </div>

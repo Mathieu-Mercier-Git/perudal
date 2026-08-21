@@ -165,6 +165,31 @@
         font-size: 16px;
       }
     }
+
+    // Croix d'exclusion d'un joueur (visible uniquement par l'admin)
+    &-kick {
+      display: flex;
+      flex: none;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      margin-left: auto;
+      padding: 0;
+      background: transparent;
+      border: none;
+      border-radius: 50%;
+      color: var(--ink3);
+      transition: color .18s ease;
+
+      &:hover {
+        color: var(--terra-txt);
+      }
+
+      .MuiIcon-root {
+        font-size: 16px;
+      }
+    }
   }
 
   &__actions {

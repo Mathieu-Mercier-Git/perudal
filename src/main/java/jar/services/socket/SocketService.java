@@ -119,6 +119,23 @@ public class SocketService {
         sendLobby(lobby);
     }
 
+    /**
+     * Exclusion par l'admin : le joueur exclu est prévenu individuellement (évènement
+     * {@link ServerEvent#KICKED}) avant d'être sorti de la room, puis le lobby mis à
+     * jour est diffusé aux joueurs restants.
+     */
+    public void kickPlayer(UUID kickedPlayerId, Lobby lobby) {
+        WebSocket socket = socketByPlayer.remove(kickedPlayerId);
+        if (socket != null) {
+            socket.send(parserService.parseObject(SocketResponse.of(ServerEvent.KICKED, lobby.getGameCode())));
+            Passport passport = IdAndGameCodebySocket.get(socket);
+            if (passport != null) {
+                leaveRoom(socket, passport);
+            }
+        }
+        sendLobby(lobby);
+    }
+
     public void cancelGame(String gameCode) {
         List<WebSocket> sockets = socketsByGame.get(gameCode);
         if (sockets != null) {

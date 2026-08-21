@@ -158,7 +158,9 @@ public class GameService {
         currentGame.setDiceNumber(startGame.getDiceNumber());
         currentGame.setStatus(GameStatus.IN_GAME);
         currentGame.setIsPlanificato(false);
-        currentGame.setPlayerIdFinishTurn(null);
+        // Le premier joueur à jouer est tiré au sort parmi les joueurs présents
+        List<UUID> playerIds = new ArrayList<>(currentGame.getPlayers().keySet());
+        currentGame.setPlayerIdFinishTurn(playerIds.get(new Random().nextInt(playerIds.size())));
         for (Player player : currentGame.getPlayers().values()) {
             player.setDiceNumber(startGame.getDiceNumber());
             player.setDices(GameUtils.rollDices(startGame.getDiceNumber()));

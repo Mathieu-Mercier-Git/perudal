@@ -2,44 +2,34 @@
 GAMEPLAY / REGLES DU JEU
 ========================================
 
-o Dans la Game, prévoir une option d'aide pour retirer ou ajouter des dès à un joueur pendant la game en cas d'erreur
-  -> demander au joueur admin s'il souhaite relancer les dés ou conserver le tirage
+o Pour le pérucode elever les lettres qui posent soucis genre le 'O' qu'on confond avec le zéro
 
-o Ajouter une page pour les règles
+o Prévoir un évènement pour relancer tous les dés de la partie dans les options (et on peut le faire si on est en pleine partie sinon le bouton est disable)
 
-o Gérer le planificato de tour (actuellement le tour est planifié mais pas exécuté)
-  - Front : admin-ui/src/components/pages/game/Game.tsx:65-66
+o Ajouter le local storage pour garder les infos perso et de la partie en cours
 
-o Utiliser Claude code pour stocker les chaines de caractère dans MessageService
+o message d'erreur si la partie n'existe pas
 
-o Ajout de tests
+o Faire des tests manuels sur la reconnexion d'un joueur (localStorage + socket)
 
-o POur le pseudo, interdire les caractères spéciaux
+o Faire des manuels sur la tâche de purge
 
 ========================================
 LOBBY / GESTION DE PARTIE
 ========================================
+toujours "123" en dur)
+  - Back : src/main/java/jar/services/utils/GameUtils.java:13-14
 
 o Limiter le nombre maximum et minimum de joueurs dans une partie et gérer le cas où la partie est pleine
   - Back : src/main/java/jar/services/game/GameService.java:46
 
-o Générer un vrai code de partie (actuellement toujours "123" en dur)
-  - Back : src/main/java/jar/services/utils/GameUtils.java:13-14
-
+o Générer un vrai code de partie (actuellement
 o Rediriger vers HOME avec une popup d'information quand la partie a été annulée
   - Front : admin-ui/src/components/pages/lobby/Lobby.tsx:43
-
-o Idée : bouton avec chargement de 5s et possibilité d'annuler pendant ce laps de temps
-  - Front : admin-ui/src/components/pages/lobby/Lobby.tsx:69
 
 ========================================
 RECONNEXION JOUEUR (problème connu)
 ========================================
-
-o Les joueurs sont identifiés par leur UUID de connexion WebSocket : un rafraîchissement de page fait perdre la connexion.
-  Prévoir une identification plus stable (ex: token persistant / localStorage) plutôt que le seul UUID socket.
-  - Back : src/main/java/jar/services/game/GameService.java:122
-  - Back : src/main/java/jar/webservices/api/GameWs.java:40 (ajouter le socketId dans la signature du WS)
 
 o Stocker les infos de session/partie dans le localStorage (home + lobby)
   - Front : admin-ui/src/components/pages/home/Home.tsx:39
@@ -102,3 +92,22 @@ LIB VENDORÉE (plume-admin-users — tiers, à ne pas modifier sauf besoin réel
 o admin-ui/src/lib/plume-admin-users/pages/Users.tsx:27 — récupérer la route courante où le composant est monté
 o admin-ui/src/lib/plume-admin-users/pages/Users.tsx:36 — récupération des rôles (utilisés partout)
 o admin-ui/src/lib/plume-admin-users/pages/UsersEdit.tsx:73 — le changement de mot de passe devrait être une action à part
+
+
+========================================
+LATER
+========================================
+
+o Utiliser Claude code pour stocker les chaines de caractère dans MessageService
+
+o Augmenter la version de java et de node
+
+o Régler les erreurs dans la console typescript
+
+o Ajout de tests
+
+o Relire et adapter les règles du perudo
+
+o Passe sur le texte dans l'application (moins de sérieux + de fun)
+
+o Ajouter des animations (voir ce qu'il est possible de faire)

@@ -37,7 +37,7 @@ sessionService.tryInitializingSessionFromStorage();
 sessionService.synchronizeSessionFromOtherBrowserTags();
 
 const userService: UserService = injector.getInstance(UserService);
-// userService.initializingUserFromStorage(); // TODO : à commenter pour testeer plusieurs joueurs en local
+userService.initializingUserFromStorage()
 
 // dayjs
 initializeLocalizedDate(injector.getInstance(LocaleService));
@@ -45,9 +45,9 @@ initializeLocalizedDate(injector.getInstance(LocaleService));
 injector.getInstance(NotificationRenderer).initialize();
 
 const reactApp: JSX.Element = (
-  // <React.StrictMode>
+  <React.StrictMode>
     <App />
-  // </React.StrictMode>
+  </React.StrictMode>
 );
 const rootElement: HTMLElement | null = document.getElementById('root');
 if (!rootElement) {

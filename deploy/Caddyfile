@@ -1,0 +1,31 @@
+# Configuration Caddy pour Perudal.
+# Installée par server-setup.sh dans /etc/caddy/Caddyfile (le domaine y est substitué).
+#
+# Caddy obtient et renouvelle automatiquement le certificat HTTPS (Let's Encrypt)
+# pour le domaine ci-dessous : aucune configuration TLS manuelle n'est nécessaire.
+# Il faut seulement que le DNS du domaine pointe déjà vers ce serveur et que les
+# ports 80 et 443 soient ouverts.
+#
+# DOMAINE_A_REMPLACER est substitué par le vrai domaine par server-setup.sh.
+
+DOMAINE_A_REMPLACER {
+	encode gzip
+
+	# API REST du backend
+	handle /api/* {
+		reverse_proxy localhost:8080
+	}
+
+	# WebSocket temps réel (reverse_proxy gère l'upgrade WebSocket tout seul)
+	handle /socket {
+		reverse_proxy localhost:8080
+	}
+
+	# Frontend React : fichiers statiques, avec repli sur index.html
+	# pour que les routes côté client (ex. /lobby) fonctionnent au rechargement
+	handle {
+		root * /opt/perudal/front
+		try_files {path} /index.html
+		file_server
+	}
+}

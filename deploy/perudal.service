@@ -1,0 +1,27 @@
+# Unité systemd du backend Perudal.
+# Installée par server-setup.sh dans /etc/systemd/system/perudal.service
+#
+# Commandes utiles sur le serveur :
+#   sudo systemctl status perudal      # état du service
+#   sudo systemctl restart perudal     # redémarrage (fait par deploy.sh)
+#   sudo journalctl -u perudal -f      # suivre les logs en direct
+
+[Unit]
+Description=Perudal game server (Java backend)
+After=network.target
+
+[Service]
+Type=simple
+User=perudal
+Group=perudal
+WorkingDirectory=/opt/perudal/backend
+# Le script "start" généré par Maven référence une classe Play inexistante :
+# on lance directement la classe main du projet avec toutes les dépendances.
+ExecStart=/usr/bin/java -Xms128m -Xmx512m -cp "/opt/perudal/backend/lib/*" jar.WebApplication
+# Secrets et surcharges de configuration (PERUDAL_INTERNAL_API_PASSWORD, etc.)
+EnvironmentFile=/etc/perudal/env
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

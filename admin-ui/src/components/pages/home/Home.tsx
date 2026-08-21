@@ -105,11 +105,11 @@ export default function Home() {
     return lettersAndSpaces.charAt(0).toUpperCase() + lettersAndSpaces.slice(1);
   };
 
-  const onChangeUsername = (event) => {
+  const onChangeUsername = (event: React.ChangeEvent<HTMLInputElement>) => {
     userService.setUsername(sanitizeUsername(event.target.value));
   };
 
-  const onChangePerucode = (event) => {
+  const onChangePerucode = (event: React.ChangeEvent<HTMLInputElement>) => {
     // Le pérucode contient une lettre : on la remet en majuscule à la saisie
     setPerucode(event.target.value.toUpperCase());
   };

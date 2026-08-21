@@ -36,7 +36,7 @@ export default class GameApi {
       .execute();
   }
 
-  startGame(body: StartGame): HttpPromise<void> {
+  startGame(body: StartGame): HttpPromise<LobbyType> {
     return this
       .httpClient
       .restRequest<LobbyType>(HttpMethod.PUT, `${GameApi.BASE_PATH}/start`)
@@ -44,7 +44,7 @@ export default class GameApi {
       .execute();
   }
 
-  quitGame(body: ActionGame): HttpPromise<void> {
+  quitGame(body: ActionGame): HttpPromise<LobbyType> {
     return this
       .httpClient
       .restRequest<LobbyType>(HttpMethod.PUT, `${GameApi.BASE_PATH}/quit`)
@@ -52,7 +52,7 @@ export default class GameApi {
       .execute();
   }
 
-  cancelGame(body: ActionGame): HttpPromise<void> {
+  cancelGame(body: ActionGame): HttpPromise<LobbyType> {
     return this
       .httpClient
       .restRequest<LobbyType>(HttpMethod.PUT, `${GameApi.BASE_PATH}/cancel`)
@@ -60,7 +60,7 @@ export default class GameApi {
       .execute();
   }
 
-  finishTurn(body: TurnInfo): HttpPromise<void> {
+  finishTurn(body: TurnInfo): HttpPromise<LobbyType> {
     return this
       .httpClient
       .restRequest<LobbyType>(HttpMethod.PUT, `${GameApi.BASE_PATH}/finish-turn`)

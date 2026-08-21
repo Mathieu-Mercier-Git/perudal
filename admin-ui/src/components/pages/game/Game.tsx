@@ -112,7 +112,10 @@ export default function Game() {
   }
 
   const revealDices = () => {
-    gameService.sendRevealDices(game?.gameCode);
+    if (!game) {
+      return;
+    }
+    gameService.sendRevealDices(game.gameCode);
     // TODO : gérer le planificato
   }
 
@@ -145,12 +148,18 @@ export default function Game() {
     }
   });
 
-  const finishTurn = (playerId: string, hasLost: boolean) => {
-    gameService.finishTurn(game?.gameCode, playerId, hasLost);
+  const finishTurn = (turnPlayerId: string, hasLost: boolean) => {
+    if (!game) {
+      return;
+    }
+    gameService.finishTurn(game.gameCode, turnPlayerId, hasLost);
   }
 
   const backToHome = () => {
-    gameService.cancelGame(game?.gameCode);
+    if (!game) {
+      return;
+    }
+    gameService.cancelGame(game.gameCode);
   };
 
   const openRulesFromMenu = () => {
@@ -162,15 +171,18 @@ export default function Game() {
   // Ces actions déclenchent des évènements côté backend (comme dans le lobby).
   const leaveGame = () => {
     // TODO : gérer les évènements côté backend
+    if (!game) {
+      return;
+    }
     if (isAdmin) {
       setConfirmAction({
         title: 'Es-tu sûr de vouloir annuler la partie ?',
-        onValidation: () => gameService.cancelGame(game?.gameCode),
+        onValidation: () => gameService.cancelGame(game.gameCode),
       });
     } else {
       setConfirmAction({
         title: 'Es-tu sûr de vouloir quitter la partie ?',
-        onValidation: () => gameService.quitGame(game?.gameCode),
+        onValidation: () => gameService.quitGame(game.gameCode),
       });
     }
   };

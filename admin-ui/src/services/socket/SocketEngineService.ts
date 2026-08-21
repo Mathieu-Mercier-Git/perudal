@@ -27,9 +27,9 @@ const messageListeners: Set<(event: MessageEvent) => void> = new Set();
 // une fois l'identifiant de socket reçu du serveur
 const connectedListeners: Set<() => void> = new Set();
 
-export const socketListener = (
+export const socketListener = <T>(
   eventName: string,
-  callback: (body: Object) => void,
+  callback: (body: T) => void,
 ) => {
   return (event: MessageEvent) => {
     const response: SocketResponse = JSON.parse(event.data);
@@ -38,7 +38,7 @@ export const socketListener = (
     }
 
     if (response.event && response.event === eventName) {
-      callback(response.body);
+      callback(response.body as T);
     }
   };
 };

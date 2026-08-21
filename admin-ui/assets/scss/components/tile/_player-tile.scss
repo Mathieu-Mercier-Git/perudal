@@ -2,6 +2,8 @@
 
 // Joueur sélectionnable dans une popin (« Qui a perdu ? »)
 .player-tile {
+  position: relative; // ancre la barre de progression du compte à rebours
+  overflow: hidden;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -23,6 +25,8 @@
   }
 
   &__name {
+    position: relative; // au-dessus de la barre de progression
+    z-index: 1;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -31,10 +35,33 @@
 
   // nombre de dés restants, aligné à droite
   &__dices {
+    position: relative; // au-dessus de la barre de progression
+    z-index: 1;
     flex: none;
     font-family: var(--font-mono);
     font-size: 13px;
     font-weight: 600;
     color: var(--ink3);
+  }
+
+  // Compte à rebours annulable avant l'envoi de la fin du tour : même principe
+  // que le bouton « Révéler tous les dés » (keyframes reveal-countdown, _game.scss)
+  &__progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: rgba(0, 0, 0, .16);
+    // la durée est fournie en style inline (constante configurable côté React)
+    animation: reveal-countdown linear forwards;
+  }
+
+  &--pending {
+    border-color: var(--t-accent-line);
+
+    .player-tile__name {
+      font-weight: 900; // le joueur en attente ressort en gras
+    }
   }
 }

@@ -170,7 +170,7 @@ export default function Home() {
               onChange={onChangePerucode}
               autoComplete="off"
               value={perucode}
-              inputProps={{ maxLength: 5 }}
+              inputProps={{ maxLength: 4 }}
             />
         </ValidationPopin>
       )}

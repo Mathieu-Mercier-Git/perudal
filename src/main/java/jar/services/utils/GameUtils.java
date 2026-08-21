@@ -7,8 +7,9 @@ import java.util.Locale;
 import java.util.Random;
 
 public class GameUtils {
-    private static final String GAME_CODE_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private static final int GAME_CODE_DIGITS_COUNT = 4;
+    // I et O sont exclus pour éviter la confusion avec les chiffres 1 et 0
+    private static final String GAME_CODE_LETTERS = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+    private static final int GAME_CODE_DIGITS_COUNT = 3;
     // SecureRandom et non Random : le code est le seul élément qui protège l'accès
     // à une partie, il ne doit pas être devinable à partir des codes précédents
     private static final SecureRandom GAME_CODE_RANDOM = new SecureRandom();
@@ -18,7 +19,7 @@ public class GameUtils {
     }
 
     /**
-     * Code de partie : une lettre majuscule suivie de 4 chiffres (ex. « K7392 »).
+     * Code de partie : une lettre majuscule (hors I et O) suivie de 3 chiffres (ex. « K739 »).
      */
     public static String generateGameCode() {
         StringBuilder gameCode = new StringBuilder(1 + GAME_CODE_DIGITS_COUNT);

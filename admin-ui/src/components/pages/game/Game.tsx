@@ -36,7 +36,7 @@ type ConfirmAction = {
 const logger: Logger = new Logger('Game');
 
 // Délai (ms) pendant lequel « Révéler tous les dés » peut être annulé avant que l'action ne parte
-const REVEAL_COUNTDOWN_MS: number = 2500;
+const REVEAL_COUNTDOWN_MS: number = 2000;
 
 export default function Game() {
   const gameService = getGlobalInstance(GameService);

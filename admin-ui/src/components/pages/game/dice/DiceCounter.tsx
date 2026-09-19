@@ -1,94 +1,81 @@
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import Dice from './Dice';
 import { Game, Player } from '../../../../services/game/GameTypes';
+import classNames from '../../../../lib/class-names/ClassNames';
 
 type Props = {
-  game: Game;
-  isPlanificato?: boolean;
+  game: Game,
+  isPlanificato?: boolean,
 };
 
-type DiceCount = {
-  one: number;
-  two: number;
-  three: number;
-  four: number;
-  five: number;
-  six: number;
-}
+type FaceCount = {
+  face: number,
+  // Nombre de dés affichant réellement cette face
+  count: number,
+  // Perudos (toucans) qui viennent compléter une mise sur cette face
+  bonus: number,
+};
+
+const FACES: number[] = [1, 2, 3, 4, 5, 6];
+
+const toucanImage: string = '/assets/images/toucan.png';
 
 export default function DiceCounter({ game, isPlanificato }: Props) {
-  const players: Player[] = [...game.players];
+  // Hors planificato, le perudo (toucan, face 1) est un joker : il compte dans
+  // les mises sur 2, 3, 4, 5 et 6. On affiche donc le décompte brut de la face,
+  // puis le renfort apporté par les perudos.
+  const faceCounts: FaceCount[] = useMemo(
+    () => {
+      const counts: number[] = FACES.map(() => 0);
+      game.players.forEach((player: Player) => {
+        player.dices.forEach((dice: number) => {
+          if (dice >= 1 && dice <= 6) {
+            counts[dice - 1] += 1;
+          }
+        });
+      });
 
-  const makeDiceCount = (): DiceCount => {
-    let one: number = 0;
-    let two: number = 0;
-    let three: number = 0;
-    let four: number = 0;
-    let five: number = 0;
-    let six: number = 0;
+      const toucanCount: number = counts[0];
+      return FACES.map((face: number) => ({
+        face,
+        count: counts[face - 1],
+        bonus: (isPlanificato || face === 1) ? 0 : toucanCount,
+      }));
+    },
+    [game.players, isPlanificato],
+  );
 
-    players.forEach((player: Player) => {
-      player.dices.forEach((dice: number) => {
-        if (dice === 1) one++;
-        else if (dice === 2) two++;
-        else if (dice === 3) three++;
-        else if (dice === 4) four++;
-        else if (dice === 5) five++;
-        else if (dice === 6) six++;
-      })
-    })
-    return { one, two, three, four, five, six };
-  }
-
-  const [diceCount, ] = useState<DiceCount>(makeDiceCount());
+  const hasNoJoker: boolean = !isPlanificato && faceCounts[0].count === 0;
 
   return (
     <div className="dice-counter">
-      <div>Résultat du tour</div>
+      <div className="dice-counter__title">Résultat du tour</div>
       <div className="dice-counter-list">
-        <div className="dice-counter-item">
-          <Dice number={1} show isPlanificato={isPlanificato} />
-          <div className="dice-count">
-            <span>x</span>
-            {diceCount.one}
+        {faceCounts.map(({ face, count, bonus }: FaceCount) => (
+          <div
+            key={face}
+            className={classNames('dice-counter-item', {
+              'dice-counter-item--joker': face === 1 && !isPlanificato,
+            })}
+            title={bonus > 0 ? `${count} + ${bonus} perudo${bonus > 1 ? 's' : ''} = ${count + bonus}` : undefined}
+          >
+            <Dice number={face} show isPlanificato={isPlanificato} />
+            <div className="dice-count">
+              <span>x</span>
+              {count}
+            </div>
+            {bonus > 0 && (
+              <span className="dice-counter-bonus">
+                <span className="dice-counter-bonus__value">+{bonus}</span>
+                <img src={toucanImage} alt="perudos" />
+              </span>
+            )}
           </div>
-        </div>
-        <div className="dice-counter-item">
-          <Dice number={2} show />
-          <div className="dice-count">
-            <span>x</span>
-            {diceCount.two}
-          </div>
-        </div>
-        <div className="dice-counter-item">
-          <Dice number={3} show />
-          <div className="dice-count">
-            <span>x</span>
-            {diceCount.three}
-          </div>
-        </div>
-        <div className="dice-counter-item">
-          <Dice number={4} show />
-          <div className="dice-count">
-            <span>x</span>
-            {diceCount.four}
-          </div>
-        </div>
-        <div className="dice-counter-item">
-          <Dice number={5} show />
-          <div className="dice-count">
-            <span>x</span>
-            {diceCount.five}
-          </div>
-        </div>
-        <div className="dice-counter-item">
-          <Dice number={6} show />
-          <div className="dice-count">
-            <span>x</span>
-            {diceCount.six}
-          </div>
-        </div>
+        ))}
       </div>
+      {hasNoJoker && (
+        <div className="dice-counter__legend">Aucun perudo sur la table</div>
+      )}
     </div>
   );
 }

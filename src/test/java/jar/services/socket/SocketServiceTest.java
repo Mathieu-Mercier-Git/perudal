@@ -72,4 +72,18 @@ public class SocketServiceTest {
 
         Assertions.assertThat(deadSocket.received).isEmpty();
     }
+
+    @Test
+    public void joinRoom__should_leave_the_previous_room() {
+        SocketService socketService = new SocketService(new ParserService());
+        FakeSocket fakeSocket = new FakeSocket();
+        UUID socketId = UUID.randomUUID();
+        socketService.onConnect(fakeSocket.socket, socketId);
+        socketService.reconnect("AAAA", UUID.randomUUID(), socketId);
+        socketService.reconnect("BBBB", UUID.randomUUID(), socketId);
+
+        socketService.broadcast("AAAA", "message");
+
+        Assertions.assertThat(fakeSocket.received).isEmpty();
+    }
 }

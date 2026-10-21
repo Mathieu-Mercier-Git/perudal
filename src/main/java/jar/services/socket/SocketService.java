@@ -182,6 +182,13 @@ public class SocketService {
             return;
         }
 
+        Passport previousPassport = IdAndGameCodebySocket.get(socket);
+        if (previousPassport != null && previousPassport.getGameCode() != null
+            && !previousPassport.getGameCode().equals(gameCode)) {
+            // Sinon la socket resterait dans l'ancienne room sans que onClose() ne l'en retire
+            leaveRoom(socket, previousPassport);
+        }
+
         IdAndGameCodebySocket.computeIfPresent(socket,
             (key, passport) -> Passport.of(passport.getSocketId(), gameCode));
 

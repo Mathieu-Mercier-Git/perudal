@@ -49,7 +49,8 @@
     justify-content: center;
     align-items: flex-start;
     flex-wrap: wrap;
-    gap: 0.4rem;
+    // 6 dés de 50px + 5 écarts de 10px = 350px : tient sur une ligne dès 360px d'écran
+    gap: 10px;
   }
 
   .dice-counter-item {

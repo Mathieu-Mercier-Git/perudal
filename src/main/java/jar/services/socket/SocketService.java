@@ -263,8 +263,24 @@ public class SocketService {
             logger.warn("Cannot broadcast: no room for the game {}", gameCode);
             return;
         }
+        // Une socket fermée lève une exception sur send() : sans cette protection,
+        // elle interromprait la diffusion pour tous les joueurs placés après elle
+        List<WebSocket> deadSockets = new ArrayList<>();
         for (WebSocket socket : sockets) {
-            socket.send(message);
+            if (!socket.isConnected()) {
+                deadSockets.add(socket);
+                continue;
+            }
+            try {
+                socket.send(message);
+            } catch (RuntimeException e) {
+                logger.warn("Cannot send message to a socket of the game {}", gameCode, e);
+                deadSockets.add(socket);
+            }
+        }
+        if (!deadSockets.isEmpty()) {
+            logger.info("Removing {} dead socket(s) from the game {}", deadSockets.size(), gameCode);
+            socketsByGame.put(gameCode, sockets.stream().filter(s -> !deadSockets.contains(s)).toList());
         }
     }
 

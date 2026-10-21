@@ -5,14 +5,17 @@
   flex-direction: column;
   align-items: center;
   gap: $spacer-3;
+  // Pleine largeur : on annule le padding horizontal de .game__scroll (20px),
+  // et seules les bordures haute et basse restent visibles
+  margin: 0 -20px;
   padding: 15px 5px;
   background: var(--surf);
-  border: 2px solid var(--ink);
-  border-radius: 16px;
+  border-top: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
 
   &__title {
     font-family: var(--font-mono);
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     letter-spacing: .08em;
     text-transform: uppercase;

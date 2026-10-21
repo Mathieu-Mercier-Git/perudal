@@ -33,17 +33,17 @@ export default function ValidationPopin({
       <div className="popin-buttons">
         <theme.actionsContainer>
           <theme.actionButton
-            style={ActionStyle.PRIMARY}
-            onClick={onValidation}
-          >
-            {submitMessage || messages.action.confirm}
-          </theme.actionButton>
-          <theme.actionButton
             style={ActionStyle.SECONDARY}
             onClick={onClose}
             isLoading={isLoading}
           >
             {secondaryButtonLabel || messages.action.close}
+          </theme.actionButton>
+          <theme.actionButton
+            style={ActionStyle.PRIMARY}
+            onClick={onValidation}
+          >
+            {submitMessage || messages.action.confirm}
           </theme.actionButton>
         </theme.actionsContainer>
       </div>

@@ -12,6 +12,7 @@
   background: var(--surf);
   border-top: 2px solid var(--ink);
   border-bottom: 2px solid var(--ink);
+  animation: dice-counter-reveal .45s cubic-bezier(.2, 1.2, .4, 1) both;
 
   &__title {
     font-family: var(--font-mono);
@@ -114,5 +115,18 @@
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
+  }
+}
+
+// Apparition de l'encart à la révélation des dés
+@keyframes dice-counter-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scaleY(.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
   }
 }

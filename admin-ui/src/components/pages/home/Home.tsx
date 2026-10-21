@@ -12,7 +12,7 @@ import { ServerEvent } from '../../../services/socket/SocketTypes';
 import { getGlobalInstance } from 'plume-ts-di';
 import { LobbyType } from '../../../services/game/GameTypes';
 import GameService from '../../../services/game/GameService';
-import { LOBBY } from '../../Routes';
+import { CONTACT, LOBBY } from '../../Routes';
 import ValidationPopin from '../../theme/popin/ValidationPopin';
 import useToggle from '../../../lib/react-hook-toggle/ReactHookToggle';
 import UserService from '../../../services/user/UserService';
@@ -117,6 +117,14 @@ export default function Home() {
   return (
     <Panel>
       <div className="home">
+        <button
+          type="button"
+          className="home__contact-link"
+          onClick={() => navigate(CONTACT)}
+          aria-label="Contact"
+        >
+          <Icon>mail</Icon>
+        </button>
         <button
           type="button"
           className="home__rules-link"

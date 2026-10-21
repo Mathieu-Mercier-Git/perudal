@@ -5,12 +5,13 @@ import { getGlobalInstance } from 'plume-ts-di';
 import { Logger } from 'simple-logging-system';
 import GlobalErrorBoundary from './theme/GlobalErrorBoundary';
 import { useOnComponentMounted } from '../lib/react-hooks-alias/ReactHooksAlias';
-import { GAME, HOME, LOBBY } from './Routes';
+import { CONTACT, GAME, HOME, LOBBY } from './Routes';
 import Home from './pages/home/Home';
 import Lobby from './pages/lobby/Lobby';
 import LandingPage from './pages/LandingPage';
 import { addOnConnected, initSocket, removeOnConnected } from '../services/socket/SocketEngineService';
 import Game from './pages/game/Game';
+import Contact from './pages/contact/Contact';
 import Rules from './pages/rules/Rules';
 import GameService from '../services/game/GameService';
 
@@ -60,6 +61,7 @@ export default function App() {
           <Route path={HOME} element={<Home />} />
           <Route path={LOBBY} element={<Lobby />} />
           <Route path={GAME} element={<Game />} />
+          <Route path={CONTACT} element={<Contact />} />
           <Route path="*" element={<Navigate to={{ pathname: HOME }} />} />
         </Routes>
         <Rules />

@@ -76,6 +76,35 @@
     }
   }
 
+  // Accès au contact : même bouton icône, en haut à gauche
+  &__contact-link {
+    position: absolute;
+    top: calc(18px + env(safe-area-inset-top));
+    left: 20px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    background-color: var(--btn2);
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    color: var(--ink);
+    cursor: pointer;
+    transition: filter .18s ease, border-color .18s ease;
+
+    &:hover {
+      border-color: var(--accent-line);
+      filter: brightness(1.1);
+    }
+
+    .MuiIcon-root {
+      font-size: 22px;
+    }
+  }
+
   &__logo {
     position: relative;
     display: flex;

@@ -329,7 +329,7 @@ export default function Game() {
             {isAdmin && (
               isRevealDices
                 ? (
-                  <ActionButton style={ActionStyle.PRIMARY} onClick={() => setShowFinishTurnPopin(true)}>
+                  <ActionButton style={ActionStyle.SECONDARY} onClick={() => setShowFinishTurnPopin(true)}>
                     Fin du tour
                   </ActionButton>
                 )

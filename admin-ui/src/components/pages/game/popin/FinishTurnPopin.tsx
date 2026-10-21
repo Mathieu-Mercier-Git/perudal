@@ -55,6 +55,11 @@ export default function FinishTurnPopin({ onClose, onClick, players }: Props) {
       <div className={`popin-title ${hasLostTurn ? '' : 'win'}`}>
         {hasLostTurn ? 'Qui a perdu ce tour ?' : 'Qui a trouvé le chiffre exact ?'}
       </div>
+      <div className="popin-message popin-message--subtitle">
+        {hasLostTurn
+          ? 'Le joueur perd un dé.'
+          : 'Le joueur gagne un dé. S\'il a déjà tous ses dés, tous les autres joueurs en perdent un.'}
+      </div>
       <div className="popin-content popin-content--tiles">
         {players.filter(player => player.diceNumber > 0).map(player => (
           <div

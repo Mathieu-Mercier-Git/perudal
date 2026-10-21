@@ -28,6 +28,10 @@ import java.util.stream.Stream;
  * L'identité durable du joueur est le {@code playerId}, et {@link #socketByPlayer}
  * fait le lien entre les deux — c'est ce qui permet à un joueur de retrouver sa
  * place après un verrouillage du téléphone.
+ * <p>
+ * Les méthodes publiques sont synchronisées : les sockets (threads Grizzly) et les
+ * appels REST (threads Jersey) modifient les mêmes maps en parallèle, par exemple
+ * une fermeture de socket concurrente d'une reconnexion.
  */
 @Singleton
 public class SocketService {
@@ -48,12 +52,12 @@ public class SocketService {
         this.socketByPlayer = new HashMap<>();
     }
 
-    public void onConnect(WebSocket socket, UUID socketId) {
+    public synchronized void onConnect(WebSocket socket, UUID socketId) {
         socketById.put(socketId, socket);
         IdAndGameCodebySocket.put(socket, Passport.of(socketId, null));
     }
 
-    public void onClose(WebSocket socket) {
+    public synchronized void onClose(WebSocket socket) {
         Passport passport = IdAndGameCodebySocket.get(socket);
         if (passport == null) {
             return;
@@ -66,7 +70,7 @@ public class SocketService {
         IdAndGameCodebySocket.remove(socket);
     }
 
-    public void createGame(String gameCode, UUID socketId) {
+    public synchronized void createGame(String gameCode, UUID socketId) {
         if (socketsByGame.containsKey(gameCode)) {
             logger.error("Game with the code {} already exists", gameCode);
             // TODO : handle
@@ -74,7 +78,7 @@ public class SocketService {
         joinRoom(gameCode, socketId);
     }
 
-    public void joinGame(UUID socketId, Lobby lobby) {
+    public synchronized void joinGame(UUID socketId, Lobby lobby) {
         String gameCode = lobby.getGameCode();
         if (!socketsByGame.containsKey(gameCode)) {
             logger.error("Game with the code {} doesn't exist", gameCode);
@@ -85,7 +89,7 @@ public class SocketService {
     }
 
     /** Associe une identité de joueur à sa connexion courante */
-    public void bindPlayer(UUID playerId, UUID socketId) {
+    public synchronized void bindPlayer(UUID playerId, UUID socketId) {
         WebSocket socket = socketById.get(socketId);
         if (socket == null) {
             logger.error("Cannot bind player {}: unknown socket {}", playerId, socketId);
@@ -95,7 +99,7 @@ public class SocketService {
     }
 
     /** Rattache une nouvelle socket à la room et à l'identité du joueur qui revient */
-    public void reconnect(String gameCode, UUID playerId, UUID socketId) {
+    public synchronized void reconnect(String gameCode, UUID playerId, UUID socketId) {
         joinRoom(gameCode, socketId);
         bindPlayer(playerId, socketId);
     }
@@ -116,7 +120,7 @@ public class SocketService {
         broadcast(gameInfo.getGameCode(), response);
     }
 
-    public void quitGame(UUID playerId, Lobby lobby) {
+    public synchronized void quitGame(UUID playerId, Lobby lobby) {
         WebSocket socket = socketByPlayer.remove(playerId);
         if (socket != null) {
             Passport passport = IdAndGameCodebySocket.get(socket);
@@ -132,7 +136,7 @@ public class SocketService {
      * {@link ServerEvent#KICKED}) avant d'être sorti de la room, puis le lobby mis à
      * jour est diffusé aux joueurs restants.
      */
-    public void kickPlayer(UUID kickedPlayerId, Lobby lobby) {
+    public synchronized void kickPlayer(UUID kickedPlayerId, Lobby lobby) {
         WebSocket socket = socketByPlayer.remove(kickedPlayerId);
         if (socket != null) {
             socket.send(parserService.parseObject(SocketResponse.of(ServerEvent.KICKED, lobby.getGameCode())));
@@ -144,7 +148,7 @@ public class SocketService {
         sendLobby(lobby);
     }
 
-    public void cancelGame(String gameCode) {
+    public synchronized void cancelGame(String gameCode) {
         List<WebSocket> sockets = socketsByGame.get(gameCode);
         if (sockets != null) {
             for (WebSocket socket : sockets) {
@@ -163,7 +167,7 @@ public class SocketService {
      * avant de tout supprimer : sans ça, ces clients resteraient sur un écran de partie
      * qui n'existe plus côté serveur.
      */
-    public void closeRoom(String gameCode) {
+    public synchronized void closeRoom(String gameCode) {
         List<WebSocket> sockets = socketsByGame.get(gameCode);
         if (sockets != null && !sockets.isEmpty()) {
             sendCancelGame(gameCode);
@@ -264,7 +268,7 @@ public class SocketService {
         broadcast(gameCode, parserService.parseObject(response));
     }
 
-    public void broadcast(String gameCode, String message) {
+    public synchronized void broadcast(String gameCode, String message) {
         List<WebSocket> sockets = socketsByGame.get(gameCode);
         if (sockets == null) {
             logger.warn("Cannot broadcast: no room for the game {}", gameCode);
@@ -291,7 +295,7 @@ public class SocketService {
         }
     }
 
-    public void onMessage(WebSocket socket, String eventKey, String gameCode) {
+    public synchronized void onMessage(WebSocket socket, String eventKey, String gameCode) {
         ClientEvent clientEvent = ClientEvent.findByName(eventKey);
         if (clientEvent == null) {
             logger.error("Unknown client event received: {}", eventKey);

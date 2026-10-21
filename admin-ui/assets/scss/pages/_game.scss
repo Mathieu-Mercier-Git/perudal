@@ -159,7 +159,7 @@
     gap: $spacer-3;
 
     // chaque bouton occupe une part égale de la div :
-    // 100 % seul (non-admin), 50 % chacun (admin)
+    // 100 % seul (joueur), 50 % chacun (admin)
     .action-container {
       flex: 1;
     }
@@ -167,14 +167,6 @@
     // les boutons remplissent toute la hauteur de la div
     .MuiButton-root {
       height: 100%;
-    }
-
-    // ici l'œil n'est pas une pastille compacte : il remplit sa colonne comme le bouton admin
-    // (sélecteur volontairement plus spécifique pour battre `.action-container--icon` de _material-override)
-    .action-container.action-container--icon .MuiButton-root {
-      width: 100%;
-      min-width: 0;
-      border-radius: 14px;
     }
   }
 }

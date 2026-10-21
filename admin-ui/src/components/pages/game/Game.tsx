@@ -320,22 +320,12 @@ export default function Game() {
             )}
           </div>
           <div className="game__tray-actions">
-            {isAdmin
-              ? (
-                <ActionButton
-                  style={ActionStyle.SECONDARY}
-                  onClick={() => setShowMyDices(!showMyDices)}
-                >
-                  {showMyDices ? 'Masquer mes dés' : 'Révéler mes dés'}
-                </ActionButton>
-              )
-              : (
-                <ActionButton
-                  cssClasses="action-container--icon"
-                  onClick={() => setShowMyDices(!showMyDices)}
-                  icon={showMyDices ? 'visibility' : 'visibility_off'}
-                />
-              )}
+            <ActionButton
+              style={ActionStyle.PRIMARY}
+              onClick={() => setShowMyDices(!showMyDices)}
+            >
+              {showMyDices ? 'Masquer mes dés' : 'Révéler mes dés'}
+            </ActionButton>
             {isAdmin && (
               isRevealDices
                 ? (
@@ -351,7 +341,7 @@ export default function Game() {
                       { 'reveal-button--pending': isRevealPending },
                     )}
                   >
-                    <Button variant="contained" color="primary" onClick={handleRevealClick}>
+                    <Button variant="contained" color="secondary" onClick={handleRevealClick}>
                       {isRevealPending && (
                         <span
                           className="reveal-button__progress"

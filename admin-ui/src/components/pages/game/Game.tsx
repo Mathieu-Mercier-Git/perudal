@@ -324,7 +324,7 @@ export default function Game() {
               style={ActionStyle.PRIMARY}
               onClick={() => setShowMyDices(!showMyDices)}
             >
-              {showMyDices ? 'Masquer mes dés' : 'Révéler mes dés'}
+              {showMyDices ? 'Masquer mes dés' : 'Voir mes dés'}
             </ActionButton>
             {isAdmin && (
               isRevealDices

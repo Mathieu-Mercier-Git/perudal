@@ -50,7 +50,7 @@
   // Accès aux règles : petit bouton icône en haut à droite
   &__rules-link {
     position: absolute;
-    top: calc(18px + env(safe-area-inset-top));
+    top: calc(70px + env(safe-area-inset-top));
     right: 20px;
     z-index: 1;
     display: flex;
@@ -76,11 +76,11 @@
     }
   }
 
-  // Accès au contact : même bouton icône, en haut à gauche
+  // Accès au contact : même bouton icône, au-dessus de celui des règles
   &__contact-link {
     position: absolute;
     top: calc(18px + env(safe-area-inset-top));
-    left: 20px;
+    right: 20px;
     z-index: 1;
     display: flex;
     align-items: center;

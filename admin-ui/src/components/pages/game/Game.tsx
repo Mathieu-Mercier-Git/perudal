@@ -322,6 +322,7 @@ export default function Game() {
           <div className="game__tray-actions">
             <ActionButton
               style={ActionStyle.PRIMARY}
+              icon={showMyDices ? 'visibility_off' : 'visibility'}
               onClick={() => setShowMyDices(!showMyDices)}
             >
               {showMyDices ? 'Masquer mes dés' : 'Voir mes dés'}

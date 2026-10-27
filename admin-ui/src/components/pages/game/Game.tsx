@@ -341,7 +341,12 @@ export default function Game() {
                       { 'reveal-button--pending': isRevealPending },
                     )}
                   >
-                    <Button variant="contained" color="secondary" onClick={handleRevealClick}>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={handleRevealClick}
+                      endIcon={!isRevealPending && <Icon>arrow_forward</Icon>}
+                    >
                       {isRevealPending && (
                         <span
                           className="reveal-button__progress"

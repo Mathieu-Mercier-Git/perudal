@@ -163,9 +163,10 @@
       flex: 1;
     }
 
-    // les boutons remplissent toute la hauteur de la div
+    // hauteur fixe calée sur un libellé de deux lignes (padding 2 × 14px + 2 × 13px + bordure 2 × 1px),
+    // pour que les boutons ne changent pas de taille quand le texte tient sur une seule ligne
     .MuiButton-root {
-      height: 100%;
+      height: 56px;
     }
   }
 }

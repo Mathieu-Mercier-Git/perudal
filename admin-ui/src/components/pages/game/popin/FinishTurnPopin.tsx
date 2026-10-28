@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Player } from '../../../../services/game/GameTypes';
+import PlayerName from '../../../theme/player/PlayerName';
 import { Popin } from '../../../theme/popin/Popin';
 import ActionStyle from '../../../../lib/plume-admin-theme/action/ActionStyle';
 import { ActionButton, ActionsContainer } from '../../../theme/action/Actions';
@@ -73,7 +74,7 @@ export default function FinishTurnPopin({ onClose, onClick, players }: Props) {
                 style={{ animationDuration: `${FINISH_TURN_COUNTDOWN_MS}ms` }}
               />
             )}
-            <span className="player-tile__name">{player.name}</span>
+            <PlayerName player={player} className="player-tile__name" />
             <span className="player-tile__dices">
               {player.diceNumber} {player.diceNumber > 1 ? 'dés' : 'dé'}
             </span>

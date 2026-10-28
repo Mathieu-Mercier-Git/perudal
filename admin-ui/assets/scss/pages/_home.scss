@@ -153,4 +153,32 @@
     flex-direction: column;
     gap: $spacer-3;
   }
+
+  // Encart emoji + champ pseudo sur une même ligne
+  &__identity {
+    display: flex;
+    align-items: stretch;
+    gap: $spacer-2;
+  }
+
+  // Encart cliquable affichant l'emoji du joueur, au même gabarit que le champ pseudo
+  &__emoji {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--ink3);
+    border-radius: 4px;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    transition: border-color .18s ease;
+
+    &:hover, &:focus-visible {
+      border-color: var(--ink);
+    }
+  }
 }

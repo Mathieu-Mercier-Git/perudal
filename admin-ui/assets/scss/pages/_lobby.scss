@@ -132,29 +132,12 @@
     border: 1px solid var(--line);
     border-radius: 10px;
 
-    &-avatar {
-      display: flex;
-      flex: none;
-      align-items: center;
-      justify-content: center;
-      width: 26px;
-      height: 26px;
-      background: var(--accent-soft);
-      border: 1px solid var(--accent-line);
-      border-radius: 50%;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--accent-txt);
-    }
-
+    // pas d'overflow: hidden ici, il rognerait l'emoji (plus haut que le texte) :
+    // l'ellipsis est portée par le pseudo lui-même (.player-name__label)
     &-name {
-      overflow: hidden;
-      min-width: 0; // permet au texte de rétrécir pour déclencher l'ellipsis
+      min-width: 0;
       font-size: 14px;
       color: var(--ink);
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
 
     &-crown {

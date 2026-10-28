@@ -12,5 +12,6 @@ import java.util.UUID;
 public class NewGame {
     private UUID userSocketId;
     private String userName;
+    private String userEmoji;
     private int diceNumber;
 }

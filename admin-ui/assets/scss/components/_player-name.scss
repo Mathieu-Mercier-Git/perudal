@@ -1,0 +1,24 @@
+// Emoji + pseudo d'un joueur : alignés par le bas (ligne de base commune)
+// plutôt que centrés, l'emoji étant plus haut que le texte
+.player-name {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .3em;
+  min-width: 0; // permet au pseudo de rétrécir pour déclencher l'ellipsis
+
+  &__emoji {
+    flex: none;
+    font-size: 1.15em;
+    line-height: 1;
+    // Léger décalage vers le bas, réglé à l'œil : l'emoji étant plus haut que le texte,
+    // il paraît sinon remonté par rapport au pseudo (~1px à la taille du lobby)
+    transform: translateY(.06em);
+  }
+
+  &__label {
+    overflow: hidden;
+    min-width: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

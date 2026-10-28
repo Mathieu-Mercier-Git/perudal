@@ -10,7 +10,10 @@ import ActionStyle from '../../../lib/plume-admin-theme/action/ActionStyle';
 import { GAME, HOME } from '../../Routes';
 import { useOnComponentMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
 import GameService from '../../../services/game/GameService';
-import { Game, LobbyType, Player } from '../../../services/game/GameTypes';
+import {
+  Game, LobbyType, Player, playerDisplayName,
+} from '../../../services/game/GameTypes';
+import PlayerName from '../../theme/player/PlayerName';
 import {
   addOnMessage,
   removeOnMessage,
@@ -123,7 +126,7 @@ export default function Lobby() {
 
   const askKickPlayer = (player: Player): void => {
     setConfirmAction({
-      title: `Es-tu sûr de vouloir exclure ${player.name} de la partie ?`,
+      title: `Es-tu sûr de vouloir exclure ${playerDisplayName(player)} de la partie ?`,
       onValidation: () => gameService.kickPlayer(lobby!.gameCode, player.id),
     });
   };
@@ -183,8 +186,7 @@ export default function Lobby() {
           <div className="lobby__players-grid">
             {React.Children.toArray(lobby.players.map((player) => (
               <div className="lobby__player">
-                <span className="lobby__player-avatar">{player.name.charAt(0).toUpperCase()}</span>
-                <span className="lobby__player-name">{player.name}</span>
+                <PlayerName player={player} className="lobby__player-name" />
                 {player.isAdmin && (<Icon className="lobby__player-crown">star</Icon>)}
                 {isAdmin && !player.isAdmin && (
                   <button type="button" className="lobby__player-kick" onClick={() => askKickPlayer(player)}>

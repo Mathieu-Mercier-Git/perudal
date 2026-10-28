@@ -8,6 +8,7 @@
 @use 'components/dice/dice' as *;
 @use 'components/dice/dice-counter' as *;
 @use 'components/tile/player-tile' as *;
+@use 'components/player-name' as *;
 
 @use 'pages/home' as *;
 @use 'pages/lobby' as *;

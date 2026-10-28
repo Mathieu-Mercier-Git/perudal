@@ -13,6 +13,11 @@ public class GameUtils {
     // SecureRandom et non Random : le code est le seul élément qui protège l'accès
     // à une partie, il ne doit pas être devinable à partir des codes précédents
     private static final SecureRandom GAME_CODE_RANDOM = new SecureRandom();
+    // Emoji affiché devant le pseudo quand le client n'en envoie pas (ou un invalide)
+    private static final String DEFAULT_PLAYER_EMOJI = "\uD83C\uDFB2"; // 🎲
+    // Un emoji composé (drapeau, famille, couleur de peau...) tient en quelques code points :
+    // au-delà, ce n'est pas un emoji mais du texte libre glissé dans le champ
+    private static final int MAX_PLAYER_EMOJI_CODE_POINTS = 8;
 
     private GameUtils() {
         // empty constructor
@@ -36,6 +41,23 @@ public class GameUtils {
      */
     public static String normalizeGameCode(String gameCode) {
         return gameCode == null ? null : gameCode.trim().toUpperCase(Locale.ROOT);
+    }
+
+    /**
+     * L'emoji est choisi côté client : on se protège d'une valeur absente ou d'un
+     * texte arbitraire qui serait ensuite diffusé à tous les joueurs de la partie.
+     */
+    public static String sanitizePlayerEmoji(String emoji) {
+        if (emoji == null) {
+            return DEFAULT_PLAYER_EMOJI;
+        }
+        String trimmedEmoji = emoji.trim();
+        if (trimmedEmoji.isEmpty()
+            || trimmedEmoji.codePointCount(0, trimmedEmoji.length()) > MAX_PLAYER_EMOJI_CODE_POINTS
+            || trimmedEmoji.codePoints().anyMatch(Character::isLetterOrDigit)) {
+            return DEFAULT_PLAYER_EMOJI;
+        }
+        return trimmedEmoji;
     }
 
     public static List<Integer> rollDices(int diceNumber) {

@@ -13,6 +13,7 @@ import java.util.UUID;
 public class Player { // TODO : Peut être créer un type PlayerLobby et Player tout court. PlayerLobby n'ayant besoin que de name et isAdmin?
     private UUID id;
     private String name;
+    private String emoji;
     private int diceNumber;
     private List<Integer> dices;
     private Boolean isAdmin;

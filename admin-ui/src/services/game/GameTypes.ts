@@ -6,10 +6,17 @@ export type LobbyType = {
 export type Player = { // TODO : Peut être créer un type PlayerLobby et Player tout court. PlayerLobby n'ayant besoin que de name et isAdmin?
   id: string,
   name: string,
+  emoji: string,
   diceNumber: number,
   dices: number[],
   isAdmin: boolean,
 };
+
+// Pseudo tel qu'affiché partout dans l'application : précédé de l'emoji du joueur
+// (absent si le serveur ne l'a pas renvoyé, par exemple une version antérieure)
+export function playerDisplayName(player: Player): string {
+  return player.emoji ? `${player.emoji} ${player.name}` : player.name;
+}
 
 export type Game = {
   players: Player[],

@@ -8,6 +8,7 @@ import classNames from '../../../lib/class-names/ClassNames';
 import { Panel } from '../../theme/layout/Panel';
 import GameService from '../../../services/game/GameService';
 import { Game, LobbyType, Player } from '../../../services/game/GameTypes';
+import PlayerName from '../../theme/player/PlayerName';
 import { HOME, LOBBY } from '../../Routes';
 import Dice from './dice/Dice';
 import { ActionButton, ActionsContainer } from '../../theme/action/Actions';
@@ -287,7 +288,7 @@ export default function Game() {
             {opponents.map((opponent) => (
               <div key={opponent.id} className="tile">
                 <div className="tile__head">
-                  <span className="tile__name">{opponent.name}</span>
+                  <PlayerName player={opponent} className="tile__name" />
                   {opponent.isAdmin && (<Icon className="tile__crown">star</Icon>)}
                   {opponent.dices.length === 0
                     && (<span className="tile__lost">a lamentablement perdu</span>)}
@@ -401,7 +402,7 @@ export default function Game() {
        <FinishTurnPopin onClick={finishTurn} onClose={() => setShowFinishTurnPopin(false)} players={game.players} />
       )}
       {!!playerWinner && (
-        <FinishGamePopin onClick={backToHome} playerName={playerWinner.name} />
+        <FinishGamePopin onClick={backToHome} player={playerWinner} />
       )}
     </Panel>
   );

@@ -29,7 +29,7 @@ public class GamePurgeTest {
     }
 
     private static String createGame(GameService gameService, GameStatus status, Duration age) {
-        GameSession session = gameService.createGame(NewGame.of(UUID.randomUUID(), "Mathieu", 5));
+        GameSession session = gameService.createGame(NewGame.of(UUID.randomUUID(), "Mathieu", "\uD83E\uDD9C", 5));
         String gameCode = session.getGame().getGameCode();
         Game game = gameService.getGames().get(gameCode);
         game.setStatus(status);
@@ -85,7 +85,7 @@ public class GamePurgeTest {
     @Test
     public void quitGame__removes_the_game_as_soon_as_the_last_player_leaves() {
         GameService gameService = newGameService();
-        GameSession session = gameService.createGame(NewGame.of(UUID.randomUUID(), "Mathieu", 5));
+        GameSession session = gameService.createGame(NewGame.of(UUID.randomUUID(), "Mathieu", "\uD83E\uDD9C", 5));
         String gameCode = session.getGame().getGameCode();
 
         gameService.quitGame(ActionGame.of(session.getPlayerId(), gameCode));
@@ -96,9 +96,9 @@ public class GamePurgeTest {
     @Test
     public void quitGame__keeps_the_game_while_players_remain() {
         GameService gameService = newGameService();
-        GameSession creatorSession = gameService.createGame(NewGame.of(UUID.randomUUID(), "Mathieu", 5));
+        GameSession creatorSession = gameService.createGame(NewGame.of(UUID.randomUUID(), "Mathieu", "\uD83E\uDD9C", 5));
         String gameCode = creatorSession.getGame().getGameCode();
-        gameService.joinGame(JoinGame.of(UUID.randomUUID(), "Camille", gameCode));
+        gameService.joinGame(JoinGame.of(UUID.randomUUID(), "Camille", "\uD83D\uDC38", gameCode));
 
         gameService.quitGame(ActionGame.of(creatorSession.getPlayerId(), gameCode));
 

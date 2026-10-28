@@ -1,12 +1,14 @@
 export type NewGameRequestBody = {
   userSocketId: string,
   userName: string,
+  userEmoji: string,
   diceNumber: number,
 };
 
 export type JoinGameRequestBody = {
   userSocketId: string,
   userName: string,
+  userEmoji: string,
   gameCode: string,
 };
 

@@ -47,7 +47,7 @@ public class GameService {
         socketService.createGame(gameCode, newGame.getUserSocketId());
         socketService.bindPlayer(playerId, newGame.getUserSocketId());
 
-        List<Player> players = addPlayer(gameCode, playerId, newGame.getUserName(), true);
+        List<Player> players = addPlayer(gameCode, playerId, newGame.getUserName(), newGame.getUserEmoji(), true);
 
         return buildSession(playerId, gameCode, games.get(gameCode), players);
     }
@@ -118,7 +118,7 @@ public class GameService {
             throw new WsException(CustomWsError.GAME_NOT_FOUND);
         }
         UUID playerId = UUID.randomUUID();
-        List<Player> players = addPlayer(gameCode, playerId, joinGame.getUserName(), false);
+        List<Player> players = addPlayer(gameCode, playerId, joinGame.getUserName(), joinGame.getUserEmoji(), false);
 
         Lobby lobby = Lobby.of(gameCode, players);
         socketService.joinGame(joinGame.getUserSocketId(), lobby);
@@ -285,10 +285,10 @@ public class GameService {
         );
     }
 
-    private List<Player> addPlayer(String gameCode, UUID playerId, String username, boolean isAdmin) {
+    private List<Player> addPlayer(String gameCode, UUID playerId, String username, String emoji, boolean isAdmin) {
         Game game = games.get(gameCode);
         Map<UUID, Player> players = game.getPlayers();
-        players.put(playerId, Player.of(playerId, username, game.getDiceNumber(), new ArrayList<>(), isAdmin));
+        players.put(playerId, Player.of(playerId, username, GameUtils.sanitizePlayerEmoji(emoji), game.getDiceNumber(), new ArrayList<>(), isAdmin));
 
         return new ArrayList<>(players.values());
     }

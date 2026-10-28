@@ -107,16 +107,20 @@ export default class GameService {
       });
   }
 
-  createGame(userName: string, diceNumber: number): HttpPromise<void> {
+  createGame(userName: string, userEmoji: string, diceNumber: number): HttpPromise<void> {
     const userSocketId: string = getIdSocket();
-    return this.gameApi.createGame({ userSocketId, userName, diceNumber })
+    return this.gameApi.createGame({
+      userSocketId, userName, userEmoji, diceNumber,
+    })
       .then((session: GameSession) => this.applySession(session))
       .catch(() => logger.error('ERROR CREATE GAME'));
   }
 
-  joinGame(userName: string, gameCode: string): HttpPromise<void> {
+  joinGame(userName: string, userEmoji: string, gameCode: string): HttpPromise<void> {
     const userSocketId: string = getIdSocket();
-    return this.gameApi.joinGame({ userSocketId, userName, gameCode })
+    return this.gameApi.joinGame({
+      userSocketId, userName, userEmoji, gameCode,
+    })
       .then((session: GameSession) => this.applySession(session));
   }
 

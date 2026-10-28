@@ -66,6 +66,35 @@
         margin: $spacer-3 0;
       }
 
+      // Choix de l'emoji du joueur (accueil) : grille de 5 colonnes
+      &.emoji-picker {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: $spacer-2;
+      }
+
+      .emoji-picker__item {
+        aspect-ratio: 1;
+        padding: 0;
+        background: var(--btn2);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        font-size: 28px;
+        line-height: 1;
+        cursor: pointer;
+        transition: filter .18s ease, border-color .18s ease;
+
+        &:hover {
+          border-color: var(--accent-line);
+          filter: brightness(1.1);
+        }
+
+        &--selected {
+          background: var(--accent-soft);
+          border-color: var(--accent);
+        }
+      }
+
       // Menu de la partie : options empilées, chacune sur toute la largeur
       &.game-menu {
         gap: $spacer-3;

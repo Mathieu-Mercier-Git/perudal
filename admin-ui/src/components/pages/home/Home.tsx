@@ -18,6 +18,7 @@ import useToggle from '../../../lib/react-hook-toggle/ReactHookToggle';
 import UserService from '../../../services/user/UserService';
 import RulesOverlayService from '../../../services/rules/RulesOverlayService';
 import ActionStyle from '../../../lib/plume-admin-theme/action/ActionStyle';
+import EmojiPickerPopin from './EmojiPickerPopin';
 
 const logger: Logger = new Logger('Home');
 
@@ -32,6 +33,7 @@ export default function Home() {
   const userService = getGlobalInstance(UserService);
   const rulesOverlayService = getGlobalInstance(RulesOverlayService);
   const username: string = useObservable(userService.getUsername());
+  const emoji: string = useObservable(userService.getEmoji());
 
   const { messages } = useMessages();
   const navigate = useNavigate();
@@ -39,6 +41,7 @@ export default function Home() {
   const [perucode, setPerucode] = useState<string>('');
   const [usernameError, setUsernameError] = useState<undefined | UsernameError>(undefined);
   const [showJoinGamePopin, toggleJoinGamePopin] = useToggle(false);
+  const [showEmojiPickerPopin, toggleEmojiPickerPopin] = useToggle(false);
 
   const listenerSwitchPhase = useCallback( // TODO : se documenter sur ce hook
     socketListener(ServerEvent.UPDATED_LOBBY, (response: LobbyType) => {
@@ -76,7 +79,7 @@ export default function Home() {
     if (usernameCheck()) {
       return;
     }
-    gameService.createGame(username, 5)
+    gameService.createGame(username, emoji, 5)
       .then(() => {
         navigate(LOBBY);
       });
@@ -90,7 +93,7 @@ export default function Home() {
   };
 
   const joinLobby = () => {
-    gameService.joinGame(username, perucode)
+    gameService.joinGame(username, emoji, perucode)
       .then(() => {
         navigate(LOBBY);
       })
@@ -107,6 +110,11 @@ export default function Home() {
 
   const onChangeUsername = (event: React.ChangeEvent<HTMLInputElement>) => {
     userService.setUsername(sanitizeUsername(event.target.value));
+  };
+
+  const onSelectEmoji = (selectedEmoji: string) => {
+    userService.setEmoji(selectedEmoji);
+    toggleEmojiPickerPopin();
   };
 
   const onChangePerucode = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -141,16 +149,26 @@ export default function Home() {
           <p className="home__tagline">Le grand jeu de dés et de bluff</p>
         </div>
         <div className="home__actions">
-          <TextField
-            className="text-field"
-            name="username"
-            placeholder="Saisis ton pseudo"
-            type="text"
-            onChange={onChangeUsername}
-            autoComplete="off"
-            value={username}
-            inputProps={{ maxLength: 25 }}
-          />
+          <div className="home__identity">
+            <button
+              type="button"
+              className="home__emoji"
+              onClick={toggleEmojiPickerPopin}
+              aria-label="Choisir ton emoji"
+            >
+              {emoji}
+            </button>
+            <TextField
+              className="text-field"
+              name="username"
+              placeholder="Saisis ton pseudo"
+              type="text"
+              onChange={onChangeUsername}
+              autoComplete="off"
+              value={username}
+              inputProps={{ maxLength: 25 }}
+            />
+          </div>
           {!!usernameError && (
             <div className="error-message">
               {usernameErrorLabel()}
@@ -164,6 +182,13 @@ export default function Home() {
           </ActionButton>
         </div>
       </div>
+      {showEmojiPickerPopin && (
+        <EmojiPickerPopin
+          selectedEmoji={emoji}
+          onSelect={onSelectEmoji}
+          onClose={toggleEmojiPickerPopin}
+        />
+      )}
       {showJoinGamePopin && (
         <ValidationPopin
           title="Saisie le pérucode de la partie"

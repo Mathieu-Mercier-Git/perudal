@@ -24,13 +24,12 @@
     filter: brightness(1.1);
   }
 
+  // pas d'overflow: hidden ici, il rognerait l'emoji (plus haut que le texte) :
+  // l'ellipsis est portée par le pseudo lui-même (.player-name__label)
   &__name {
     position: relative; // au-dessus de la barre de progression
     z-index: 1;
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   // nombre de dés restants, aligné à droite

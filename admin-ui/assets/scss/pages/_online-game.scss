@@ -1,0 +1,686 @@
+@use "../variables" as *;
+
+// Partie en mode « En ligne » (OnlineGame.tsx). Le squelette (header, zone qui défile,
+// barre du bas) reprend les classes .game__* du mode local.
+
+.online-game {
+  &__my-turn {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--t-accent);
+  }
+
+  &__current {
+    font-weight: 700;
+    color: var(--t-accent);
+  }
+
+  &__mydice-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__my-position {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--ink2);
+  }
+}
+
+// Petit titre mono en capitales
+.online-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink3);
+}
+
+// Badge « Toi »
+.online-chip {
+  flex: none;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--hover2);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+// Pastille de position dans l'ordre de jeu
+.online-position {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--hover2);
+  border: 1px solid var(--line-strong);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+
+  &--active {
+    background: var(--t-accent);
+    border-color: var(--t-accent);
+    color: var(--accent-ink);
+  }
+
+  &--sm {
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+  }
+}
+
+// Pastille « [carré] N dés »
+.online-count {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--hover);
+  border: 1px solid var(--t-line);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--ink);
+
+  &__mini {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    background: var(--hidden-bg);
+    border: 1px solid var(--ink3);
+  }
+}
+
+// Mise « 4 × [dé] »
+.bid-label {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 5px;
+
+  &__quantity {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--accent-txt);
+  }
+
+  &--large {
+    gap: 10px;
+
+    .bid-label__quantity {
+      font-size: 30px;
+    }
+  }
+}
+
+// Liste des joueurs dans l'ordre fixe
+.online-players {
+  display: flex;
+  flex-direction: column;
+  gap: $spacer-2;
+
+  &--compact {
+    gap: 6px;
+  }
+}
+
+.online-player {
+  display: flex;
+  flex-direction: column;
+  gap: $spacer-2;
+  padding: 10px 12px;
+  background: var(--t-surf);
+  border: 1px solid var(--t-line);
+  border-radius: 14px;
+
+  .online-players--compact & {
+    justify-content: center;
+    min-height: 44px;
+    padding: 6px 12px;
+    border-radius: 12px;
+  }
+
+  &--active {
+    background: var(--t-accent-soft);
+    border-color: var(--t-accent);
+    box-shadow: 0 0 0 1px var(--t-accent-line);
+  }
+
+  &--me {
+    border-style: dashed;
+    border-color: var(--line-strong);
+  }
+
+  &--eliminated {
+    opacity: .5;
+  }
+
+  &--loser {
+    background: var(--terra-soft);
+    border-color: var(--terra-line);
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    min-height: 26px;
+  }
+
+  // pas d'overflow: hidden ici, il rognerait l'emoji (plus haut que le texte) :
+  // l'ellipsis est portée par le pseudo lui-même (.player-name__label)
+  &__name {
+    font-family: var(--font-title);
+    font-weight: 600;
+    font-size: 15px;
+    white-space: nowrap;
+    color: var(--t-ink);
+  }
+
+  // Le pseudo prend la place libre : badge et dés sont calés à droite, dans la même colonne
+  &--result &__name {
+    flex: 1;
+  }
+
+  &__aside {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  &__status {
+    font-size: 12px;
+    white-space: nowrap;
+    color: var(--ink2);
+  }
+
+  // « réfléchit » suivi de trois points animés
+  &__thinking {
+    font-size: 12px;
+    font-style: italic;
+    white-space: nowrap;
+    color: var(--t-accent);
+
+    span {
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      margin-left: 3px;
+      border-radius: 50%;
+      background: var(--t-accent);
+      animation: online-thinking 1.2s infinite ease-in-out;
+
+      &:first-child {
+        margin-left: 6px;
+      }
+
+      &:nth-child(2) {
+        animation-delay: .2s;
+      }
+
+      &:nth-child(3) {
+        animation-delay: .4s;
+      }
+    }
+  }
+
+  &__dices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding-left: 36px;
+  }
+
+  &__revealed {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px;
+    // Largeur de la plus longue rangée de dés (22px par dé) : cf. --dice-slots dans RoundResultView
+    min-width: calc(var(--dice-slots) * 22px + (var(--dice-slots) - 1) * 4px);
+    padding: 6px 0;
+  }
+}
+
+@keyframes online-thinking {
+  0%,
+  80%,
+  100% {
+    opacity: .25;
+  }
+
+  40% {
+    opacity: 1;
+  }
+}
+
+// Panneau du bas pendant mon tour (choix, puis sélection de la mise)
+.online-panel {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: $spacer-3;
+  padding: 16px 20px calc(22px + env(safe-area-inset-bottom));
+  background: var(--tray);
+  border-top: 1px solid var(--t-accent-line);
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -8px 24px var(--tray-shadow);
+
+  &--bidding {
+    flex: 1;
+    justify-content: space-between;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  &__to-beat {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--hover);
+    border: 1px solid var(--accent-line);
+    border-radius: 14px;
+  }
+
+  &__to-beat-who {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  &__bidder {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    white-space: nowrap;
+    color: var(--ink);
+  }
+
+  &__opening {
+    justify-content: center;
+    min-height: 62px;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--t-accent);
+  }
+
+  &__challenges {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $spacer-3;
+  }
+}
+
+// Menteur ! (terracotta) et Chiffre exact (jade), avec compte à rebours annulable
+.app .online-challenge {
+  .MuiButton-root {
+    min-height: 56px;
+    box-shadow: none;
+  }
+
+  .MuiButton-root.Mui-disabled {
+    opacity: .45;
+  }
+
+  &--liar .MuiButton-root,
+  &--liar .MuiButton-root:hover {
+    background: var(--terra-soft);
+    border: 1.5px solid var(--terra-line);
+    color: var(--terra-txt);
+    box-shadow: none;
+  }
+
+  &--exact .MuiButton-root,
+  &--exact .MuiButton-root:hover {
+    background: var(--t-surf);
+    border: 1.5px solid var(--jade-line);
+    color: var(--jade);
+    box-shadow: none;
+  }
+}
+
+// Sélection de la mise : bande des joueurs (5 colonnes, défilement au-delà)
+.online-strip {
+  flex: none;
+  display: grid;
+  grid-auto-columns: calc((100% - 16px) / 5);
+  grid-auto-flow: column;
+  gap: 4px;
+  padding: 4px 20px 14px;
+  overflow-x: auto;
+
+  &__player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+
+    .online-count {
+      padding: 2px 7px;
+      font-size: 11px;
+    }
+  }
+
+  &__name {
+    display: flex;
+    align-items: center;
+    max-width: 100%;
+    height: 18px;
+    font-size: 12px;
+    line-height: 18px;
+    white-space: nowrap;
+    color: var(--ink2);
+  }
+}
+
+.online-bid {
+  &__context {
+    display: flex;
+    align-items: center;
+    gap: $spacer-2;
+  }
+
+  &__to-beat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    padding: 6px 10px;
+    background: var(--hover);
+    border: 1px solid var(--accent-line);
+    border-radius: 10px;
+  }
+
+  &__bidder {
+    font-size: 12px;
+    white-space: nowrap;
+    color: var(--ink2);
+  }
+
+  &__mydice {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px;
+    margin-left: auto;
+  }
+
+  &__buttons {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: $spacer-3;
+  }
+}
+
+// Cadenas à deux molettes : nombre de dés × valeur
+.online-lock {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+
+  &__wheel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    .online-label {
+      text-align: center;
+    }
+  }
+
+  &__arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 68px;
+    padding: 0;
+    background: var(--btn2);
+    border: 1px solid var(--hidden-line);
+    border-radius: 14px;
+    color: var(--ink);
+    cursor: pointer;
+
+    &:disabled {
+      opacity: .3;
+      cursor: not-allowed;
+    }
+
+    .MuiIcon-root {
+      font-size: 36px;
+    }
+  }
+
+  &__value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 120px;
+    background: var(--hover);
+    border: 1.5px solid var(--accent-line);
+    border-radius: 18px;
+
+    &--perudo {
+      background: var(--t-accent-soft);
+      border-color: var(--t-accent);
+    }
+  }
+
+  &__quantity {
+    font-family: var(--font-mono);
+    font-size: 72px;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  &__times {
+    padding-top: 22px;
+    font-family: var(--font-mono);
+    font-size: 34px;
+    font-weight: 600;
+    color: var(--ink3);
+  }
+}
+
+// Encart de validation de la mise
+.online-validation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacer-2;
+  min-height: 52px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+
+  .MuiIcon-root {
+    flex: none;
+    font-size: 20px;
+  }
+
+  &--ok {
+    background: var(--t-surf);
+    border: 1.5px solid var(--jade-line);
+    color: var(--jade);
+  }
+
+  &--ko {
+    background: var(--terra-soft);
+    border: 1.5px solid var(--terra-line);
+    color: var(--terra-txt);
+  }
+}
+
+// Résultat de la manche
+.online-result {
+  &__next {
+    font-size: 13px;
+    text-align: center;
+    color: var(--ink2);
+  }
+}
+
+.online-verdict {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 16px;
+
+  &--win {
+    background: var(--t-surf);
+    border: 1.5px solid var(--jade-line);
+  }
+
+  &--lose {
+    background: var(--terra-soft);
+    border: 1.5px solid var(--terra-line);
+  }
+
+  &--neutral {
+    background: var(--t-accent-soft);
+    border: 1.5px solid var(--t-accent-line);
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: $spacer-3;
+  }
+
+  &__icon {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: var(--surf-modal);
+
+    &--win {
+      background: var(--jade);
+    }
+
+    &--lose {
+      background: var(--terra-txt);
+    }
+  }
+
+  &__title {
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: -.02em;
+    color: var(--ink);
+  }
+
+  &__emoji--win {
+    position: relative;
+    top: -2px;
+    left: 2px;
+  }
+
+  &__emoji--lose {
+    position: relative;
+    top: 2px;
+    left: 2px;
+  }
+
+  &__figures {
+    display: flex;
+    align-items: center;
+    gap: $spacer-2;
+    padding-top: 10px;
+    border-top: 1px solid var(--t-line);
+  }
+
+  &__table-label {
+    margin-left: auto;
+  }
+}
+
+// Décompte par face
+.online-faces {
+  display: flex;
+  flex-direction: column;
+  gap: $spacer-2;
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 0;
+    border-radius: 10px;
+
+    &--highlight {
+      background: var(--t-accent-soft);
+      box-shadow: inset 0 0 0 1px var(--t-accent-line);
+    }
+  }
+
+  &__count {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+}
+
+// Badges « −1 dé » / « +1 dé »
+.online-badge {
+  flex: none;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--surf-modal);
+
+  &--minus {
+    background: var(--terra-txt);
+  }
+
+  &--plus {
+    background: var(--jade);
+  }
+}

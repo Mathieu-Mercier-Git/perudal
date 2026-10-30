@@ -1,5 +1,6 @@
 package jar.services.game.beans;
 
+import jar.services.game.enums.GameMode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,4 +19,13 @@ public class GameInfo {
     private String gameCode;
     private Boolean isPlanificato;
     private UUID playerIdFinishTurn;
+    private GameMode mode;
+    // Champs du mode en ligne (vides en local)
+    private List<UUID> playerOrder;
+    private UUID currentPlayerId;
+    private Bid currentBid;
+    private List<Bid> roundBids;
+    private RoundResult lastRoundResult;
+    /** Joueurs partis pendant la manche : leurs dés comptent encore jusqu'à sa résolution */
+    private List<Player> departedPlayers;
 }

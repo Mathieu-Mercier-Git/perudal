@@ -45,6 +45,20 @@
     }
   }
 
+  // action impossible (ex. lancer une partie seul) : on garde la couleur, atténuée.
+  // Le chargement désactive aussi le bouton mais garde son propre rendu.
+  .loading-button:not(.loading-button--loading) .MuiButton-root.Mui-disabled {
+    opacity: .45;
+    cursor: not-allowed;
+    pointer-events: auto;
+
+    &.MuiButton-containedPrimary, /* stylelint-disable-line selector-class-pattern */
+    &.MuiButton-containedInherit { /* stylelint-disable-line selector-class-pattern */
+      background-color: var(--accent);
+      color: var(--accent-ink);
+    }
+  }
+
   // secondaire : translucide bordé
   .MuiButton-containedSecondary {
     background-color: var(--btn2);

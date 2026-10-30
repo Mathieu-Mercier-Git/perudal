@@ -7,4 +7,12 @@ public enum CustomWsError implements WsError {
     PLAYER_NOT_FOUND,
     NOT_GAME_ADMIN,
     NO_GAME_CODE_AVAILABLE,
+    NOT_ENOUGH_PLAYERS,
+    GAME_ALREADY_STARTED,
+    // Mode en ligne
+    GAME_NOT_STARTED,
+    WRONG_GAME_MODE,
+    NOT_YOUR_TURN,
+    INVALID_BID,
+    NO_BID_TO_CHALLENGE,
 }

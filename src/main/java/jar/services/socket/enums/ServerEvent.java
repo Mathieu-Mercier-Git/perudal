@@ -7,5 +7,9 @@ public enum ServerEvent {
     FINISH_TURN,
     REVEAL_DICES,
     ROLL_DICES,
-    KICKED;
+    KICKED,
+    // Mode en ligne
+    BID_PLACED,
+    ROUND_RESULT,
+    NEXT_ROUND;
 }

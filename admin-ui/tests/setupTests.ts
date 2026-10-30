@@ -1,12 +1,7 @@
 import { configure } from 'enzyme';
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 
-const fetch = require('node-fetch');
-const { Headers, Request, Response } = require('node-fetch');
-
-global.fetch = fetch;
-global.Headers = Headers;
-global.Request = Request;
-global.Response = Response;
+// fetch, Headers, Request, Response, TextEncoder et TextDecoder sont fournis par
+// tests/jsdomEnvironment.js (APIs natives de Node 18)
 
 configure({ adapter: new Adapter() });

@@ -1,8 +1,7 @@
 import React from 'react';
 import fetchMock from 'fetch-mock';
 import { mount, ReactWrapper } from 'enzyme';
-import { Router } from 'react-router';
-import { createMemoryHistory } from 'history';
+import { MemoryRouter } from 'react-router-dom';
 import { configureGlobalInjector } from 'plume-ts-di';
 import { createInjector } from '../../../TestUtils';
 import Login from '../../../../src/components/features/login/Login';
@@ -14,7 +13,6 @@ import installPlumeAdminUsersModule from '../../../../src/lib/plume-admin-users/
 
 describe('Tests on Login', () => {
   let wrapper: ReactWrapper;
-  const history = createMemoryHistory();
   const injector = createInjector();
   installServicesModule(injector);
   installComponentsModule(injector);
@@ -35,9 +33,9 @@ describe('Tests on Login', () => {
 
   beforeEach(() => {
     wrapper = mount(
-      <Router history={history}>
+      <MemoryRouter>
         <Login />
-      </Router>,
+      </MemoryRouter>,
     );
   });
 

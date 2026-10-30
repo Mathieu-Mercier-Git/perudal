@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Partie en ligne — tour d'un autre joueur</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;600;700;900&amp;family=Chivo+Mono:wght@600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#FFEBD2}a:hover{color:#FFF7EE}
+.lbl{font-family:'Chivo Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,247,238,.7)}
+.die{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);width:50px;height:50px;padding:6px;box-sizing:border-box;background:#fff;border:2px solid #333;border-radius:12px;box-shadow:2px 2px 4px rgba(0,0,0,.25);flex:none}
+.die .dot{width:10px;height:10px;background:#333;border-radius:50%;align-self:center;justify-self:center}
+.die img{grid-column:1/4;grid-row:1/4;width:100%;height:100%;object-fit:contain}
+.die--sm{width:34px;height:34px;padding:4px;border-radius:9px;border-width:1.5px}
+.die--sm .dot{width:6px;height:6px}
+.die--xs{width:22px;height:22px;padding:3px;border-radius:6px;border-width:1.5px;box-shadow:none}
+.die--xs .dot{width:4px;height:4px}
+.die--hidden{background:rgba(255,255,255,.3);border-color:rgba(255,247,238,.2);box-shadow:none}
+.die--hidden .dot,.die--hidden img{visibility:hidden}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:56px;padding:14px 16px;border:0;border-radius:14px;font-family:'Chivo',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;line-height:1;cursor:pointer;box-sizing:border-box}
+.btn--primary{background:#FFF4E4;color:#7A3410;box-shadow:0 5px 0 rgba(0,0,0,.3)}
+.btn--secondary{background:rgba(255,255,255,.16);border:1px solid rgba(255,247,238,.12);color:#FFF7EE;box-shadow:0 5px 0 rgba(0,0,0,.28)}
+.tile{display:flex;flex-direction:column;gap:8px;padding:10px 12px;background:rgba(52,18,8,.42);border:1px solid rgba(255,247,238,.16);border-radius:14px}
+.tile--active{background:rgba(255,212,143,.14);border-color:rgba(255,212,143,.75);box-shadow:0 0 0 1px rgba(255,212,143,.42)}
+.tile--me{border-style:dashed;border-color:rgba(255,247,238,.34)}
+.pos{display:flex;align-items:center;justify-content:center;flex:none;width:26px;height:26px;border-radius:50%;background:rgba(255,247,238,.14);border:1px solid rgba(255,247,238,.24);font-family:'Chivo Mono',monospace;font-size:13px;font-weight:600;color:#FFF7EE;box-sizing:border-box}
+.pos--active{background:#FFD48F;border-color:#FFD48F;color:#5A2208}
+.chip{padding:2px 8px;border-radius:999px;background:rgba(255,247,238,.14);font-family:'Chivo Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#FFF7EE}
+.think span{display:inline-block;width:5px;height:5px;margin-left:3px;border-radius:50%;background:#FFD48F;animation:blink 1.2s infinite ease-in-out}
+.think span:nth-child(2){animation-delay:.2s}.think span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: linear-gradient(160deg, #B85F14 0%, #A2431D 55%, #7E2A16 100%); color: #FFF7EE; font-family: 'Chivo', Roboto, sans-serif; font-size: 14px; overflow: hidden">
+
+  <header style="flex: none; padding: 24px 20px 14px">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+      <h1 style="margin: 0; font-weight: 900; font-size: 26px; letter-spacing: -0.03em">Partie en ligne</h1>
+      <div style="display: flex; align-items: center; gap: 8px">
+        <div style="display: flex; align-items: baseline; gap: 4px; padding: 6px 12px; background: rgba(48,17,7,.42); border: 1px solid rgba(255,247,238,.12); border-radius: 999px">
+          <span style="font-family: 'Chivo Mono', monospace; font-size: 18px; font-weight: 600; color: #FFEBD2">25</span>
+          <span class="lbl" style="font-size: 10px">dés</span>
+        </div>
+        <button type="button" aria-label="Menu" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: rgba(48,17,7,.42); border: 1px solid rgba(255,247,238,.12); border-radius: 50%; color: #FFF7EE">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+        </button>
+      </div>
+    </div>
+    <div style="margin-top: 8px; font-size: 14px; color: rgba(255,247,238,.8)">Au tour de <strong style="color: rgb(255, 212, 143); font-weight: 700">🐙 Hugo<br></strong></div>
+  </header>
+
+  <div style="display: flex; flex: 1; flex-direction: column; gap: 14px; min-height: 0; padding: 4px 20px 16px; overflow: hidden">
+
+    
+
+    
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <sc-for list="{{players}}" as="pl" hint-placeholder-count="5">
+        <div class="{{pl.tileCls}}">
+          <div style="display: flex; align-items: center; gap: 10px; min-height: 26px">
+            <span class="{{pl.posCls}}">{{pl.pos}}</span>
+            <span style="font-weight: 600; font-size: 15px; white-space: nowrap">{{pl.label}}</span>
+            <sc-if value="{{pl.isMe}}" hint-placeholder-val="{{false}}"><span class="chip">Toi</span></sc-if>
+            <div style="display: flex; align-items: center; gap: 6px; margin-left: auto">
+              <sc-if value="{{pl.hasBet}}" hint-placeholder-val="{{false}}">
+                <span style="font-size: 12px; color: rgba(255,247,238,.75)">a parié</span>
+                <span style="font-family: 'Chivo Mono', monospace; font-size: 15px; font-weight: 600; color: #FFEBD2">{{pl.betQty}} ×</span>
+                <div class="die die--xs">
+                  <sc-for list="{{pl.betDie.dots}}" as="p" hint-placeholder-count="4"><span class="dot" style="grid-column: {{p.c}}; grid-row: {{p.r}}"></span></sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{pl.isActive}}" hint-placeholder-val="{{false}}">
+                <span class="think" style="font-size: 12px; font-style: italic; color: #FFD48F">réfléchit<span></span><span></span><span></span></span>
+              </sc-if>
+              <sc-if value="{{pl.isWaiting}}" hint-placeholder-val="{{true}}">
+                <span style="font-size: 12px; color: rgba(255,247,238,.7)">en attente</span>
+              </sc-if>
+            </div>
+          </div>
+          <div style="display: flex; gap: 5px; padding-left: 36px">
+            <sc-for list="{{pl.dice}}" as="d" hint-placeholder-count="5"><div class="die die--xs die--hidden"></div></sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="flex: none; display: flex; flex-direction: column; gap: 12px; padding: 14px 20px 22px; background: rgba(48,17,7,.58); border-top: 1px solid rgba(255,247,238,.12); box-shadow: 0 -6px 20px rgba(0,0,0,.5)">
+    <div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; background: rgba(52,18,8,.42); border: 1px solid rgba(255,247,238,.16); border-radius: 14px">
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <span style="font-weight: 600; font-size: 15px; color: rgba(255,247,238,.75)">Tes dés</span>
+        <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: rgba(255,247,238,.75)">ta position <span class="pos" style="width: 22px; height: 22px; font-size: 12px">3</span></span>
+      </div>
+      <div style="display: flex; gap: 8px">
+        <sc-for list="{{myDice}}" as="d" hint-placeholder-count="5"><div class="die die--hidden"></div></sc-for>
+      </div>
+    </div>
+    <button type="button" class="btn btn--primary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+      Voir mes dés
+    </button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  die(n) {
+    const P = { 1: [], 2: [[1,1],[3,3]], 3: [[1,1],[2,2],[3,3]], 4: [[1,1],[1,3],[3,1],[3,3]], 5: [[1,1],[1,3],[3,1],[3,3],[2,2]], 6: [[1,1],[1,2],[1,3],[3,1],[3,2],[3,3]] };
+    return { toucan: n === 1, dots: (P[n] || []).map(function (x) { return { c: x[0], r: x[1] }; }) };
+  }
+  renderVals() {
+    const five = [1, 2, 3, 4, 5];
+    const raw = [
+      { pos: 1, label: '🐸 Léa', state: 'bet', qty: 3, face: 4 },
+      { pos: 2, label: '🐙 Hugo', state: 'active' },
+      { pos: 3, label: '🦊 Math', state: 'wait', me: true },
+      { pos: 4, label: '🌮 Inès', state: 'wait' },
+      { pos: 5, label: '🤠 Karim', state: 'wait' },
+    ];
+    const players = raw.map((p) => ({
+      pos: p.pos,
+      label: p.label,
+      isMe: !!p.me,
+      hasBet: p.state === 'bet',
+      isActive: p.state === 'active',
+      isWaiting: p.state === 'wait',
+      betQty: p.qty,
+      betDie: this.die(p.face || 2),
+      dice: five,
+      tileCls: 'tile' + (p.state === 'active' ? ' tile--active' : '') + (p.me ? ' tile--me' : ''),
+      posCls: 'pos' + (p.state === 'active' ? ' pos--active' : ''),
+    }));
+    return { players: players, myDice: five };
+  }
+}
+</script>
+</body>
+</html>

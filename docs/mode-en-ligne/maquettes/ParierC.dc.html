@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Parier — cadenas à 2 molettes</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;600;700;900&amp;family=Chivo+Mono:wght@600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#FFEBD2}a:hover{color:#FFF7EE}
+.lbl{font-family:'Chivo Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,247,238,.7)}
+.die{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);width:50px;height:50px;padding:6px;box-sizing:border-box;background:#fff;border:2px solid #333;border-radius:12px;box-shadow:2px 2px 4px rgba(0,0,0,.25);flex:none}
+.die .dot{width:10px;height:10px;background:#333;border-radius:50%;align-self:center;justify-self:center}
+.die img{grid-column:1/4;grid-row:1/4;width:100%;height:100%;object-fit:contain}
+.die--xl{width:84px;height:84px;padding:10px;border-radius:18px;border-width:2.5px}
+.die--xl .dot{width:15px;height:15px}
+.die--sm{width:34px;height:34px;padding:4px;border-radius:9px;border-width:1.5px}
+.die--sm .dot{width:6px;height:6px}
+.die--xs{width:22px;height:22px;padding:3px;border-radius:6px;border-width:1.5px;box-shadow:none}
+.die--xs .dot{width:4px;height:4px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:56px;padding:14px 16px;border:0;border-radius:14px;font-family:'Chivo',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;line-height:1;cursor:pointer;box-sizing:border-box}
+.btn--primary{background:#FFF4E4;color:#7A3410;box-shadow:0 5px 0 rgba(0,0,0,.3)}
+.btn--primary:disabled{opacity:.45;cursor:not-allowed}
+.btn--secondary{background:rgba(255,255,255,.16);border:1px solid rgba(255,247,238,.12);color:#FFF7EE;box-shadow:0 5px 0 rgba(0,0,0,.28)}
+.arrow{display:flex;align-items:center;justify-content:center;width:100%;height:68px;padding:0;border-radius:14px;background:rgba(255,255,255,.16);border:1px solid rgba(255,247,238,.2);color:#FFF7EE;cursor:pointer}
+.arrow svg{width:36px;height:36px}
+.wheel{display:flex;align-items:center;justify-content:center;height:120px;border-radius:18px;background:rgba(255,244,228,.1);border:1.5px solid rgba(255,244,228,.42)}
+.arrow:disabled{opacity:.3;cursor:not-allowed}
+.wheel--perudo{background:rgba(255,212,143,.18);border-color:#FFD48F}
+.toggle .die--sm{width:46px;height:46px;padding:6px;border-radius:12px}
+.toggle .die--sm .dot{width:8px;height:8px}
+.val{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:10px 14px;border-radius:14px;font-size:15px;font-weight:700;line-height:1.3;text-align:center;box-sizing:border-box}
+.val--ok{background:rgba(191,240,214,.16);border:1.5px solid rgba(191,240,214,.6);color:#BFF0D6}
+.val--ko{background:rgba(255,217,194,.14);border:1.5px solid rgba(255,217,194,.6);color:#FFD9C2}
+.toggle{display:flex;align-items:center;gap:14px;width:100%;min-height:84px;padding:12px 16px;border-radius:16px;background:rgba(52,18,8,.42);border:1.5px solid rgba(255,212,143,.55);color:#FFF7EE;cursor:pointer;text-align:left;font-family:'Chivo',sans-serif;box-sizing:border-box}
+.toggle--on{background:rgba(255,212,143,.2);border-color:#FFD48F}
+.pos{display:flex;align-items:center;justify-content:center;flex:none;width:26px;height:26px;border-radius:50%;background:rgba(255,247,238,.14);border:1px solid rgba(255,247,238,.24);font-family:'Chivo Mono',monospace;font-size:13px;font-weight:600;color:#FFF7EE;box-sizing:border-box}
+.pos--active{background:#FFD48F;border-color:#FFD48F;color:#5A2208}
+.cnt{display:flex;align-items:center;gap:4px;padding:2px 7px;border-radius:999px;background:rgba(255,247,238,.1);border:1px solid rgba(255,247,238,.16);font-family:'Chivo Mono',monospace;font-size:11px;font-weight:600;white-space:nowrap}
+.mini{width:8px;height:8px;border-radius:2px;background:rgba(255,255,255,.35);border:1px solid rgba(255,247,238,.5);box-sizing:border-box}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: linear-gradient(160deg, #B85F14 0%, #A2431D 55%, #7E2A16 100%); color: #FFF7EE; font-family: 'Chivo', Roboto, sans-serif; font-size: 14px; overflow: hidden">
+
+  <header style="flex: none; padding: 24px 20px 12px">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+      <h1 style="margin: 0; font-weight: 900; font-size: 26px; letter-spacing: -0.03em">Partie en ligne</h1>
+      <div style="display: flex; align-items: center; gap: 8px">
+        <div style="display: flex; align-items: baseline; gap: 4px; padding: 6px 12px; background: rgba(48,17,7,.42); border: 1px solid rgba(255,247,238,.12); border-radius: 999px">
+          <span style="font-family: 'Chivo Mono', monospace; font-size: 18px; font-weight: 600; color: #FFEBD2">25</span>
+          <span class="lbl" style="font-size: 10px">dés</span>
+        </div>
+        <button type="button" aria-label="Menu" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: rgba(48,17,7,.42); border: 1px solid rgba(255,247,238,.12); border-radius: 50%; color: #FFF7EE">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+        </button>
+      </div>
+    </div>
+    <div style="margin-top: 8px; font-size: 15px; font-weight: 700; color: #FFD48F">À toi de jouer : fais ta mise</div>
+  </header>
+
+  <div style="flex: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; padding: 4px 20px 14px">
+    <sc-for list="{{order}}" as="o" hint-placeholder-count="5">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px">
+        <span class="{{o.posCls}}">{{o.pos}}</span>
+        <span style="display: flex; align-items: center; height: 18px; line-height: 18px; font-size: 12px; white-space: nowrap; color: rgba(255,247,238,.85)">{{o.label}}</span>
+        <span class="cnt"><span class="mini"></span>{{o.n}} dés</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; padding: 16px 20px 22px; background: rgba(48,17,7,.66); border-top: 1px solid rgba(255,212,143,.42); border-radius: 22px 22px 0 0; box-shadow: 0 -8px 24px rgba(0,0,0,.5)">
+
+    <div style="display: flex; align-items: center; gap: 8px">
+      <div style="display: flex; align-items: center; gap: 6px; padding: 6px 10px; background: rgba(255,244,228,.1); border: 1px solid rgba(255,244,228,.32); border-radius: 10px">
+        <span style="font-size: 12px; color: rgba(255,247,238,.85)">Hugo</span>
+        <span style="font-family: 'Chivo Mono', monospace; font-size: 15px; font-weight: 600; color: #FFEBD2">4 ×</span>
+        <div class="die die--xs"><span class="dot" style="grid-column: 1; grid-row: 1"></span><span class="dot" style="grid-column: 1; grid-row: 3"></span><span class="dot" style="grid-column: 3; grid-row: 1"></span><span class="dot" style="grid-column: 3; grid-row: 3"></span><span class="dot" style="grid-column: 2; grid-row: 2"></span></div>
+      </div>
+      <div style="display: flex; gap: 4px; margin-left: auto">
+        <sc-for list="{{myDice}}" as="d" hint-placeholder-count="5">
+          <div class="die die--sm">
+            <sc-if value="{{d.toucan}}" hint-placeholder-val="{{false}}"><img src="/_blob/53de4a61186bdc1cc54ce90ba4805839" alt="Perudo"></sc-if>
+            <sc-for list="{{d.dots}}" as="p" hint-placeholder-count="4"><span class="dot" style="grid-column: {{p.c}}; grid-row: {{p.r}}"></span></sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 10px">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <span class="lbl" style="text-align: center">Dés</span>
+        <button type="button" class="arrow" aria-label="Un dé de plus" onClick="{{inc}}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"></path></svg></button>
+        <div class="wheel"><span style="font-family: 'Chivo Mono', monospace; font-size: 72px; font-weight: 600; line-height: 1">{{qty}}</span></div>
+        <button type="button" class="arrow" aria-label="Un dé de moins" onClick="{{dec}}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+      </div>
+      <span style="padding-top: 22px; font-family: 'Chivo Mono', monospace; font-size: 34px; font-weight: 600; color: rgba(255,247,238,.6)">×</span>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <span class="lbl" style="text-align: center">{{valueLabel}}</span>
+        <button type="button" class="arrow" aria-label="Valeur au-dessus" onClick="{{faceUp}}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"></path></svg></button>
+        <div class="{{wheelCls}}">
+          <div class="die die--xl">
+            <sc-if value="{{sel.toucan}}" hint-placeholder-val="{{false}}"><img src="/_blob/53de4a61186bdc1cc54ce90ba4805839" alt="Perudo"></sc-if>
+            <sc-for list="{{sel.dots}}" as="p" hint-placeholder-count="6"><span class="dot" style="grid-column: {{p.c}}; grid-row: {{p.r}}"></span></sc-for>
+          </div>
+        </div>
+        <button type="button" class="arrow" aria-label="Valeur en dessous" onClick="{{faceDown}}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+      </div>
+    </div>
+
+    <button type="button" class="{{toggleCls}}" aria-pressed="{{isPerudo}}" onClick="{{toggle}}">
+      <sc-if value="{{isClassic}}" hint-placeholder-val="{{true}}">
+        <span class="die die--sm"><img src="/_blob/53de4a61186bdc1cc54ce90ba4805839" alt=""></span>
+      </sc-if>
+      <sc-if value="{{isPerudo}}" hint-placeholder-val="{{false}}">
+        <span class="die die--sm"><span class="dot" style="grid-column: 1; grid-row: 1"></span><span class="dot" style="grid-column: 1; grid-row: 3"></span><span class="dot" style="grid-column: 3; grid-row: 1"></span><span class="dot" style="grid-column: 3; grid-row: 3"></span><span class="dot" style="grid-column: 2; grid-row: 2"></span></span>
+      </sc-if>
+      <span style="display: flex; flex: 1; flex-direction: column; gap: 3px; min-width: 0">
+        <span style="font-weight: 700; font-size: 16px; letter-spacing: .05em; text-transform: uppercase">{{toggleTitle}}</span>
+        <span style="font-size: 14px; color: rgba(255,247,238,.85)">{{toggleCaption}}</span>
+      </span>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4L3 8l4 4"></path><path d="M3 8h14"></path><path d="M17 12l4 4-4 4"></path><path d="M21 16H7"></path></svg>
+    </button>
+
+    <sc-if value="{{valid}}" hint-placeholder-val="{{true}}">
+      <div class="val val--ok" role="status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg><span>{{validMsg}}</span></div>
+    </sc-if>
+    <sc-if value="{{invalid}}" hint-placeholder-val="{{false}}">
+      <div class="val val--ko" role="status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true" style="flex: none"><path d="M12 7v6"></path><path d="M12 17h.01"></path><circle cx="12" cy="12" r="9.5"></circle></svg><span>{{invalidMsg}}</span></div>
+    </sc-if>
+
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 12px">
+      <a href="MonTour.dc.html" class="btn btn--secondary" style="text-decoration: none">Retour</a>
+      <button type="button" class="btn btn--primary" disabled="{{invalid}}">Valider la mise</button>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { qty: 4, face: 6, lastFace: 6 };
+  }
+  die(n) {
+    const P = { 1: [], 2: [[1,1],[3,3]], 3: [[1,1],[2,2],[3,3]], 4: [[1,1],[1,3],[3,1],[3,3]], 5: [[1,1],[1,3],[3,1],[3,3],[2,2]], 6: [[1,1],[1,2],[1,3],[3,1],[3,2],[3,3]] };
+    return { toucan: n === 1, dots: (P[n] || []).map(function (x) { return { c: x[0], r: x[1] }; }) };
+  }
+  renderVals() {
+    // Mise à battre : 4 × 5. En perudos, il faut au moins la moitié arrondie au-dessus : 2.
+    const prevQty = 4;
+    const prevFace = 5;
+    const minPerudo = Math.ceil(prevQty / 2);
+    // Le mode découle de la valeur choisie : face 1 = perudo, que l'on passe par la molette ou par le bouton
+    const qty = this.state.qty;
+    const face = this.state.face;
+    const lastFace = this.state.lastFace;
+    const isPerudo = face === 1;
+    const valid = isPerudo ? qty >= minPerudo : (qty > prevQty || (qty === prevQty && face > prevFace));
+    const order = [
+      { pos: 1, label: '🐸 Léa' },
+      { pos: 2, label: '🐙 Hugo' },
+      { pos: 3, label: 'Toi', me: true },
+      { pos: 4, label: '🌮 Inès' },
+      { pos: 5, label: '🤠 Karim' },
+    ].map((o) => ({ pos: o.pos, label: o.label, n: 5, posCls: 'pos' + (o.me ? ' pos--active' : '') }));
+    return {
+      qty: qty,
+      valid: valid,
+      invalid: !valid,
+      isPerudo: isPerudo,
+      isClassic: !isPerudo,
+      valueLabel: isPerudo ? 'Perudo' : 'Valeur',
+      wheelCls: 'wheel' + (isPerudo ? ' wheel--perudo' : ''),
+      toggleCls: 'toggle' + (isPerudo ? ' toggle--on' : ''),
+      toggleTitle: isPerudo ? 'Revenir aux chiffres' : 'Passer en perudos',
+      toggleCaption: isPerudo ? qty + ' perudo' + (qty > 1 ? 's' : '') + ' → ' + (qty * 2 + 1) + ' × ' + lastFace : qty + ' × ' + face + ' → ' + Math.ceil(qty / 2) + ' perudo' + (Math.ceil(qty / 2) > 1 ? 's' : ''),
+      validMsg: isPerudo ? 'Mise valide : ' + minPerudo + ' perudos minimum face à ' + prevQty + ' × ' + prevFace : 'Mise valide, elle dépasse ' + prevQty + ' × ' + prevFace,
+      invalidMsg: isPerudo ? 'Mise trop faible : il faut au moins ' + minPerudo + ' perudos' : 'Mise trop faible : monte le nombre ou la valeur au-dessus de ' + prevQty + ' × ' + prevFace,
+      toggle: () => this.setState(isPerudo ? { face: lastFace, qty: Math.min(25, qty * 2 + 1) } : { face: 1, lastFace: face, qty: Math.max(1, Math.ceil(qty / 2)) }),
+      sel: this.die(face),
+      order: order,
+      myDice: [4, 4, 2, 6, 3].map((n) => this.die(n)),
+      inc: () => this.setState({ qty: Math.min(25, qty + 1) }),
+      dec: () => this.setState({ qty: Math.max(1, qty - 1) }),
+      faceUp: () => this.setState({ face: Math.min(6, face + 1) }),
+      faceDown: () => this.setState(face === 2 ? { face: 1, lastFace: 2 } : { face: Math.max(1, face - 1) }),
+    };
+  }
+}
+</script>
+</body>
+</html>

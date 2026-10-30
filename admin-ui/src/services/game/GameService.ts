@@ -2,10 +2,13 @@ import { Observable, observable, WritableObservable } from 'micro-observables';
 import { HttpPromise } from 'simple-http-rest-client';
 import { Logger } from 'simple-logging-system';
 import {
-  Game, GameSession, GameStatus, LobbyType, Player,
+  ChallengeType, Game, GameMode, GameSession, GameStatus, LobbyType, Player, RoundResult, RoundResultMessage,
 } from './GameTypes';
 import GameApi from '../../api/game/GameApi';
-import { sendRevealDices, getIdSocket } from '../socket/SocketEngineService';
+import {
+  addOnMessage, getIdSocket, sendRevealDices, socketListener,
+} from '../socket/SocketEngineService';
+import { ServerEvent } from '../socket/SocketTypes';
 
 const logger: Logger = new Logger('GameService');
 
@@ -27,6 +30,9 @@ export default class GameService {
   private playerId: WritableObservable<string | undefined>;
   private isRestoringSession: WritableObservable<boolean>;
 
+  // Mode en ligne : résultat de la manche qui vient d'être résolue, affiché jusqu'au clic de l'admin sur « Tour suivant »
+  private roundResult: WritableObservable<RoundResult | undefined>;
+
   constructor(private readonly gameApi: GameApi) {
     const storedSession: StoredGameSession | undefined = GameService.readStoredSession();
 
@@ -35,6 +41,18 @@ export default class GameService {
     this.playerId = observable(storedSession?.playerId);
     // Tant que la reprise est en cours, les écrans ne doivent pas rediriger vers l'accueil
     this.isRestoringSession = observable(!!storedSession);
+    this.roundResult = observable(undefined);
+
+    // Mode en ligne : les actions des autres joueurs arrivent par la socket
+    addOnMessage(socketListener(ServerEvent.BID_PLACED, (game: Game) => this.setGame(game)));
+    addOnMessage(socketListener(ServerEvent.ROUND_RESULT, (message: RoundResultMessage) => {
+      this.roundResult.set(message.result);
+      this.setGame(message.game);
+    }));
+    addOnMessage(socketListener(ServerEvent.NEXT_ROUND, (game: Game) => {
+      this.roundResult.set(undefined);
+      this.setGame(game);
+    }));
   }
 
   getLobby(): Observable<LobbyType | undefined> {
@@ -59,6 +77,10 @@ export default class GameService {
 
   getIsRestoringSession(): Observable<boolean> {
     return this.isRestoringSession.readOnly();
+  }
+
+  getRoundResult(): Observable<RoundResult | undefined> {
+    return this.roundResult.readOnly();
   }
 
   getOpponents(): Player[] { // TODO : checker comment rejouter cette fonction uniquement quand l'observable bouge
@@ -124,6 +146,22 @@ export default class GameService {
       .then((session: GameSession) => this.applySession(session));
   }
 
+  setMode(gameCode: string, mode: GameMode): void {
+    const playerId: string | undefined = this.playerId.get();
+    if (!playerId) {
+      return;
+    }
+    // Seul l'admin voit le mode : pas d'évènement socket, on met à jour son lobby après la réponse
+    this.gameApi.setMode({ playerId, gameCode, mode })
+      .then(() => {
+        const lobby: LobbyType | undefined = this.lobby.get();
+        if (lobby?.gameCode === gameCode) {
+          this.setLobby({ ...lobby, mode });
+        }
+      })
+      .catch((error: unknown) => logger.error('Impossible de changer le mode de jeu', { error }));
+  }
+
   startGame(gameCode: string, diceNumber: number): void {
     this.gameApi.startGame({ gameCode, diceNumber });
   }
@@ -168,6 +206,35 @@ export default class GameService {
     this.gameApi.finishTurn({ gameCode, playerId, hasLost });
   }
 
+  /** Mode en ligne : la partie mise à jour arrivera par l'évènement socket BID_PLACED */
+  placeBid(gameCode: string, quantity: number, face: number): HttpPromise<void> {
+    const playerId: string | undefined = this.playerId.get();
+    if (!playerId) {
+      return new HttpPromise<void>(Promise.resolve());
+    }
+    return this.gameApi.placeBid({
+      gameCode, playerId, quantity, face,
+    });
+  }
+
+  /** Mode en ligne : le résultat arrivera par l'évènement socket ROUND_RESULT */
+  challenge(gameCode: string, type: ChallengeType): HttpPromise<void> {
+    const playerId: string | undefined = this.playerId.get();
+    if (!playerId) {
+      return new HttpPromise<void>(Promise.resolve());
+    }
+    return this.gameApi.challenge({ gameCode, playerId, type });
+  }
+
+  /** Mode en ligne, admin : tous les joueurs quitteront le résultat à l'évènement socket NEXT_ROUND */
+  nextRound(gameCode: string): HttpPromise<void> {
+    const playerId: string | undefined = this.playerId.get();
+    if (!playerId) {
+      return new HttpPromise<void>(Promise.resolve());
+    }
+    return this.gameApi.nextRound({ playerId, gameCode });
+  }
+
   sendRevealDices(gameCode: string): void {
     sendRevealDices(gameCode);
   }
@@ -178,17 +245,20 @@ export default class GameService {
     this.playerId.set(undefined);
     this.setLobby(undefined);
     this.setGame(undefined);
+    this.roundResult.set(undefined);
   }
 
   private applySession(session: GameSession): void {
     this.playerId.set(session.playerId);
     GameService.storeSession({ gameCode: session.game.gameCode, playerId: session.playerId });
 
+    // À la reconnexion, le résultat reste affiché tant que l'admin n'a pas lancé le tour suivant
+    this.roundResult.set(session.game.lastRoundResult ?? undefined);
     if (session.status === GameStatus.IN_GAME) {
       this.setGame(session.game);
       this.setLobby(undefined);
     } else {
-      this.setLobby({ gameCode: session.game.gameCode, players: session.game.players });
+      this.setLobby({ gameCode: session.game.gameCode, players: session.game.players, mode: session.game.mode });
       this.setGame(undefined);
     }
   }

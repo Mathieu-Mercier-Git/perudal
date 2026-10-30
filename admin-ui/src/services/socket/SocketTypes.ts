@@ -19,4 +19,8 @@ export enum ServerEvent {
   ROLL_DICES = 'ROLL_DICES',
   FINISH_TURN = 'FINISH_TURN',
   KICKED = 'KICKED',
+  // Mode en ligne
+  BID_PLACED = 'BID_PLACED',
+  ROUND_RESULT = 'ROUND_RESULT',
+  NEXT_ROUND = 'NEXT_ROUND',
 }

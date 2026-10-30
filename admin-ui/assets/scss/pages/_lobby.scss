@@ -68,6 +68,69 @@
     }
   }
 
+  // Choix du mode de jeu (admin uniquement)
+  &__mode {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    &-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--ink3);
+    }
+
+    &-switch {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 4px;
+      padding: 4px;
+      background: var(--surf);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+
+    &-option {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: $spacer-2;
+      min-height: 44px;
+      padding: 0 $spacer-2;
+      background: transparent;
+      border: 0;
+      border-radius: 10px;
+      font-family: var(--font-title);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--ink2);
+      cursor: pointer;
+      transition: background .18s ease, color .18s ease;
+
+      &--active {
+        background: var(--accent);
+        color: var(--accent-ink);
+        box-shadow: 0 3px 0 var(--btn2-deep);
+      }
+
+      .MuiIcon-root {
+        font-size: 18px;
+      }
+    }
+
+    &-help {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--ink2);
+    }
+  }
+
   // Sélecteur du nombre de dés (admin)
   &__dice {
     display: flex;

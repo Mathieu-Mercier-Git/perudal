@@ -7,7 +7,9 @@ import { Button, Icon } from '@mui/material';
 import classNames from '../../../lib/class-names/ClassNames';
 import { Panel } from '../../theme/layout/Panel';
 import GameService from '../../../services/game/GameService';
-import { Game, LobbyType, Player } from '../../../services/game/GameTypes';
+import {
+  Game, GameMode, LobbyType, Player,
+} from '../../../services/game/GameTypes';
 import PlayerName from '../../theme/player/PlayerName';
 import { HOME, LOBBY } from '../../Routes';
 import Dice from './dice/Dice';
@@ -28,6 +30,7 @@ import FinishGamePopin from './popin/FinishGamePopin';
 import GameMenuPopin from './popin/GameMenuPopin';
 import RulesOverlayService from '../../../services/rules/RulesOverlayService';
 import ValidationPopin from '../../theme/popin/ValidationPopin';
+import OnlineGame from './online/OnlineGame';
 
 type ConfirmAction = {
   title: string,
@@ -257,6 +260,15 @@ export default function Game() {
     // La partie n'a pas (re)démarré : si on a toujours un lobby, on y retourne
     return (<Navigate to={lobby ? LOBBY : HOME} />);
   } // TODO : ajouter le total de dés sur la table
+
+  // Mode en ligne : écrans dédiés, le rendu local ci-dessous reste inchangé
+  if (game.mode === GameMode.ONLINE) {
+    return (
+      <Panel>
+        <OnlineGame game={game} playerId={playerId} />
+      </Panel>
+    );
+  }
 
   return (
     <Panel>

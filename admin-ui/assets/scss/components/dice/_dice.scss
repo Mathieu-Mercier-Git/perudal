@@ -145,3 +145,54 @@
   }
 }
 
+
+// Tailles du mode en ligne (sans modificateur, le dé garde sa taille d'origine)
+.dice.dice--xs {
+  width: 22px;
+  height: 22px;
+  padding: 3px;
+  border-width: 1.5px;
+  border-radius: 6px;
+  box-shadow: none;
+
+  .dice-dot {
+    width: 4px;
+    height: 4px;
+  }
+}
+
+.dice.dice--sm {
+  width: 34px;
+  height: 34px;
+  padding: 4px;
+  border-width: 1.5px;
+  border-radius: 9px;
+
+  .dice-dot {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+.dice.dice--xl {
+  width: 84px;
+  height: 84px;
+  padding: 10px;
+  border-width: 2.5px;
+  border-radius: 18px;
+
+  .dice-dot {
+    width: 15px;
+    height: 15px;
+  }
+}
+
+// Résultat d'une manche en ligne : dés qui comptent pour la mise, et les autres
+.dice.dice--highlight {
+  outline: 2px solid var(--t-accent);
+  outline-offset: 1px;
+}
+
+.dice.dice--dim {
+  opacity: .4;
+}

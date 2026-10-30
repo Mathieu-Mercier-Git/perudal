@@ -2,7 +2,8 @@ import { HttpMethod } from 'simple-http-request-builder';
 import { HttpPromise } from 'simple-http-rest-client';
 import ApiHttpClient from '../ApiHttpClient';
 import {
-  ActionGame, TurnInfo, JoinGameRequestBody, KickPlayer, NewGameRequestBody, ReconnectRequestBody, StartGame,
+  ActionGame, Challenge, TurnInfo, JoinGameRequestBody, KickPlayer, NewGameRequestBody, PlaceBid,
+  ReconnectRequestBody, SetGameMode, StartGame,
 } from './GameApiType';
 import { GameSession, LobbyType } from '../../services/game/GameTypes';
 
@@ -32,6 +33,14 @@ export default class GameApi {
     return this
       .httpClient
       .restRequest<GameSession>(HttpMethod.PUT, `${GameApi.BASE_PATH}/reconnect`)
+      .jsonBody(body)
+      .execute();
+  }
+
+  setMode(body: SetGameMode): HttpPromise<void> {
+    return this
+      .httpClient
+      .restRequest<void>(HttpMethod.PUT, `${GameApi.BASE_PATH}/mode`)
       .jsonBody(body)
       .execute();
   }
@@ -80,6 +89,30 @@ export default class GameApi {
     return this
       .httpClient
       .restRequest<LobbyType>(HttpMethod.PUT, `${GameApi.BASE_PATH}/finish-turn`)
+      .jsonBody(body)
+      .execute();
+  }
+
+  placeBid(body: PlaceBid): HttpPromise<void> {
+    return this
+      .httpClient
+      .restRequest<void>(HttpMethod.PUT, `${GameApi.BASE_PATH}/bid`)
+      .jsonBody(body)
+      .execute();
+  }
+
+  challenge(body: Challenge): HttpPromise<void> {
+    return this
+      .httpClient
+      .restRequest<void>(HttpMethod.PUT, `${GameApi.BASE_PATH}/challenge`)
+      .jsonBody(body)
+      .execute();
+  }
+
+  nextRound(body: ActionGame): HttpPromise<void> {
+    return this
+      .httpClient
+      .restRequest<void>(HttpMethod.PUT, `${GameApi.BASE_PATH}/next-round`)
       .jsonBody(body)
       .execute();
   }

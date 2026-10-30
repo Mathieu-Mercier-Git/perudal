@@ -6,12 +6,15 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jar.services.game.GameService;
 import jar.services.game.beans.ActionGame;
+import jar.services.game.beans.Challenge;
 import jar.services.game.beans.GameSession;
 import jar.services.game.beans.TurnInfo;
 import jar.services.game.beans.JoinGame;
 import jar.services.game.beans.KickPlayer;
 import jar.services.game.beans.NewGame;
+import jar.services.game.beans.PlaceBid;
 import jar.services.game.beans.ReconnectGame;
+import jar.services.game.beans.SetGameMode;
 import jar.services.game.beans.StartGame;
 
 import javax.inject.Inject;
@@ -97,5 +100,33 @@ public class GameWs {
     @Operation(description = "Finish a turn and update players")
     public void finishTurn(@RequestBody TurnInfo turnInfo) {
         gameService.finishTurn(turnInfo);
+    }
+
+    @PUT
+    @Path("/mode")
+    @Operation(description = "Choose the game mode, local or online (admin only, in the lobby)")
+    public void setMode(@RequestBody SetGameMode setGameMode) {
+        gameService.setMode(setGameMode);
+    }
+
+    @PUT
+    @Path("/bid")
+    @Operation(description = "Online mode: place a bid on your turn")
+    public void placeBid(@RequestBody PlaceBid placeBid) {
+        gameService.placeBid(placeBid);
+    }
+
+    @PUT
+    @Path("/challenge")
+    @Operation(description = "Online mode: challenge the current bid (liar or exact)")
+    public void challenge(@RequestBody Challenge challenge) {
+        gameService.challenge(challenge);
+    }
+
+    @PUT
+    @Path("/next-round")
+    @Operation(description = "Online mode: leave the round result and go to the next round (admin only)")
+    public void nextRound(@RequestBody ActionGame actionGame) {
+        gameService.nextRound(actionGame);
     }
 }

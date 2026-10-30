@@ -2,6 +2,7 @@ package jar.services.socket;
 
 import jar.services.game.beans.GameInfo;
 import jar.services.game.beans.Lobby;
+import jar.services.game.beans.RoundResultMessage;
 import jar.services.socket.enums.ClientEvent;
 import jar.services.socket.enums.ServerEvent;
 import jar.services.socket.beans.SocketResponse;
@@ -110,6 +111,24 @@ public class SocketService {
 
     public void finishTurn(GameInfo gameInfo) {
         sendFinishTurn(gameInfo);
+    }
+
+    /**
+     * Mode en ligne : diffuse l'état de la manche après une mise. Sert aussi après le
+     * départ d'un joueur en cours de partie (ordre ou joueur courant modifiés).
+     */
+    public void bidPlaced(GameInfo gameInfo) {
+        sendBidPlaced(gameInfo);
+    }
+
+    /** Mode en ligne : diffuse le verdict d'une manche et l'état de la suivante */
+    public void roundResult(RoundResultMessage roundResultMessage) {
+        sendRoundResult(roundResultMessage);
+    }
+
+    /** Mode en ligne : l'admin a validé la fin de l'écran de résultat */
+    public void nextRound(GameInfo gameInfo) {
+        broadcast(gameInfo.getGameCode(), SocketResponse.of(ServerEvent.NEXT_ROUND, gameInfo));
     }
 
     public void rollDices(GameInfo gameInfo) {
@@ -254,6 +273,22 @@ public class SocketService {
             gameInfo
         );
         broadcast(gameInfo.getGameCode(), response);
+    }
+
+    private void sendBidPlaced(GameInfo gameInfo) {
+        SocketResponse response = SocketResponse.of(
+            ServerEvent.BID_PLACED,
+            gameInfo
+        );
+        broadcast(gameInfo.getGameCode(), response);
+    }
+
+    private void sendRoundResult(RoundResultMessage roundResultMessage) {
+        SocketResponse response = SocketResponse.of(
+            ServerEvent.ROUND_RESULT,
+            roundResultMessage
+        );
+        broadcast(roundResultMessage.getGame().getGameCode(), response);
     }
 
     private void sendRevealDices(String gameCode) {

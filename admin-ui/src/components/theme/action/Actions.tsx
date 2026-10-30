@@ -49,6 +49,11 @@ export function ActionLink({
   );
 }
 
+type ThemeActionButtonProps = ActionButtonProps & {
+  // Ajouté ici plutôt que dans le type vendorisé de lib/ : action impossible pour l'instant
+  disabled?: boolean,
+};
+
 export function ActionButton(
   {
     style,
@@ -56,8 +61,9 @@ export function ActionButton(
     cssClasses,
     onClick,
     isLoading = false,
+    disabled = false,
     children,
-  }: ActionButtonProps,
+  }: ThemeActionButtonProps,
 ) {
   return (
     <div
@@ -74,7 +80,7 @@ export function ActionButton(
         onClick={onClick}
         type={onClick ? 'button' : 'submit'}
         variant="contained"
-        disabled={isLoading}
+        disabled={isLoading || disabled}
         color={actionStyleToCssClass(style)}
         startIcon={icon && <Icon>{icon}</Icon>}
       >

@@ -11,7 +11,7 @@ import { GAME, HOME } from '../../Routes';
 import { useOnComponentMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
 import GameService from '../../../services/game/GameService';
 import {
-  Game, LobbyType, Player, playerDisplayName,
+  Game, GameMode, LobbyType, Player, playerDisplayName,
 } from '../../../services/game/GameTypes';
 import PlayerName from '../../theme/player/PlayerName';
 import {
@@ -26,6 +26,7 @@ import AnimatedLoader from '../../layout/AnimatedLoader';
 const DICE_NUMBER: number = 5;
 const MIN_DICE_NUMBER: number = 1;
 const MAX_DICE_NUMBER: number = 9;
+const MIN_PLAYERS_TO_START: number = 2;
 
 type ConfirmAction = {
   title: string,
@@ -49,6 +50,10 @@ export default function Lobby() {
   // Dérivé de l'état et non figé au montage : après une reprise de session,
   // le lobby n'est connu qu'une fois la réponse du serveur reçue
   const isAdmin: boolean = !!lobby?.players.find(player => player.id === playerId && player.isAdmin);
+  const mode: GameMode = lobby?.mode ?? GameMode.LOCAL;
+  const isOnline: boolean = mode === GameMode.ONLINE;
+  // Le serveur refuse de lancer une partie à un seul joueur
+  const canStartGame: boolean = (lobby?.players.length ?? 0) >= MIN_PLAYERS_TO_START;
 
   const listenerUpdateLobby = useCallback(
     socketListener(ServerEvent.UPDATED_LOBBY, (response: LobbyType) => {
@@ -96,6 +101,13 @@ export default function Lobby() {
     // TODO : ajouter des conditions + une popin de confirmation
     // TODO : idée, chargement sur le bouton de 5sec avec possibilités d'annuler pendant ce laps de temps
     gameService.startGame(lobby!.gameCode, diceNumber);
+  };
+
+  const changeMode = (newMode: GameMode): void => {
+    if (newMode === mode) {
+      return;
+    }
+    gameService.setMode(lobby!.gameCode, newMode);
   };
 
   const removeDice = (): void => {
@@ -171,6 +183,35 @@ export default function Lobby() {
         </div>
 
         {isAdmin && (
+          <div className="lobby__mode">
+            <div className="lobby__mode-label">{messages.lobby.mode}</div>
+            <div className="lobby__mode-switch" role="group" aria-label={messages.lobby.mode}>
+              <button
+                type="button"
+                className={`lobby__mode-option${isOnline ? '' : ' lobby__mode-option--active'}`}
+                aria-pressed={!isOnline}
+                onClick={() => changeMode(GameMode.LOCAL)}
+              >
+                <Icon>group</Icon>
+                {messages.lobby.mode_local}
+              </button>
+              <button
+                type="button"
+                className={`lobby__mode-option${isOnline ? ' lobby__mode-option--active' : ''}`}
+                aria-pressed={isOnline}
+                onClick={() => changeMode(GameMode.ONLINE)}
+              >
+                <Icon>public</Icon>
+                {messages.lobby.mode_online}
+              </button>
+            </div>
+            <p className="lobby__mode-help">
+              {isOnline ? messages.lobby.mode_online_help : messages.lobby.mode_local_help}
+            </p>
+          </div>
+        )}
+
+        {isAdmin && (
           <div className="lobby__dice">
             <span className="lobby__dice-label">{messages.lobby.dice_number}</span>
             <div className="lobby__dice-stepper">
@@ -200,7 +241,7 @@ export default function Lobby() {
 
         <div className="lobby__actions">
           {isAdmin && (
-            <ActionButton style={ActionStyle.PRIMARY} onClick={startGame}>
+            <ActionButton style={ActionStyle.PRIMARY} onClick={startGame} disabled={!canStartGame}>
               {messages.action.start_game}
             </ActionButton>
           )}

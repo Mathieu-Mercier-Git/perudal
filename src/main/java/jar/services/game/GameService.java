@@ -414,6 +414,7 @@ public class GameService {
                 actualCount,
                 faceCounts,
                 BidRules.areJokersCounted(bid.getFace(), planificato),
+                planificato,
                 challengerWon,
                 diceChanges,
                 nextStarterId,

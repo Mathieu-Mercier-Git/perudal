@@ -44,6 +44,12 @@ export type InvalidBid = {
 
 export const isPerudo = (face: number): boolean => face === PERUDO;
 
+/** Face voisine sur la molette, qui boucle : après le 6 revient le 1 (perudo), et inversement */
+export function cycleFace(face: number, delta: number): number {
+  const faceCount: number = MAX_FACE - MIN_FACE + 1;
+  return ((face - MIN_FACE + delta + faceCount) % faceCount) + MIN_FACE;
+}
+
 const ceilHalf = (quantity: number): number => Math.ceil(quantity / 2);
 
 const lockedFaceOf = (context: BidContext): number | undefined => (

@@ -26,6 +26,8 @@ public class RoundResult {
     private Map<Integer, Integer> faceCounts;
     /** Les perudos ont-ils compté comme jokers (faux en planificato ou sur une mise en perudos) */
     private boolean jokersCounted;
+    /** La manche résolue était-elle planificato (la partie porte déjà l'état de la manche suivante) */
+    private boolean planificato;
     private boolean challengerWon;
     /** Variation du nombre de dés des joueurs concernés (-1 / +1) */
     private Map<UUID, Integer> diceChanges;

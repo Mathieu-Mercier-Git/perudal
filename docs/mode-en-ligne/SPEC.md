@@ -141,6 +141,7 @@ Quand il ne reste qu'un joueur avec des dés, il gagne. On réutilise `FinishGam
   - `actualCount` ;
   - `faceCounts: Map<Integer, Integer>` (nombre de dés par face 1..6) ;
   - `jokersCounted: boolean` ;
+  - `planificato: boolean` (la manche résolue, pas la suivante) ;
   - `challengerWon: boolean` ;
   - `diceChanges: Map<UUID, Integer>` (−1 / +1 par joueur concerné) ;
   - `nextStarterId` ;

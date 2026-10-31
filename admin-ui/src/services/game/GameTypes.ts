@@ -64,6 +64,8 @@ export type RoundResult = {
   // Nombre de dés par face, clés « 1 » à « 6 »
   faceCounts: Record<string, number>,
   jokersCounted: boolean,
+  // La manche résolue était planificato (`Game.isPlanificato` porte déjà la manche suivante)
+  planificato: boolean,
   challengerWon: boolean,
   // Variation du nombre de dés (-1 / +1) par identifiant de joueur
   diceChanges: Record<string, number>,

@@ -422,6 +422,34 @@ public class OnlineGameServiceTest {
     }
 
     @Test
+    public void liar__result_tells_the_resolved_round_was_planificato_even_on_a_bid_of_ones() {
+        TestGame testGame = startedOnlineGame(2);
+        game(testGame).setIsPlanificato(true);
+        setDices(testGame, 1, 1, 1, 3, 6, 2);
+        setDices(testGame, 2, 5, 4, 4, 6, 3);
+        bid(testGame, 1, 2, 1);
+
+        challenge(testGame, 2, ChallengeType.LIAR);
+
+        RoundResult result = game(testGame).getLastRoundResult();
+        Assertions.assertThat(result.isPlanificato()).isTrue();
+        Assertions.assertThat(game(testGame).getIsPlanificato()).isFalse();
+    }
+
+    @Test
+    public void liar__result_is_not_planificato_when_only_the_next_round_is() {
+        TestGame testGame = startedOnlineGame(2);
+        setDices(testGame, 1, 5, 3);
+        setDices(testGame, 2, 4, 4, 6);
+        bid(testGame, 1, 3, 5);
+
+        challenge(testGame, 2, ChallengeType.LIAR);
+
+        Assertions.assertThat(game(testGame).getLastRoundResult().isPlanificato()).isFalse();
+        Assertions.assertThat(game(testGame).getIsPlanificato()).isTrue();
+    }
+
+    @Test
     public void liar__lets_the_next_alive_player_open_when_the_loser_is_eliminated() {
         TestGame testGame = startedOnlineGame(3);
         setDices(testGame, 1, 3, 3);

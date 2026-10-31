@@ -7,6 +7,7 @@ import { Game, Player } from '../../../../services/game/GameTypes';
 import {
   BidContext,
   BidValue,
+  cycleFace,
   InvalidBid,
   InvalidBidReason,
   invalidReason,
@@ -23,8 +24,6 @@ import {
   bidContextOf, findPlayer, OrderedPlayer, orderedPlayers,
 } from './OnlineGameUtils';
 
-const MIN_FACE: number = 1;
-const MAX_FACE: number = 6;
 const DEFAULT_CLASSIC_FACE: number = 2;
 
 type Props = {
@@ -80,7 +79,7 @@ export default function BidSelector({
 
   const changeQuantity = (delta: number) => setBid({ ...bid, quantity: clamp(bid.quantity + delta, 1, maxQuantity) });
 
-  const changeFace = (delta: number) => setBid({ ...bid, face: clamp(bid.face + delta, MIN_FACE, MAX_FACE) });
+  const changeFace = (delta: number) => setBid({ ...bid, face: cycleFace(bid.face, delta) });
 
   const bidder: Player | undefined = findPlayer(game, previous ? game.currentBid?.playerId : undefined);
 
@@ -147,7 +146,7 @@ export default function BidSelector({
               type="button"
               className="online-lock__arrow"
               aria-label={texts.face_up}
-              disabled={isFaceLocked || bid.face >= MAX_FACE}
+              disabled={isFaceLocked}
               onClick={() => changeFace(1)}
             >
               <Icon>expand_less</Icon>
@@ -163,7 +162,7 @@ export default function BidSelector({
               type="button"
               className="online-lock__arrow"
               aria-label={texts.face_down}
-              disabled={isFaceLocked || bid.face <= MIN_FACE}
+              disabled={isFaceLocked}
               onClick={() => changeFace(-1)}
             >
               <Icon>expand_more</Icon>

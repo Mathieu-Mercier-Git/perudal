@@ -1,5 +1,6 @@
 import {
   BidContext,
+  cycleFace,
   InvalidBidReason,
   invalidReason,
   isValidBid,
@@ -15,6 +16,21 @@ const after = (quantity: number, face: number, planificato: boolean = false): Bi
   planificato,
   openingFace: planificato ? face : undefined,
   totalDice: TOTAL_DICE,
+});
+
+describe('BidRules.cycleFace', () => {
+  it('passe à la face voisine', () => {
+    expect(cycleFace(3, 1)).toBe(4);
+    expect(cycleFace(3, -1)).toBe(2);
+  });
+
+  it('revient au perudo après le 6', () => {
+    expect(cycleFace(6, 1)).toBe(1);
+  });
+
+  it('revient au 6 avant le perudo', () => {
+    expect(cycleFace(1, -1)).toBe(6);
+  });
 });
 
 describe('BidRules.isValidBid', () => {

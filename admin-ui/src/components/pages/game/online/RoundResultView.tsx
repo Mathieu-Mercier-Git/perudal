@@ -89,7 +89,7 @@ export default function RoundResultView({
 
   const { bid } = result;
   // Les perudos ne sont pas des jokers en planificato : ils s'affichent alors comme un « 1 » classique
-  const wasPlanificato: boolean = !result.jokersCounted && bid.face !== PERUDO;
+  const wasPlanificato: boolean = result.planificato;
   const countsForBid = (dice: number): boolean => dice === bid.face || (result.jokersCounted && dice === PERUDO);
 
   const revealed: Player[] = result.revealedPlayers.filter((player: Player) => player.dices.length > 0);
@@ -112,6 +112,9 @@ export default function RoundResultView({
   const verdict: Verdict = computeVerdict(messages, result, playerId, nameOf);
 
   const faceCount = (face: number): number => result.faceCounts[String(face)] ?? 0;
+  // Aucun perudo sur la table : rien à mettre en avant sur cette face
+  const isFaceHighlighted = (face: number): boolean => countsForBid(face)
+    && !(face === PERUDO && !wasPlanificato && faceCount(face) === 0);
 
   return (
     <>
@@ -147,7 +150,9 @@ export default function RoundResultView({
             {FACES.map((face: number) => (
               <div
                 key={face}
-                className={classNames('online-faces__item', { 'online-faces__item--highlight': countsForBid(face) })}
+                className={classNames('online-faces__item', {
+                  'online-faces__item--highlight': isFaceHighlighted(face),
+                })}
               >
                 <Dice number={face} show isPlanificato={wasPlanificato} size="sm" />
                 <span className="online-faces__count">×{faceCount(face)}</span>

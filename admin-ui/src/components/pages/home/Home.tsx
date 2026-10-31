@@ -1,24 +1,22 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { Icon, TextField } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useObservable } from 'micro-observables';
 import { Logger } from 'simple-logging-system';
 import { Panel } from '../../theme/layout/Panel';
 import useMessages from '../../../i18n/hooks/messagesHook';
 import { ActionButton } from '../../theme/action/Actions';
-import { useOnComponentMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
-import { addOnMessage, removeOnMessage, socketListener, } from '../../../services/socket/SocketEngineService';
-import { ServerEvent } from '../../../services/socket/SocketTypes';
 import { getGlobalInstance } from 'plume-ts-di';
-import { LobbyType } from '../../../services/game/GameTypes';
+import { Game, LobbyType } from '../../../services/game/GameTypes';
 import GameService from '../../../services/game/GameService';
-import { CONTACT, LOBBY } from '../../Routes';
+import { CONTACT, GAME, LOBBY } from '../../Routes';
 import ValidationPopin from '../../theme/popin/ValidationPopin';
 import useToggle from '../../../lib/react-hook-toggle/ReactHookToggle';
 import UserService from '../../../services/user/UserService';
 import RulesOverlayService from '../../../services/rules/RulesOverlayService';
 import ActionStyle from '../../../lib/plume-admin-theme/action/ActionStyle';
 import EmojiPickerPopin from './EmojiPickerPopin';
+import AnimatedLoader from '../../layout/AnimatedLoader';
 
 const logger: Logger = new Logger('Home');
 
@@ -34,6 +32,9 @@ export default function Home() {
   const rulesOverlayService = getGlobalInstance(RulesOverlayService);
   const username: string = useObservable(userService.getUsername());
   const emoji: string = useObservable(userService.getEmoji());
+  const lobby: LobbyType | undefined = useObservable(gameService.getLobby());
+  const game: Game | undefined = useObservable(gameService.getGame());
+  const isRestoringSession: boolean = useObservable(gameService.getIsRestoringSession());
 
   const { messages } = useMessages();
   const navigate = useNavigate();
@@ -42,23 +43,6 @@ export default function Home() {
   const [usernameError, setUsernameError] = useState<undefined | UsernameError>(undefined);
   const [showJoinGamePopin, toggleJoinGamePopin] = useToggle(false);
   const [showEmojiPickerPopin, toggleEmojiPickerPopin] = useToggle(false);
-
-  const listenerSwitchPhase = useCallback( // TODO : se documenter sur ce hook
-    socketListener(ServerEvent.UPDATED_LOBBY, (response: LobbyType) => {
-      gameService.setLobby(response);
-      navigate(LOBBY);
-      // TODO : stocker dans un localStorage
-    }),
-    [],
-  );
-
-  useOnComponentMounted(() => {
-    addOnMessage(listenerSwitchPhase);
-
-    return () => {
-      removeOnMessage(listenerSwitchPhase);
-    };
-  });
 
   const usernameErrorLabel = () => usernameError == UsernameError.TOO_SHORT
       ? messages.error.username_too_short
@@ -79,10 +63,8 @@ export default function Home() {
     if (usernameCheck()) {
       return;
     }
-    gameService.createGame(username, emoji, 5)
-      .then(() => {
-        navigate(LOBBY);
-      });
+    // Une fois le lobby connu, l'écran redirige de lui-même
+    gameService.createGame(username, emoji, 5);
   };
 
   const openJoinLobbyPopin = () => {
@@ -93,10 +75,8 @@ export default function Home() {
   };
 
   const joinLobby = () => {
+    // Une fois le lobby connu, l'écran redirige de lui-même
     gameService.joinGame(username, emoji, perucode)
-      .then(() => {
-        navigate(LOBBY);
-      })
       .catch((error) => logger.error('ERROR JOIN GAME', { error }));
   };
 
@@ -121,6 +101,26 @@ export default function Home() {
     // Le pérucode contient une lettre : on la remet en majuscule à la saisie
     setPerucode(event.target.value.toUpperCase());
   };
+
+  // Reprise de session en cours : on attend la réponse du serveur avant de décider
+  // quel écran afficher, sinon l'accueil apparaît brièvement à un joueur qui a une partie
+  if (isRestoringSession) {
+    return (
+      <Panel>
+        <div className="home"><AnimatedLoader /></div>
+      </Panel>
+    );
+  }
+
+  // Un joueur inscrit à une partie ne doit pas pouvoir revenir sur l'accueil (bouton Précédent du navigateur) :
+  // il y resterait inscrit sans recevoir la suite de la partie
+  if (game) {
+    return (<Navigate to={GAME} replace />);
+  }
+
+  if (lobby) {
+    return (<Navigate to={LOBBY} replace />);
+  }
 
   return (
     <Panel>

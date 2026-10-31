@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { getGlobalInstance } from 'plume-ts-di';
 import { useObservable } from 'micro-observables';
 import { Icon } from '@mui/material';
@@ -7,6 +7,7 @@ import { Panel } from '../../theme/layout/Panel';
 import useMessages from '../../../i18n/hooks/messagesHook';
 import { ActionButton } from '../../theme/action/Actions';
 import ActionStyle from '../../../lib/plume-admin-theme/action/ActionStyle';
+import useBackButtonHandler from '../../navigation/useBackButtonHandler';
 import { GAME, HOME } from '../../Routes';
 import { useOnComponentMounted } from '../../../lib/react-hooks-alias/ReactHooksAlias';
 import GameService from '../../../services/game/GameService';
@@ -45,7 +46,6 @@ export default function Lobby() {
   const [confirmAction, setConfirmAction] = useState<ConfirmAction | undefined>(undefined);
 
   const { messages } = useMessages();
-  const navigate = useNavigate();
 
   // Dérivé de l'état et non figé au montage : après une reprise de session,
   // le lobby n'est connu qu'une fois la réponse du serveur reçue
@@ -64,22 +64,15 @@ export default function Lobby() {
 
   const listenerCancelGame = useCallback(
     socketListener(ServerEvent.CANCEL_GAME, () => {
+      // TODO : rediriger vers HOME avec une popup d'information pour dire que la partie a été annulée
       gameService.clearSession(); // la partie n'existe plus : on oublie l'identité locale
-      navigate(HOME); // TODO : rediriger avec vers HOME avec une popup d'information pour dire que la partie a été annulée
     }), [],
   );
 
   const listenerKicked = useCallback(
     socketListener(ServerEvent.KICKED, () => {
+      // TODO : rediriger vers HOME avec une popup d'information pour dire qu'on a été exclu
       gameService.clearSession(); // l'admin nous a exclu : on oublie l'identité locale
-      navigate(HOME); // TODO : rediriger vers HOME avec une popup d'information pour dire qu'on a été exclu
-    }), [],
-  );
-
-  const listenerStartGame = useCallback(
-    socketListener(ServerEvent.START_GAME, (response: Game) => {
-      gameService.setGame(response);
-      navigate(GAME);
     }), [],
   );
 
@@ -87,13 +80,11 @@ export default function Lobby() {
     addOnMessage(listenerUpdateLobby);
     addOnMessage(listenerCancelGame);
     addOnMessage(listenerKicked);
-    addOnMessage(listenerStartGame);
 
     return () => {
       removeOnMessage(listenerUpdateLobby);
       removeOnMessage(listenerCancelGame);
       removeOnMessage(listenerKicked);
-      removeOnMessage(listenerStartGame);
     };
   });
 
@@ -136,6 +127,17 @@ export default function Lobby() {
     });
   };
 
+  // Précédent du navigateur : on demande confirmation plutôt que de faire sortir le joueur de la partie
+  useBackButtonHandler(() => {
+    if (confirmAction) {
+      setConfirmAction(undefined);
+    } else if (isAdmin) {
+      askCancelGame();
+    } else {
+      askQuitGame();
+    }
+  }, !!lobby && !game);
+
   const askKickPlayer = (player: Player): void => {
     setConfirmAction({
       title: `Es-tu sûr de vouloir exclure ${playerDisplayName(player)} de la partie ?`,
@@ -161,12 +163,12 @@ export default function Lobby() {
     );
   }
 
-  if (game) { // la partie a démarré pendant la coupure
-    return (<Navigate to={GAME} />);
+  if (game) { // la partie a démarré
+    return (<Navigate to={GAME} replace />);
   }
 
   if (!lobby) {
-    return (<Navigate to={HOME} />);
+    return (<Navigate to={HOME} replace />);
   }
 
   return (

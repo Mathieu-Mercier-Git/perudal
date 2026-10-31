@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useObservable } from 'micro-observables';
 import { getGlobalInstance } from 'plume-ts-di';
 import { Logger } from 'simple-logging-system';
@@ -31,6 +31,7 @@ import GameMenuPopin from './popin/GameMenuPopin';
 import RulesOverlayService from '../../../services/rules/RulesOverlayService';
 import ValidationPopin from '../../theme/popin/ValidationPopin';
 import OnlineGame from './online/OnlineGame';
+import useBackButtonHandler from '../../navigation/useBackButtonHandler';
 
 type ConfirmAction = {
   title: string,
@@ -62,7 +63,6 @@ export default function Game() {
   const revealTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // const { messages } = useMessages();
-  const navigate = useNavigate();
 
   // Dérivé de l'état et non figé au montage : après une reprise de session,
   // la partie n'est connue qu'une fois la réponse du serveur reçue
@@ -100,7 +100,6 @@ export default function Game() {
   const listenerCancelGame = useCallback(
     socketListener(ServerEvent.CANCEL_GAME, () => {
       gameService.clearSession(); // la partie n'existe plus : on oublie l'identité locale
-      navigate(HOME);
     }), [],
   );
 
@@ -243,6 +242,25 @@ export default function Game() {
     }
   };
 
+  // Précédent du navigateur : ferme ce qui est ouvert, sinon ouvre le menu qui permet de quitter la partie.
+  // Le mode en ligne gère son propre retour, et la popin de fin de partie n'a qu'une seule issue.
+  useBackButtonHandler(() => {
+    if (playerWinner) {
+      return;
+    }
+    if (rulesOverlayService.isRulesOpen().get()) {
+      rulesOverlayService.close();
+    } else if (confirmAction) {
+      setConfirmAction(undefined);
+    } else if (showRollDicesInfo) {
+      setShowRollDicesInfo(false);
+    } else if (showFinishTurnPopin) {
+      setShowFinishTurnPopin(false);
+    } else {
+      setShowMenuPopin(!showMenuPopin);
+    }
+  }, !!game && game.mode !== GameMode.ONLINE);
+
   const diceTotalQuantity: number = game?.players.reduce((total, player) => total + player.dices.length, 0) ?? 0;
   const isPlanificato: boolean | undefined = game?.isPlanificato;
 
@@ -258,7 +276,7 @@ export default function Game() {
 
   if (!game) {
     // La partie n'a pas (re)démarré : si on a toujours un lobby, on y retourne
-    return (<Navigate to={lobby ? LOBBY : HOME} />);
+    return (<Navigate to={lobby ? LOBBY : HOME} replace />);
   } // TODO : ajouter le total de dés sur la table
 
   // Mode en ligne : écrans dédiés, le rendu local ci-dessous reste inchangé

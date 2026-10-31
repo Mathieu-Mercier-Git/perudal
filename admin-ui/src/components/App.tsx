@@ -62,7 +62,7 @@ export default function App() {
           <Route path={LOBBY} element={<Lobby />} />
           <Route path={GAME} element={<Game />} />
           <Route path={CONTACT} element={<Contact />} />
-          <Route path="*" element={<Navigate to={{ pathname: HOME }} />} />
+          <Route path="*" element={<Navigate to={{ pathname: HOME }} replace />} />
         </Routes>
         <Rules />
       </BrowserRouter>

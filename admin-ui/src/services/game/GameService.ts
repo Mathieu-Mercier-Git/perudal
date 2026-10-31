@@ -43,6 +43,11 @@ export default class GameService {
     this.isRestoringSession = observable(!!storedSession);
     this.roundResult = observable(undefined);
 
+    // Écouté ici et non dans le lobby : le joueur doit entrer dans la partie quel que soit l'écran affiché
+    addOnMessage(socketListener(ServerEvent.START_GAME, (game: Game) => {
+      this.setGame(game);
+      this.setLobby(undefined);
+    }));
     // Mode en ligne : les actions des autres joueurs arrivent par la socket
     addOnMessage(socketListener(ServerEvent.BID_PLACED, (game: Game) => this.setGame(game)));
     addOnMessage(socketListener(ServerEvent.ROUND_RESULT, (message: RoundResultMessage) => {

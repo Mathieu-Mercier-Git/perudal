@@ -12,6 +12,7 @@ import {
 } from '../../../../services/game/GameTypes';
 import { BidValue } from '../../../../services/game/BidRules';
 import NotificationEngine from '../../../../lib/plume-notification/NotificationEngine';
+import useBackButtonHandler from '../../../navigation/useBackButtonHandler';
 import RulesOverlayService from '../../../../services/rules/RulesOverlayService';
 import ActionStyle from '../../../../lib/plume-admin-theme/action/ActionStyle';
 import { ActionButton } from '../../../theme/action/Actions';
@@ -79,6 +80,25 @@ export default function OnlineGame({ game, playerId }: Props) {
   useEffect(() => {
     setShowMyDices(false);
   }, [roundResult]);
+
+  // Précédent du navigateur : ferme ce qui est ouvert, sinon ouvre le menu qui permet de quitter la partie.
+  // La popin de fin de partie n'a qu'une seule issue : le retour y est sans effet.
+  useBackButtonHandler(() => {
+    if (winner && !roundResult) {
+      return;
+    }
+    if (rulesOverlayService.isRulesOpen().get()) {
+      rulesOverlayService.close();
+    } else if (confirmAction) {
+      setConfirmAction(undefined);
+    } else if (showMenuPopin) {
+      setShowMenuPopin(false);
+    } else if (isBidding) {
+      setIsBidding(false);
+    } else {
+      setShowMenuPopin(true);
+    }
+  });
 
   const notifyError = (error: HttpError) => notificationEngine.addDanger(httpError(error));
 

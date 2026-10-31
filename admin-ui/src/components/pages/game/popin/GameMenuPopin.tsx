@@ -11,10 +11,13 @@ type Props = {
   onClose: () => void,
   // Mode en ligne : l'admin ne peut pas court-circuiter la manche
   canRollDices?: boolean,
+  // Mode en ligne : son joué quand c'est au joueur de jouer
+  isSoundEnabled?: boolean,
+  onToggleSound?: () => void,
 };
 
 export default function GameMenuPopin({
-  isAdmin, onShowRules, onLeaveGame, onClose, onRollDices, canRollDices = true,
+  isAdmin, onShowRules, onLeaveGame, onClose, onRollDices, canRollDices = true, isSoundEnabled, onToggleSound,
 }: Props) {
   return (
     <Popin zIndex={110}>
@@ -23,6 +26,15 @@ export default function GameMenuPopin({
         <ActionButton style={ActionStyle.PRIMARY} icon="menu_book" onClick={onShowRules}>
           Règles du jeu
         </ActionButton>
+        {onToggleSound && (
+          <ActionButton
+            style={ActionStyle.PRIMARY}
+            icon={isSoundEnabled ? 'volume_off' : 'volume_up'}
+            onClick={onToggleSound}
+          >
+            {isSoundEnabled ? 'Couper le son' : 'Activer le son'}
+          </ActionButton>
+        )}
         {isAdmin && canRollDices && (
           <ActionButton style={ActionStyle.PRIMARY} icon="replay" onClick={onRollDices}>
             Relancer les dés

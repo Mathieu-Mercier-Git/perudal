@@ -52,6 +52,7 @@ Source des règles : `admin-ui/src/components/pages/rules/Rules.tsx`. Ce qui sui
 - L'ordre ne change plus de la partie. Un joueur éliminé (0 dé) garde sa position mais il est **sauté**.
 - « Joueur suivant » = le prochain joueur de `playerOrder` encore en vie (plus de 0 dé), en bouclant.
 - Le premier joueur de la première manche est le premier de `playerOrder` (position 1) : il n'y a pas d'autre tirage au sort.
+- Quand c'est à son tour de jouer, le joueur reçoit une vibration (absente sur iPhone) et un court motif de marimba, une fois par tour et seulement si l'appli est ouverte. Le son se coupe depuis le menu de la partie.
 
 ### 3.3 Déroulé d'une manche
 

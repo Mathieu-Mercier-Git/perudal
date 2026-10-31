@@ -6,6 +6,7 @@ import { Icon } from '@mui/material';
 import useMessages from '../../../../i18n/hooks/messagesHook';
 import { Translations } from '../../../../i18n/translations/Translations';
 import GameService from '../../../../services/game/GameService';
+import TurnAlertService from '../../../../services/game/TurnAlertService';
 import {
   ChallengeType, Game, Player, playerDisplayName, RoundResult,
 } from '../../../../services/game/GameTypes';
@@ -39,12 +40,14 @@ type Props = {
 // Partie en mode « En ligne » : chacun joue à son tour dans l'appli, le serveur calcule le résultat
 export default function OnlineGame({ game, playerId }: Props) {
   const gameService: GameService = getGlobalInstance(GameService);
+  const turnAlertService: TurnAlertService = getGlobalInstance(TurnAlertService);
   const rulesOverlayService: RulesOverlayService = getGlobalInstance(RulesOverlayService);
   const notificationEngine: NotificationEngine = getGlobalInstance(NotificationEngine);
   const { messages, httpError } = useMessages();
   const texts: Translations['online_game'] = messages.online_game;
 
   const roundResult: RoundResult | undefined = useObservable(gameService.getRoundResult());
+  const isSoundEnabled: boolean = useObservable(turnAlertService.isSoundEnabled());
 
   const [showMyDices, setShowMyDices] = useState<boolean>(false);
   const [isBidding, setIsBidding] = useState<boolean>(false);
@@ -58,6 +61,14 @@ export default function OnlineGame({ game, playerId }: Props) {
   const currentPlayer: Player | undefined = findPlayer(game, game.currentPlayerId);
   const alivePlayers: Player[] = game.players.filter(isAlive);
   const winner: Player | undefined = alivePlayers.length === 1 ? alivePlayers[0] : undefined;
+  // Le serveur désigne déjà le prochain joueur pendant l'écran de résultat : le tour commence à sa fermeture
+  const canPlayNow: boolean = isMyTurn && !roundResult && !winner;
+
+  useEffect(() => {
+    if (canPlayNow) {
+      turnAlertService.alert();
+    }
+  }, [canPlayNow, turnAlertService]);
 
   // À chaque changement de main ou de manche, on revient à l'écran de base et les dés repartent masqués
   useEffect(() => {
@@ -265,6 +276,8 @@ export default function OnlineGame({ game, playerId }: Props) {
           onShowRules={openRulesFromMenu}
           onLeaveGame={leaveGame}
           onRollDices={() => undefined}
+          isSoundEnabled={isSoundEnabled}
+          onToggleSound={() => turnAlertService.toggleSound()}
           onClose={() => setShowMenuPopin(false)}
         />
       )}

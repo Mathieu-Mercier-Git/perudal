@@ -1,9 +1,9 @@
 // Emojis proposés sur l'accueil pour accompagner le pseudo du joueur
 export const PLAYER_EMOJIS: string[] = [
-  // Animaux
-  '🐀', '🐊', '🦈', '🐙', '🐋', '🦖', '🦥', '🦘', '🐘',
+  // Animaux : couleurs vives et ternes alternées pour équilibrer les lignes du sélecteur
+  '🐞', '🐀', '🪼', '🦥', '🦖', '🐌', '🦆', '🦧', '🐋',
   // Visages et personnages
-  '😮', '🫤', '🤥', '🖕', '💀', '👽', '🤖', '🧞',
+  '😮', '🫤', '🤥', '😈', '🖕', '💀', '👽', '🤖',
   // Fruits, légumes et plantes
   '🍑', '🍆', '🍄', '🌵',
   // Objets et symboles

@@ -1,5 +1,5 @@
 import { Observable, observable, WritableObservable } from 'micro-observables';
-import { randomPlayerEmoji } from './PlayerEmojis';
+import { PLAYER_EMOJIS, randomPlayerEmoji } from './PlayerEmojis';
 
 const LOCAL_STORAGE_USERNAME: string = 'username';
 const LOCAL_STORAGE_EMOJI: string = 'emoji';
@@ -39,10 +39,11 @@ export default class UserService {
       this.username.set(username);
     }
     const emoji: string | null = localStorage.getItem(LOCAL_STORAGE_EMOJI);
-    if (emoji) {
+    if (emoji && PLAYER_EMOJIS.includes(emoji)) {
       this.emoji.set(emoji);
     } else {
-      // Premier passage : l'emoji tiré au hasard est conservé pour les visites suivantes
+      // Premier passage, ou emoji sauvegardé qui ne fait plus partie de la liste proposée :
+      // l'emoji tiré au hasard remplace l'ancien et est conservé pour les visites suivantes
       this.setEmoji(this.emoji.get());
     }
   }

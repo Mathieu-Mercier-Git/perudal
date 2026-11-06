@@ -91,5 +91,16 @@
     font-family: var(--font-mono);
     font-size: 13px;
     color: var(--accent-txt);
+    // Soulignement décalé sous le texte pour ne pas masquer le "_" de l'adresse
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+    text-underline-offset: .45em;
+    transition: text-decoration-color .2s ease;
+
+    &:hover,
+    &:focus-visible {
+      text-decoration-color: currentColor;
+    }
   }
 }

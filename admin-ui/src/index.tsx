@@ -55,4 +55,13 @@ if (!rootElement) {
 }
 createRoot(rootElement).render(reactApp);
 
+// PWA : le service worker rend l'application installable sur téléphone (pas en local,
+// pour ne pas interférer avec le rechargement à chaud de Vite en développement)
+if ('serviceWorker' in navigator && window.location.hostname !== 'localhost') {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .catch((error: unknown) => logger.warn('Service worker non enregistré', error));
+  });
+}
+
 logger.info(`Application started in ${Date.now() - currentMillis}ms`);

@@ -244,6 +244,10 @@
     gap: $spacer-2;
   }
 
+  &--left {
+    opacity: .5;
+  }
+
   &__lost {
     font-size: 13px;
     font-style: italic;

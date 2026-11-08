@@ -8,6 +8,8 @@ public enum ServerEvent {
     REVEAL_DICES,
     ROLL_DICES,
     KICKED,
+    // Mode local
+    PLAYER_LEFT,
     // Mode en ligne
     BID_PLACED,
     ROUND_RESULT,

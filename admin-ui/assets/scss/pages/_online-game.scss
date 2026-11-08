@@ -198,8 +198,16 @@
   }
 
   // Le pseudo prend la place libre : badge et dés sont calés à droite, dans la même colonne
-  &--result &__name {
+  &--result &__identity {
+    display: flex;
     flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &--result &__name {
+    max-width: 100%;
   }
 
   &__aside {

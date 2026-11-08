@@ -639,12 +639,58 @@ public class OnlineGameServiceTest {
     @Test
     public void quit__hides_the_departed_player_from_the_broadcast_order() {
         TestGame testGame = startedOnlineGame(3);
+        bid(testGame, 1, 2, 4);
         gameService.quitGame(ActionGame.of(testGame.player(3), testGame.gameCode));
 
         GameSession session = gameService.reconnect(ReconnectGame.of(testGame.gameCode, testGame.player(1), UUID.randomUUID()));
 
         Assertions.assertThat(session.getGame().getPlayerOrder()).containsExactly(testGame.player(1), testGame.player(2));
         Assertions.assertThat(session.getGame().getDepartedPlayers()).extracting(Player::getId).containsExactly(testGame.player(3));
+    }
+
+    @Test
+    public void quit__on_the_round_result_screen_removes_the_dices_from_the_next_round() {
+        TestGame testGame = startedOnlineGame(3);
+        setDices(testGame, 1, 2, 2, 2);
+        setDices(testGame, 2, 3, 3, 3);
+        setDices(testGame, 3, 4, 4, 4, 4);
+        bid(testGame, 1, 1, 5); // aucun « 5 » : le joueur 1 perd un dé
+        challenge(testGame, 2, ChallengeType.LIAR);
+
+        gameService.quitGame(ActionGame.of(testGame.player(3), testGame.gameCode));
+
+        Game game = game(testGame);
+        Assertions.assertThat(game.getDepartedPlayers()).isEmpty();
+        Assertions.assertThat(game.getPlayerOrder()).containsExactly(testGame.player(1), testGame.player(2));
+        // 2 + 3 dés : un mise sur 6 dés ou plus est refusée
+        game.setCurrentPlayerId(testGame.player(1));
+        assertError(() -> bid(testGame, 1, 6, 2), CustomWsError.INVALID_BID);
+        bid(testGame, 1, 5, 2);
+    }
+
+    @Test
+    public void quit__at_the_start_of_a_round_before_any_bid_keeps_the_dices_counted_and_passes_the_turn() {
+        TestGame testGame = startedOnlineGame(3);
+
+        gameService.quitGame(ActionGame.of(testGame.player(1), testGame.gameCode));
+
+        Game game = game(testGame);
+        Assertions.assertThat(game.getDepartedPlayers()).containsOnlyKeys(testGame.player(1));
+        Assertions.assertThat(game.getCurrentPlayerId()).isEqualTo(testGame.player(2));
+        // 3 joueurs × DICE_NUMBER dés toujours sur la table
+        bid(testGame, 2, 3 * DICE_NUMBER, 2);
+    }
+
+    @Test
+    public void quit__after_the_admin_validated_the_round_result_keeps_the_dices_counted() {
+        TestGame testGame = startedOnlineGame(3);
+        bid(testGame, 1, 1, 5);
+        challenge(testGame, 2, ChallengeType.LIAR);
+        gameService.nextRound(ActionGame.of(testGame.player(1), testGame.gameCode));
+
+        gameService.quitGame(ActionGame.of(testGame.player(3), testGame.gameCode));
+
+        Assertions.assertThat(game(testGame).getDepartedPlayers()).containsOnlyKeys(testGame.player(3));
     }
 
     // Reconnexion
@@ -784,5 +830,57 @@ public class OnlineGameServiceTest {
 
         Assertions.assertThat(game(testGame).getPlayers()).doesNotContainKey(testGame.player(2));
         Assertions.assertThat(game(testGame).getDepartedPlayers()).isEmpty();
+    }
+
+    @Test
+    public void quit__during_the_game_keeps_the_player_displayed_as_left_without_dices() {
+        TestGame localGame = startedLocalGame(3);
+        TestGame onlineGame = startedOnlineGame(3);
+        bid(onlineGame, 1, 2, 4);
+
+        gameService.quitGame(ActionGame.of(localGame.player(2), localGame.gameCode));
+        gameService.quitGame(ActionGame.of(onlineGame.player(3), onlineGame.gameCode));
+
+        for (TestGame testGame : List.of(localGame, onlineGame)) {
+            int leftPosition = testGame == localGame ? 2 : 3;
+            GameSession session = gameService.reconnect(ReconnectGame.of(testGame.gameCode, testGame.player(1), UUID.randomUUID()));
+            Assertions.assertThat(session.getGame().getLeftPlayers())
+                .singleElement()
+                .satisfies(left -> {
+                    Assertions.assertThat(left.getId()).isEqualTo(testGame.player(leftPosition));
+                    Assertions.assertThat(left.getDiceNumber()).isZero();
+                    Assertions.assertThat(left.getDices()).isEmpty();
+                });
+        }
+    }
+
+    @Test
+    public void quit__in_the_lobby_does_not_mark_the_player_as_left() {
+        TestGame testGame = newGame(GameMode.LOCAL, 3);
+
+        gameService.quitGame(ActionGame.of(testGame.player(2), testGame.gameCode));
+
+        Assertions.assertThat(game(testGame).getLeftPlayers()).isEmpty();
+    }
+
+    @Test
+    public void local__quit_of_the_player_who_starts_lets_the_players_choose_again() {
+        TestGame testGame = startedLocalGame(3);
+        game(testGame).setPlayerIdFinishTurn(testGame.player(2));
+
+        gameService.quitGame(ActionGame.of(testGame.player(2), testGame.gameCode));
+
+        Assertions.assertThat(game(testGame).getPlayerIdFinishTurn()).isNull();
+    }
+
+    @Test
+    public void local__finishTurn_on_a_departed_player_is_refused() {
+        TestGame testGame = startedLocalGame(3);
+        gameService.quitGame(ActionGame.of(testGame.player(2), testGame.gameCode));
+
+        assertError(
+            () -> gameService.finishTurn(TurnInfo.of(testGame.gameCode, testGame.player(2), true)),
+            CustomWsError.PLAYER_NOT_FOUND
+        );
     }
 }

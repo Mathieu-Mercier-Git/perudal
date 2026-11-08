@@ -97,6 +97,15 @@ export default function Game() {
     }), [],
   );
 
+  // Un joueur a quitté la partie : il disparaît de la table et ses dés du total
+  const listenerPlayerLeft = useCallback(
+    socketListener(ServerEvent.PLAYER_LEFT, (response: Game) => {
+      processIsGameFinished(response);
+      gameService.setGame(response);
+      logger.debug('EVENT PLAYER_LEFT', { response });
+    }), [],
+  );
+
   const listenerCancelGame = useCallback(
     socketListener(ServerEvent.CANCEL_GAME, () => {
       gameService.clearSession(); // la partie n'existe plus : on oublie l'identité locale
@@ -107,12 +116,14 @@ export default function Game() {
     addOnMessage(listenerRevealDices);
     addOnMessage(listenerRollDices);
     addOnMessage(listenerFinishTurn);
+    addOnMessage(listenerPlayerLeft);
     addOnMessage(listenerCancelGame);
 
     return () => {
       removeOnMessage(listenerRevealDices);
       removeOnMessage(listenerRollDices);
       removeOnMessage(listenerFinishTurn);
+      removeOnMessage(listenerPlayerLeft);
       removeOnMessage(listenerCancelGame);
     };
   });
@@ -330,6 +341,14 @@ export default function Game() {
                     ))}
                   </div>
                 )}
+              </div>
+            ))}
+            {(game.leftPlayers ?? []).map((leftPlayer: Player) => (
+              <div key={leftPlayer.id} className="tile tile--left">
+                <div className="tile__head">
+                  <PlayerName player={leftPlayer} className="tile__name" />
+                  <span className="tile__lost">a quitté la partie</span>
+                </div>
               </div>
             ))}
           </div>

@@ -38,7 +38,8 @@ export function totalDiceInPlay(game: Game): number {
 }
 
 export function findPlayer(game: Game, playerId: string | null | undefined): Player | undefined {
-  return [...game.players, ...(game.departedPlayers ?? [])].find((player: Player) => player.id === playerId);
+  return [...game.players, ...(game.departedPlayers ?? []), ...(game.leftPlayers ?? [])]
+    .find((player: Player) => player.id === playerId);
 }
 
 export function bidContextOf(game: Game): BidContext {

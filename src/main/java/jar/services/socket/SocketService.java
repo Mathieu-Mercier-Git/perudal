@@ -121,6 +121,11 @@ public class SocketService {
         sendBidPlaced(gameInfo);
     }
 
+    /** Mode local : diffuse l'état de la partie après le départ d'un joueur en cours de partie */
+    public void playerLeft(GameInfo gameInfo) {
+        broadcast(gameInfo.getGameCode(), SocketResponse.of(ServerEvent.PLAYER_LEFT, gameInfo));
+    }
+
     /** Mode en ligne : diffuse le verdict d'une manche et l'état de la suivante */
     public void roundResult(RoundResultMessage roundResultMessage) {
         sendRoundResult(roundResultMessage);

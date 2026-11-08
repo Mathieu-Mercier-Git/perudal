@@ -28,4 +28,6 @@ public class GameInfo {
     private RoundResult lastRoundResult;
     /** Joueurs partis pendant la manche : leurs dés comptent encore jusqu'à sa résolution */
     private List<Player> departedPlayers;
+    /** Joueurs ayant quitté la partie en cours, affichés comme tels (sans dés) */
+    private List<Player> leftPlayers;
 }

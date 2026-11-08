@@ -45,6 +45,12 @@ public class Game {
      * la manche suivante si le perdant désigné est l'un d'eux.
      */
     private Map<UUID, Player> departedPlayers = new LinkedHashMap<>();
+    /**
+     * Joueurs ayant quitté la partie en cours, dans l'ordre des départs. Affichage
+     * seulement (« a quitté la partie ») : ils n'ont plus de dés et ne jouent plus.
+     * Commun aux modes local et en ligne.
+     */
+    private List<Player> leftPlayers = new ArrayList<>();
 
     public static Game of(Map<UUID, Player> players, int diceNumber, GameStatus status, Boolean isPlanificato,
                           UUID playerIdFinishTurn, Instant createdAt) {

@@ -174,10 +174,13 @@ export default function RoundResultView({
               >
                 <div className="online-player__head">
                   <span className="online-position">{position ?? '–'}</span>
-                  <PlayerName player={player} className="online-player__name" />
+                  {/* Le départ est écrit sous le pseudo : à côté, il était écrasé par les dés */}
+                  <div className="online-player__identity">
+                    <PlayerName player={player} className="online-player__name" />
+                    {position === undefined && (<span className="online-player__status">{texts.departed}</span>)}
+                  </div>
                   {change < 0 && (<span className="online-badge online-badge--minus">{texts.minus_one}</span>)}
                   {change > 0 && (<span className="online-badge online-badge--plus">{texts.plus_one}</span>)}
-                  {position === undefined && (<span className="online-player__status">{texts.departed}</span>)}
                   <div className="online-player__aside online-player__revealed">
                     {player.dices.map((dice: number, index: number) => (
                       <Dice

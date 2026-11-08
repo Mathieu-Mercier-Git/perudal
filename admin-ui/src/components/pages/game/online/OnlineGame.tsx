@@ -64,6 +64,11 @@ export default function OnlineGame({ game, playerId }: Props) {
   const winner: Player | undefined = alivePlayers.length === 1 ? alivePlayers[0] : undefined;
   // Le serveur désigne déjà le prochain joueur pendant l'écran de résultat : le tour commence à sa fermeture
   const canPlayNow: boolean = isMyTurn && !roundResult && !winner;
+  // Pendant l'écran de résultat, le total reste celui de la manche jouée (dés révélés) :
+  // il ne passe au total de la manche suivante qu'à son lancement
+  const totalDice: number = roundResult
+    ? roundResult.revealedPlayers.reduce((total: number, player: Player) => total + player.dices.length, 0)
+    : totalDiceInPlay(game);
 
   useEffect(() => {
     if (canPlayNow) {
@@ -272,7 +277,7 @@ export default function OnlineGame({ game, playerId }: Props) {
             <h1 className="game__title">{title()}</h1>
             <div className="game__header-actions">
               <div className="game__total">
-                <span className="game__total-num">{totalDiceInPlay(game)}</span>
+                <span className="game__total-num">{totalDice}</span>
                 <span className="game__total-label">{texts.dice_unit}</span>
               </div>
               <button

@@ -195,6 +195,7 @@ public class GameService {
             currentGame.setDiceNumber(startGame.getDiceNumber());
             currentGame.setStatus(GameStatus.IN_GAME);
             currentGame.setIsPlanificato(false);
+            currentGame.getLeftPlayers().clear();
             // Le premier joueur à jouer est tiré au sort parmi les joueurs présents
             List<UUID> playerIds = new ArrayList<>(currentGame.getPlayers().keySet());
             currentGame.setPlayerIdFinishTurn(playerIds.get(new Random().nextInt(playerIds.size())));
@@ -226,8 +227,12 @@ public class GameService {
         List<Player> players;
         synchronized (game) {
             boolean isOnlineGameInProgress = game.getMode() == GameMode.ONLINE && game.getStatus() == GameStatus.IN_GAME;
+            boolean isLocalGameInProgress = game.getMode() != GameMode.ONLINE && game.getStatus() == GameStatus.IN_GAME;
             Player leavingPlayer = game.getPlayers().get(actionGame.getPlayerId());
             players = removePlayer(actionGame.getGameCode(), actionGame.getPlayerId());
+            if (game.getStatus() == GameStatus.IN_GAME && leavingPlayer != null) {
+                game.getLeftPlayers().add(leftPlayerOf(leavingPlayer));
+            }
 
             Lobby lobby = Lobby.of(actionGame.getGameCode(), players, game.getMode());
             socketService.quitGame(actionGame.getPlayerId(), lobby);
@@ -236,6 +241,13 @@ public class GameService {
                 leaveOnlineGame(game, leavingPlayer);
                 // Les joueurs restants doivent voir le nouvel ordre et, le cas échéant, le nouveau joueur courant
                 socketService.bidPlaced(toGameInfo(actionGame.getGameCode(), game));
+            } else if (isLocalGameInProgress && leavingPlayer != null && !players.isEmpty()) {
+                // Sans cela, l'écran de jeu local garderait le joueur parti (et ses dés dans le total)
+                // jusqu'à la fin du tour, et l'admin pourrait encore le désigner comme perdant
+                if (leavingPlayer.getId().equals(game.getPlayerIdFinishTurn())) {
+                    game.setPlayerIdFinishTurn(null); // les joueurs choisissent à nouveau qui commence
+                }
+                socketService.playerLeft(toGameInfo(actionGame.getGameCode(), game));
             }
         }
 
@@ -249,17 +261,19 @@ public class GameService {
     }
 
     /**
-     * Départ d'un joueur en pleine partie en ligne. S'il avait encore des dés, ils
-     * restent comptés jusqu'à la fin de la manche, mais il ne peut plus perdre ni
-     * gagner de dé. S'il était le joueur courant, la main passe au suivant en vie et
-     * la mise en cours est conservée.
+     * Départ d'un joueur en pleine partie en ligne. Une fois la manche affichée (avec
+     * ou sans mise), ses dés restent comptés jusqu'à la fin de la manche, mais il ne
+     * peut plus perdre ni gagner de dé. Pendant l'écran de résultat, la manche suivante
+     * n'a encore été montrée à personne : il sort tout de suite, ses dés avec. S'il
+     * était le joueur courant, la main passe au suivant en vie et la mise en cours est
+     * conservée.
      */
     private void leaveOnlineGame(Game game, Player leavingPlayer) {
         UUID leavingPlayerId = leavingPlayer.getId();
         if (leavingPlayerId.equals(game.getCurrentPlayerId())) {
             game.setCurrentPlayerId(nextAlivePlayer(game, leavingPlayerId));
         }
-        if (leavingPlayer.getDiceNumber() > 0) {
+        if (leavingPlayer.getDiceNumber() > 0 && game.getLastRoundResult() == null) {
             // Gardé dans l'ordre jusqu'à la fin de la manche (cf. Game#departedPlayers)
             game.getDepartedPlayers().put(leavingPlayerId, leavingPlayer);
         } else {
@@ -315,6 +329,9 @@ public class GameService {
         requireLocalMode(game);
 
         Player currentplayer = game.getPlayers().get(turnInfo.getPlayerId());
+        if (currentplayer == null) { // joueur parti entre-temps
+            throw new WsException(CustomWsError.PLAYER_NOT_FOUND);
+        }
         if (!turnInfo.isHasLost() && !isExactAllowed(game)) {
             throw new WsException(CustomWsError.EXACT_NOT_ALLOWED);
         }
@@ -574,6 +591,11 @@ public class GameService {
         return BidRules.isExactAllowed(isPlanificato(game), alivePlayers);
     }
 
+    /** Trace d'un joueur parti, pour l'afficher : sans dés, il ne compte plus nulle part */
+    private static Player leftPlayerOf(Player player) {
+        return Player.of(player.getId(), player.getName(), player.getEmoji(), 0, new ArrayList<>(), false);
+    }
+
     private static Player copyPlayer(Player player) {
         return Player.of(
             player.getId(), player.getName(), player.getEmoji(), player.getDiceNumber(),
@@ -619,7 +641,8 @@ public class GameService {
             game.getCurrentBid(),
             new ArrayList<>(game.getRoundBids()),
             game.getLastRoundResult(),
-            new ArrayList<>(game.getDepartedPlayers().values())
+            new ArrayList<>(game.getDepartedPlayers().values()),
+            new ArrayList<>(game.getLeftPlayers())
         );
     }
 

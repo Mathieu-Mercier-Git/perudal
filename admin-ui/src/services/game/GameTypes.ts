@@ -40,6 +40,8 @@ export type Game = {
   lastRoundResult?: RoundResult | null,
   // Joueurs partis pendant la manche : leurs dés comptent jusqu'à sa résolution
   departedPlayers?: Player[],
+  // Joueurs ayant quitté la partie en cours (affichage seulement, sans dés)
+  leftPlayers?: Player[],
 };
 
 /** Mise d'un joueur en ligne : `quantity` dés montrant `face` (1 = perudo) */

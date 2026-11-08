@@ -20,6 +20,7 @@ import PlayerName from '../../../theme/player/PlayerName';
 import Dice from '../dice/Dice';
 import BidLabel from './BidLabel';
 import useScrollStepper from './useScrollStepper';
+import RollingValue, { RollDirection } from './RollingValue';
 import { DiceCountChip } from './PlayerOrderList';
 import {
   bidContextOf, findPlayer, OrderedPlayer, orderedPlayers,
@@ -78,13 +79,24 @@ export default function BidSelector({
   const isBidPerudo: boolean = isPerudo(bid.face);
   const invalid: InvalidBid | undefined = invalidReason(bid, context);
 
-  const changeQuantity = (delta: number) => setBid((current: BidValue) => ({
-    ...current, quantity: clamp(current.quantity + delta, 1, maxQuantity),
-  }));
+  // Sens du dernier changement de chaque molette, pour l'animation de défilement
+  const [quantityDirection, setQuantityDirection] = useState<RollDirection>(1);
+  const [faceDirection, setFaceDirection] = useState<RollDirection>(1);
+  const directionOf = (delta: number): RollDirection => (delta < 0 ? -1 : 1);
 
-  const changeFace = (delta: number) => setBid((current: BidValue) => ({
-    ...current, face: cycleFace(current.face, delta),
-  }));
+  const changeQuantity = (delta: number) => {
+    setQuantityDirection(directionOf(delta));
+    setBid((current: BidValue) => ({
+      ...current, quantity: clamp(current.quantity + delta, 1, maxQuantity),
+    }));
+  };
+
+  const changeFace = (delta: number) => {
+    setFaceDirection(directionOf(delta));
+    setBid((current: BidValue) => ({
+      ...current, face: cycleFace(current.face, delta),
+    }));
+  };
 
   // Scroller (molette/trackpad) ou glisser (tactile) sur une molette change sa valeur
   const quantityWheelRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
@@ -136,7 +148,11 @@ export default function BidSelector({
               <Icon>expand_less</Icon>
             </button>
             <div className="online-lock__value">
-              <span className="online-lock__quantity">{bid.quantity}</span>
+              <RollingValue
+                value={bid.quantity}
+                direction={quantityDirection}
+                render={(quantity: number) => <span className="online-lock__quantity">{quantity}</span>}
+              />
             </div>
             <button
               type="button"
@@ -167,7 +183,11 @@ export default function BidSelector({
                 'online-lock__value--perudo': isBidPerudo && !context.planificato,
               })}
             >
-              <Dice number={bid.face} show isPlanificato={game.isPlanificato} size="xl" />
+              <RollingValue
+                value={bid.face}
+                direction={faceDirection}
+                render={(face: number) => <Dice number={face} show isPlanificato={game.isPlanificato} size="xl" />}
+              />
             </div>
             <button
               type="button"

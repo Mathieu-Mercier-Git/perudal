@@ -499,6 +499,8 @@
     align-items: center;
     justify-content: center;
     height: 120px;
+    // Masque les valeurs qui sortent pendant le défilement (RollingValue)
+    overflow: hidden;
     background: var(--hover);
     border: 1.5px solid var(--accent-line);
     border-radius: 18px;
@@ -698,5 +700,80 @@
 
   &--plus {
     background: var(--jade);
+  }
+}
+
+// Défilement façon molette de cadenas quand la valeur d'une molette de mise change (RollingValue)
+$online-roll-duration: .22s;
+
+.online-roll {
+  display: grid;
+  width: 100%;
+  height: 100%;
+
+  &__item {
+    grid-area: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation-duration: $online-roll-duration;
+    animation-timing-function: cubic-bezier(.3, .7, .4, 1);
+    animation-fill-mode: both;
+  }
+
+  // La valeur monte : l'ancienne sort par le bas, la nouvelle arrive par le haut
+  &--up &__item--leaving {
+    animation-name: online-roll-out-down;
+  }
+
+  &--up &__item--entering {
+    animation-name: online-roll-in-down;
+  }
+
+  // La valeur descend : l'ancienne sort par le haut, la nouvelle arrive par le bas
+  &--down &__item--leaving {
+    animation-name: online-roll-out-up;
+  }
+
+  &--down &__item--entering {
+    animation-name: online-roll-in-up;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__item {
+      animation: none;
+    }
+
+    &__item--leaving {
+      display: none;
+    }
+  }
+}
+
+@keyframes online-roll-out-up {
+  to {
+    opacity: .2;
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes online-roll-in-up {
+  from {
+    opacity: .2;
+    transform: translateY(100%);
+  }
+}
+
+@keyframes online-roll-out-down {
+  to {
+    opacity: .2;
+    transform: translateY(100%);
+  }
+}
+
+@keyframes online-roll-in-down {
+  from {
+    opacity: .2;
+    transform: translateY(-100%);
   }
 }

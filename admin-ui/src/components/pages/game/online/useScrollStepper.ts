@@ -10,7 +10,8 @@ const WHEEL_COOLDOWN_MS: number = 250;
 
 /**
  * Fait défiler une valeur par crans quand on scrolle (molette, trackpad) ou qu'on glisse
- * verticalement (tactile) sur l'élément : vers le haut = +1, vers le bas = -1.
+ * verticalement (tactile) sur l'élément : vers le bas = +1, vers le haut = -1
+ * (le contenu suit le geste, cohérent avec l'animation de RollingValue).
  * Le défilement de la page est bloqué tant que le geste a lieu sur l'élément.
  * Les écouteurs sont natifs (non passifs) car React enregistre `onWheel` en passif,
  * ce qui empêche d'appeler `preventDefault`.
@@ -52,9 +53,9 @@ export default function useScrollStepper(
       if (isDisabledRef.current) {
         return;
       }
-      // Scroll vers le haut (deltaY < 0) = augmenter.
+      // Scroll vers le bas (deltaY > 0) = augmenter.
       // deltaMode 1 (lignes) / 2 (pages) : chaque évènement vaut un cran
-      const pixels: number = event.deltaMode === 0 ? -event.deltaY : -Math.sign(event.deltaY) * WHEEL_STEP_PX;
+      const pixels: number = event.deltaMode === 0 ? event.deltaY : Math.sign(event.deltaY) * WHEEL_STEP_PX;
       // Changement de sens : on repart de zéro pour rester réactif
       if (wheelAccumulator !== 0 && Math.sign(pixels) !== Math.sign(wheelAccumulator)) {
         wheelAccumulator = 0;
@@ -81,8 +82,8 @@ export default function useScrollStepper(
       }
       event.preventDefault();
       const currentY: number = event.touches[0].clientY;
-      // Glisser vers le haut (y diminue) = augmenter
-      touchAccumulator += touchLastY - currentY;
+      // Glisser vers le bas (y augmente) = augmenter
+      touchAccumulator += currentY - touchLastY;
       touchLastY = currentY;
       if (!isDisabledRef.current) {
         touchAccumulator = emitSteps(touchAccumulator, TOUCH_STEP_PX);

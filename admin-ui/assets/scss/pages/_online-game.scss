@@ -454,6 +454,9 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+    // Le glissé vertical change la valeur (useScrollStepper) au lieu de faire défiler la page
+    touch-action: none;
+    user-select: none;
 
     .online-label {
       text-align: center;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { RefObject, useRef, useState } from 'react';
 import { Icon } from '@mui/material';
 import classNames from '../../../../lib/class-names/ClassNames';
 import useMessages from '../../../../i18n/hooks/messagesHook';
@@ -19,6 +19,7 @@ import { ActionButton } from '../../../theme/action/Actions';
 import PlayerName from '../../../theme/player/PlayerName';
 import Dice from '../dice/Dice';
 import BidLabel from './BidLabel';
+import useScrollStepper from './useScrollStepper';
 import { DiceCountChip } from './PlayerOrderList';
 import {
   bidContextOf, findPlayer, OrderedPlayer, orderedPlayers,
@@ -77,9 +78,19 @@ export default function BidSelector({
   const isBidPerudo: boolean = isPerudo(bid.face);
   const invalid: InvalidBid | undefined = invalidReason(bid, context);
 
-  const changeQuantity = (delta: number) => setBid({ ...bid, quantity: clamp(bid.quantity + delta, 1, maxQuantity) });
+  const changeQuantity = (delta: number) => setBid((current: BidValue) => ({
+    ...current, quantity: clamp(current.quantity + delta, 1, maxQuantity),
+  }));
 
-  const changeFace = (delta: number) => setBid({ ...bid, face: cycleFace(bid.face, delta) });
+  const changeFace = (delta: number) => setBid((current: BidValue) => ({
+    ...current, face: cycleFace(current.face, delta),
+  }));
+
+  // Scroller (molette/trackpad) ou glisser (tactile) sur une molette change sa valeur
+  const quantityWheelRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
+  const faceWheelRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
+  useScrollStepper(quantityWheelRef, changeQuantity);
+  useScrollStepper(faceWheelRef, changeFace, isFaceLocked);
 
   const bidder: Player | undefined = findPlayer(game, previous ? game.currentBid?.playerId : undefined);
 
@@ -113,7 +124,7 @@ export default function BidSelector({
         </div>
 
         <div className="online-lock">
-          <div className="online-lock__wheel">
+          <div className="online-lock__wheel" ref={quantityWheelRef}>
             <span className="online-label">{texts.quantity_label}</span>
             <button
               type="button"
@@ -138,7 +149,7 @@ export default function BidSelector({
             </button>
           </div>
           <span className="online-lock__times">×</span>
-          <div className="online-lock__wheel">
+          <div className="online-lock__wheel" ref={faceWheelRef}>
             <span className="online-label">
               {isBidPerudo && !context.planificato ? texts.face_label_perudo : texts.face_label}
             </span>

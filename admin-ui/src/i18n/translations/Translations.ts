@@ -156,6 +156,9 @@ export type Translations = {
     },
     username_missing: string,
     username_too_short: string,
+    perucode_missing: string,
+    perucode_unknown: string,
+    game_already_started: string,
   },
   'http-errors': {
     INTERNAL_ERROR: string,

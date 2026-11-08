@@ -161,7 +161,10 @@ const enMessages: Translations = {
       email_wrong_format: 'The input email address is invalid',
     },
     username_missing: 'Choisie ton pseudo pour aller plus loin',
-    username_too_short: 'Ton pseudo est trop court'
+    username_too_short: 'Ton pseudo est trop court',
+    perucode_missing: 'Enter the game\'s pérucode',
+    perucode_unknown: 'This pérucode does not match any game, please check it',
+    game_already_started: 'This game has already started, you can\'t join it',
   },
   'http-errors': {
     INTERNAL_ERROR: 'An unexpected error occurred',

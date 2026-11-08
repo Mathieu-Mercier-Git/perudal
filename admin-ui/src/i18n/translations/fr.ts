@@ -161,7 +161,10 @@ const frMessages: Translations = {
       email_wrong_format: 'L\'adresse e-mail saisie semble être incorrecte',
     },
     username_missing: 'Choisie ton pseudo pour aller plus loin',
-    username_too_short: 'Ton pseudo est trop court'
+    username_too_short: 'Ton pseudo est trop court',
+    perucode_missing: 'Saisis le pérucode de la partie',
+    perucode_unknown: 'Ce pérucode ne correspond à aucune partie, vérifie-le',
+    game_already_started: 'Cette partie a déjà commencé, impossible de la rejoindre',
   },
   'http-errors': {
     INTERNAL_ERROR: 'Une erreur inattendue s\'est produite',

@@ -1,12 +1,42 @@
-import React from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import { Icon } from '@mui/material';
 import { getGlobalInstance } from 'plume-ts-di';
 import { useObservable } from 'micro-observables';
-import RulesOverlayService from '../../../services/rules/RulesOverlayService';
+import RulesOverlayService, {
+  RULES_SECTION_EXACT,
+  RULES_SECTION_PLANIFICATO,
+} from '../../../services/rules/RulesOverlayService';
+
+const scrollToSection = (section: string) => {
+  document.getElementById(section)?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+};
+
+type SectionLinkProps = {
+  section: string,
+  children: ReactNode,
+};
+
+// Lien interne aux règles : fait défiler le contenu jusqu'à la section visée
+function SectionLink({ section, children }: SectionLinkProps) {
+  return (
+    <button type="button" className="rules__link" onClick={() => scrollToSection(section)}>
+      {children}
+    </button>
+  );
+}
 
 export default function Rules() {
   const rulesOverlayService = getGlobalInstance(RulesOverlayService);
   const isOpen: boolean = useObservable(rulesOverlayService.isRulesOpen());
+  const targetSection: string | undefined = useObservable(rulesOverlayService.getTargetSection());
+
+  // Ouverture sur une section précise (ex. bannière de l'accueil) : on y fait défiler le contenu
+  useEffect(() => {
+    if (!isOpen || !targetSection) {
+      return;
+    }
+    document.getElementById(targetSection)?.scrollIntoView({ block: 'start' });
+  }, [isOpen, targetSection]);
 
   if (!isOpen) {
     return null;
@@ -38,19 +68,13 @@ export default function Rules() {
           <section className="rules__section">
             <h2 className="rules__section-title">2. Déroulement d'une partie</h2>
             <p>
-              Tous les joueurs agitent leur gobelet en même temps puis le renversent sur la table
-              en prenant soin de garder les dés dessous. Ils regardent ensuite discrètement les valeurs
-              affichées par leurs dés, en veillant à ce que leurs voisins ne puissent pas les voir.
-            </p>
-            <p className="rules__note">
-              <Icon className="rules__note-icon">warning</Icon>
-              Attention à ne jamais changer la valeur des dés !
+              À chaque début de tour, le joueur a un ou plusieurs dés à sa disposition.
             </p>
             <p>
-              Le premier joueur (tiré au sort) doit faire une proposition : il annonce tout haut
-              une valeur de dé et un nombre de dés, principalement en fonction de son tirage.
-              Il doit théoriquement se rapprocher au mieux de la réalité, mais il peut aussi bluffer
-              en racontant n'importe quoi.
+              Le premier joueur doit faire une proposition : il annonce tout haut une valeur de dé
+              et un nombre de dés, principalement en fonction de son tirage. Il doit théoriquement
+              se rapprocher au mieux de la réalité, mais il peut aussi bluffer en racontant
+              n'importe quoi.
             </p>
             <div className="rules__example">
               <span className="rules__example-label">Exemple</span>
@@ -64,7 +88,7 @@ export default function Rules() {
               possède aucun dé de valeur 6, il est en plein bluff.
             </div>
             <p>
-              C'est ensuite au joueur à sa gauche de parler. Il a deux choix :
+              C'est ensuite au joueur à sa gauche de parler. Il a 3 choix :
             </p>
             <ul className="rules__list">
               <li>
@@ -75,14 +99,19 @@ export default function Rules() {
                 <strong>Surenchérir</strong> : il estime que l'affirmation est plausible et annonce
                 à son tour une surenchère.
               </li>
+              <li>
+                <strong>Chiffre exact</strong> : il peut aussi, dans certains cas, dire
+                « chiffre exact » (
+                <SectionLink section={RULES_SECTION_EXACT}>voir les cas particuliers</SectionLink>
+                ).
+              </li>
             </ul>
           </section>
 
           <section className="rules__section">
             <h2 className="rules__section-title">3. Menteur</h2>
             <p>
-              Tous les joueurs retirent leur gobelet sans modifier la valeur de leurs dés. On voit
-              alors si la proposition du joueur précédent est exacte ou fausse.
+              Le maître du jeu (en local) clique sur « Révéler tous les dés » :
             </p>
             <ul className="rules__list">
               <li>
@@ -103,10 +132,11 @@ export default function Rules() {
 
           <section className="rules__section">
             <h2 className="rules__section-title">4. Surenchère</h2>
-            <p>Pour surenchérir, le joueur doit choisir une seule des deux options suivantes :</p>
+            <p>Pour surenchérir, le joueur peut :</p>
             <ul className="rules__list">
               <li>soit augmenter la valeur des dés ;</li>
-              <li>soit augmenter le nombre de dés.</li>
+              <li>soit augmenter le nombre de dés ;</li>
+              <li>soit augmenter les deux.</li>
             </ul>
             <p>
               Une fois ce choix fait, il annonce sa nouvelle proposition et c'est au joueur à sa
@@ -115,18 +145,18 @@ export default function Rules() {
             <div className="rules__example">
               <span className="rules__example-label">Exemple</span>
               Le joueur précédent a annoncé « au moins 5 dés de valeur 4 ». On peut annoncer
-              « au moins 7 dés de valeur 4 » (on augmente le nombre de dés), ou « au moins 5 dés
-              de valeur 5 » (on augmente la valeur des dés).
+              « au moins 7 dés de valeur 4 » (on augmente le nombre de dés), « au moins 5 dés
+              de valeur 5 » (on augmente la valeur des dés), ou « au moins 6 dés de valeur 6 »
+              (on augmente les deux).
             </div>
           </section>
 
           <section className="rules__section">
             <h2 className="rules__section-title">5. Manche suivante</h2>
             <p>
-              Après un « menteur » et la perte d'un dé, on recommence une nouvelle manche : chacun
-              agite ses dés restants dans son gobelet. Le joueur qui vient de perdre un dé devient
-              le nouveau premier joueur. S'il vient d'être éliminé, ce rôle revient au joueur à sa
-              gauche.
+              Après un « menteur » et la perte d'un dé, on recommence une nouvelle manche. Le joueur
+              qui vient de perdre un dé devient le nouveau premier joueur. S'il vient d'être éliminé,
+              ce rôle revient au joueur à sa gauche.
             </p>
           </section>
 
@@ -143,14 +173,14 @@ export default function Rules() {
                 « menteur », les pérudos prennent la valeur de la dernière proposition exprimée.
               </li>
               <li>
-                <strong>On ne peut pas commencer avec des pérudos.</strong> Sauf en étant
-                « planificato » (voir ci-dessous), on ne peut pas ouvrir une manche en annonçant
-                un nombre de pérudos.
+                <strong>On ne peut pas commencer avec des pérudos.</strong> Sauf en étant en
+                « planificato » (
+                <SectionLink section={RULES_SECTION_PLANIFICATO}>voir ci-dessous</SectionLink>
+                ), on ne peut pas ouvrir une manche en annonçant un nombre de pérudos.
               </li>
               <li>
                 <strong>On peut proposer des pérudos.</strong> Il faut alors annoncer au moins la
-                moitié de la proposition précédente, arrondie à l'entier supérieur. C'est le seul
-                moment du jeu où l'on peut réduire la valeur du dé proposé.
+                moitié de la proposition précédente, arrondie à l'entier supérieur.
               </li>
             </ul>
             <div className="rules__example">
@@ -174,14 +204,14 @@ export default function Rules() {
               de dé doit annoncer au moins 9 dés (le double plus un).
             </div>
 
-            <h3 className="rules__subtitle">
+            <h3 id={RULES_SECTION_PLANIFICATO} className="rules__subtitle">
               b) Le planificato
               <span className="rules__subtitle-aside">
                 (oui, ce n'est pas le vrai nom, mais ça sonne mieux)
               </span>
             </h3>
             <p>
-              Dès qu'un joueur n'a plus qu'un seul dé dans son gobelet, il doit annoncer qu'il est
+              Dès qu'un joueur n'a plus qu'un seul dé dans son gobelet, il est alors en
               « planificato ». Il sera le premier joueur de la manche suivante. Lors de cette manche,
               les pérudos ne sont pas des jokers et aucun joueur ne peut modifier la valeur du dé
               proposé par le premier joueur.
@@ -190,28 +220,41 @@ export default function Rules() {
               Un joueur n'est « planificato » que durant la manche qui suit celle où il s'est retrouvé
               avec un seul dé, pas lors des suivantes.
             </p>
+            <p className="rules__note rules__note--info">
+              <Icon className="rules__note-icon">info</Icon>
+              <span>
+                Exception : un joueur qui tombe à un seul dé à cause du <strong>chiffre exact</strong> réussi
+                d'un autre joueur n'est <strong>pas</strong> en planificato.
+              </span>
+            </p>
 
-            <h3 className="rules__subtitle">c) Chiffre exact</h3>
+            <h3 id={RULES_SECTION_EXACT} className="rules__subtitle">
+              c) Chiffre exact
+              <span className="rules__subtitle-aside">(variante française)</span>
+            </h3>
             <p>
-              Avant que le joueur dont c'est le tour ne fasse sa proposition (« menteur » ou
-              surenchère), n'importe quel autre joueur — sauf celui qui vient de faire la dernière
-              annonce — peut dire « chiffre exact » s'il pense que la dernière proposition est
-              strictement exacte (le nombre de dés de la valeur choisie est exactement égal à
-              l'annonce, et non supérieur ou égal).
+              Ici, on joue la variante française : <strong>seul le joueur dont c'est le tour</strong> peut
+              dire « chiffre exact », à la place de « menteur » ou d'une surenchère. Il l'annonce s'il
+              pense que la dernière proposition est strictement exacte (le nombre de dés de la valeur
+              choisie est exactement égal à l'annonce, et non supérieur ou égal).
             </p>
             <ul className="rules__list">
-              <li>S'il a raison, il récupère un des dés qu'il avait perdus.</li>
+              <li>
+                S'il a raison, il récupère un des dés qu'il avait perdus. S'il a déjà tous ses dés,
+                ce sont tous les autres joueurs encore en jeu qui perdent un dé.
+              </li>
               <li>S'il a tort, il perd un dé.</li>
             </ul>
             <p>
-              Dans les deux cas, c'est lui qui devient le premier joueur de la manche suivante.
+              Qu'il gagne ou qu'il perde, celui qui a dit « chiffre exact » est toujours le premier
+              joueur de la manche suivante.
             </p>
-            <p>
-              Si deux joueurs disent « chiffre exact » en même temps, c'est le plus à gauche de
-              l'auteur de la dernière enchère qui est considéré comme ayant parlé en premier. Et si
-              un joueur dit « chiffre exact » au moment où le joueur dont c'est le tour fait sa
-              proposition, c'est cette proposition qui l'emporte. Le joueur venant de faire la
-              dernière enchère est donc le seul à ne pas pouvoir dire « chiffre exact ».
+            <p className="rules__note rules__note--info">
+              <Icon className="rules__note-icon">info</Icon>
+              <span>
+                Le chiffre exact n'est <strong>pas autorisé</strong> quand il ne reste
+                que <strong>deux joueurs</strong>, ni pendant un <strong>planificato</strong>.
+              </span>
             </p>
           </section>
         </div>

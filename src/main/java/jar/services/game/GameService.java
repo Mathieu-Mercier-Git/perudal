@@ -315,6 +315,9 @@ public class GameService {
         requireLocalMode(game);
 
         Player currentplayer = game.getPlayers().get(turnInfo.getPlayerId());
+        if (!turnInfo.isHasLost() && !isExactAllowed(game)) {
+            throw new WsException(CustomWsError.EXACT_NOT_ALLOWED);
+        }
         boolean isPlanificato = false;
         if (turnInfo.isHasLost()) {
             isPlanificato = loseOneDice(currentplayer, new HashMap<>());
@@ -366,6 +369,9 @@ public class GameService {
             Bid bid = game.getCurrentBid();
             if (bid == null) {
                 throw new WsException(CustomWsError.NO_BID_TO_CHALLENGE);
+            }
+            if (challenge.getType() == ChallengeType.EXACT && !isExactAllowed(game)) {
+                throw new WsException(CustomWsError.EXACT_NOT_ALLOWED);
             }
 
             boolean planificato = isPlanificato(game);
@@ -558,6 +564,14 @@ public class GameService {
 
     private static boolean isPlanificato(Game game) {
         return Boolean.TRUE.equals(game.getIsPlanificato());
+    }
+
+    /** Chiffre exact interdit en planificato et quand il ne reste que deux joueurs en jeu */
+    private static boolean isExactAllowed(Game game) {
+        long alivePlayers = game.getPlayers().values().stream()
+            .filter(player -> player.getDiceNumber() > 0)
+            .count();
+        return BidRules.isExactAllowed(isPlanificato(game), alivePlayers);
     }
 
     private static Player copyPlayer(Player player) {

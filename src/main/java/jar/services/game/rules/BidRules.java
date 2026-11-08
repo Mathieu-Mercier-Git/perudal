@@ -16,8 +16,22 @@ public final class BidRules {
     private static final int MIN_FACE = 1;
     private static final int MAX_FACE = 6;
 
+    /** En dessous de ce nombre de joueurs encore en jeu, le chiffre exact n'est plus autorisé */
+    public static final int MIN_ALIVE_PLAYERS_FOR_EXACT = 3;
+
     private BidRules() {
         // classe utilitaire
+    }
+
+    /**
+     * Le « chiffre exact » n'est pas autorisé en manche planificato, ni quand il ne reste
+     * que deux joueurs en jeu.
+     *
+     * @param planificato  manche planificato
+     * @param alivePlayers nombre de joueurs ayant encore au moins un dé
+     */
+    public static boolean isExactAllowed(boolean planificato, long alivePlayers) {
+        return !planificato && alivePlayers >= MIN_ALIVE_PLAYERS_FOR_EXACT;
     }
 
     /**

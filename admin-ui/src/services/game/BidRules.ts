@@ -121,3 +121,15 @@ export function minimalValidBid(context: BidContext): BidValue {
   }
   return { quantity: previous.quantity + 1, face: MIN_CLASSIC_FACE };
 }
+
+// En dessous de ce nombre de joueurs encore en jeu, le chiffre exact n'est plus autorisé
+const MIN_ALIVE_PLAYERS_FOR_EXACT: number = 3;
+
+/**
+ * Le « chiffre exact » n'est pas autorisé en manche planificato,
+ * ni quand il ne reste que deux joueurs en jeu (miroir de `BidRules.isExactAllowed`).
+ */
+export function isExactAllowed(planificato: boolean, players: { diceNumber: number }[]): boolean {
+  const alivePlayers: number = players.filter((player: { diceNumber: number }) => player.diceNumber > 0).length;
+  return !planificato && alivePlayers >= MIN_ALIVE_PLAYERS_FOR_EXACT;
+}

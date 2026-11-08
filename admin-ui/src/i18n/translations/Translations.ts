@@ -172,5 +172,6 @@ export type Translations = {
     NOT_YOUR_TURN: string,
     INVALID_BID: string,
     NO_BID_TO_CHALLENGE: string,
+    EXACT_NOT_ALLOWED: string,
   },
 };

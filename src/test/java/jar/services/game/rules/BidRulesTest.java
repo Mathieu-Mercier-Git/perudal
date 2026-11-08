@@ -156,4 +156,22 @@ public class BidRulesTest {
 
         Assertions.assertThat(BidRules.countMatching(players, 1, false)).isEqualTo(3);
     }
+
+    // Chiffre exact
+
+    @Test
+    public void isExactAllowed__with_three_players_or_more_in_a_normal_round() {
+        Assertions.assertThat(BidRules.isExactAllowed(false, 3)).isTrue();
+        Assertions.assertThat(BidRules.isExactAllowed(false, 6)).isTrue();
+    }
+
+    @Test
+    public void isExactAllowed__not_with_two_players_left() {
+        Assertions.assertThat(BidRules.isExactAllowed(false, 2)).isFalse();
+    }
+
+    @Test
+    public void isExactAllowed__not_in_planificato() {
+        Assertions.assertThat(BidRules.isExactAllowed(true, 4)).isFalse();
+    }
 }

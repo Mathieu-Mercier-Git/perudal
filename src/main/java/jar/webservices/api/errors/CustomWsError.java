@@ -15,4 +15,5 @@ public enum CustomWsError implements WsError {
     NOT_YOUR_TURN,
     INVALID_BID,
     NO_BID_TO_CHALLENGE,
+    EXACT_NOT_ALLOWED,
 }

@@ -7,18 +7,24 @@ import { ActionButton, ActionsContainer } from '../../../theme/action/Actions';
 import useToggle from '../../../../lib/react-hook-toggle/ReactHookToggle';
 import { useOnComponentUnMounted } from '../../../../lib/react-hooks-alias/ReactHooksAlias';
 import classNames from '../../../../lib/class-names/ClassNames';
+import { isExactAllowed } from '../../../../services/game/BidRules';
 
 type Props = {
   onClick: (playerId: string, hasLostTurn: boolean) => void,
   onClose: () => void,
   players: Player[],
+  isPlanificato: boolean,
 };
 
 // Délai (ms) pendant lequel le choix du joueur peut être annulé avant que la fin du tour ne parte
 const FINISH_TURN_COUNTDOWN_MS: number = 2000;
 
-export default function FinishTurnPopin({ onClose, onClick, players }: Props) {
+export default function FinishTurnPopin({
+  onClose, onClick, players, isPlanificato,
+}: Props) {
   const [hasLostTurn, toggleHasLostTurn] = useToggle(true);
+  // Pas de chiffre exact en planificato ni quand il ne reste que deux joueurs : seule la défaite est proposée
+  const canCallExact: boolean = isExactAllowed(isPlanificato, players);
   // Choix différé : le joueur sélectionné est mis en attente pendant un compte à
   // rebours annulable, pour rattraper un clic sur le mauvais joueur
   const [pendingPlayerId, setPendingPlayerId] = useState<string | undefined>(undefined);
@@ -98,7 +104,7 @@ export default function FinishTurnPopin({ onClose, onClick, players }: Props) {
                 Annuler
               </ActionButton>
             )
-            : (
+            : canCallExact && (
               <ActionButton
                 style={hasLostTurn ? ActionStyle.PRIMARY : ActionStyle.DANGER}
                 onClick={toggleHasLostTurn}

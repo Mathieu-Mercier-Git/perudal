@@ -429,7 +429,12 @@ export default function Game() {
         </Popin>
       )}
       {showFinishTurnPopin && (
-       <FinishTurnPopin onClick={finishTurn} onClose={() => setShowFinishTurnPopin(false)} players={game.players} />
+       <FinishTurnPopin
+         onClick={finishTurn}
+         onClose={() => setShowFinishTurnPopin(false)}
+         players={game.players}
+         isPlanificato={!!game.isPlanificato}
+       />
       )}
       {!!playerWinner && (
         <FinishGamePopin onClick={backToHome} player={playerWinner} />

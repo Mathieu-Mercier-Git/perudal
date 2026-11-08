@@ -147,6 +147,47 @@
     color: var(--ink2);
   }
 
+  // Petite bannière d'annonce (changement de règle) : renvoie vers la section des règles concernée
+  &__news {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacer-2;
+    max-width: 100%;
+    margin-top: $spacer-2;
+    padding: 5px 6px 5px 6px;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-line);
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--ink);
+    cursor: pointer;
+    transition: filter .18s ease;
+
+    &:hover, &:focus-visible {
+      filter: brightness(1.15);
+    }
+  }
+
+  &__news-badge {
+    flex: none;
+    padding: 2px 8px;
+    background: var(--accent);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+  }
+
+  &__news-arrow.MuiIcon-root {
+    flex: none;
+    font-size: 18px;
+    color: var(--ink2);
+  }
+
   // Champ pseudo + boutons, collés en bas
   &__actions {
     display: flex;

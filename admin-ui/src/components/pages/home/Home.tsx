@@ -13,7 +13,7 @@ import { CONTACT, GAME, LOBBY } from '../../Routes';
 import ValidationPopin from '../../theme/popin/ValidationPopin';
 import useToggle from '../../../lib/react-hook-toggle/ReactHookToggle';
 import UserService from '../../../services/user/UserService';
-import RulesOverlayService from '../../../services/rules/RulesOverlayService';
+import RulesOverlayService, { RULES_SECTION_EXACT } from '../../../services/rules/RulesOverlayService';
 import ActionStyle from '../../../lib/plume-admin-theme/action/ActionStyle';
 import EmojiPickerPopin from './EmojiPickerPopin';
 import AnimatedLoader from '../../layout/AnimatedLoader';
@@ -147,6 +147,15 @@ export default function Home() {
           </div>
           <h1 className="home__title">{messages.home.title}</h1>
           <p className="home__tagline">Le grand jeu de dés et de bluff</p>
+          <button
+            type="button"
+            className="home__news"
+            onClick={() => rulesOverlayService.open(RULES_SECTION_EXACT)}
+          >
+            <span className="home__news-badge">Nouveau</span>
+            <span>Règle du chiffre exact modifiée</span>
+            <Icon className="home__news-arrow">chevron_right</Icon>
+          </button>
         </div>
         <div className="home__actions">
           <div className="home__identity">

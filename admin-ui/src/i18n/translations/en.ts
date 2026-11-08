@@ -179,6 +179,7 @@ const enMessages: Translations = {
     NOT_YOUR_TURN: 'It is not your turn',
     INVALID_BID: 'This bid is not valid',
     NO_BID_TO_CHALLENGE: 'There is no bid to challenge yet',
+    EXACT_NOT_ALLOWED: 'Exact count is not allowed in planificato or when only two players are left',
   },
 } as const;
 

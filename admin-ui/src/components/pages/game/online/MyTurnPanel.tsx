@@ -7,6 +7,7 @@ import ActionStyle from '../../../../lib/plume-admin-theme/action/ActionStyle';
 import { ActionButton } from '../../../theme/action/Actions';
 import PlayerName from '../../../theme/player/PlayerName';
 import Dice from '../dice/Dice';
+import { isExactAllowed } from '../../../../services/game/BidRules';
 import BidLabel from './BidLabel';
 import { findPlayer, positionOf } from './OnlineGameUtils';
 import useCancellableCountdown, { CancellableCountdown } from './useCancellableCountdown';
@@ -34,6 +35,8 @@ export default function MyTurnPanel({
 
   const { currentBid } = game;
   const bidder: Player | undefined = findPlayer(game, currentBid?.playerId);
+  // Pas de chiffre exact en planificato ni quand il ne reste que deux joueurs
+  const canCallExact: boolean = isExactAllowed(!!game.isPlanificato, game.players);
 
   const renderChallengeButton = (type: ChallengeType, label: string, modifier: string) => {
     const isPending: boolean = countdown.pending === type;
@@ -105,9 +108,9 @@ export default function MyTurnPanel({
         {messages.online_game.bid}
       </ActionButton>
       {currentBid && (
-        <div className="online-panel__challenges">
+        <div className={classNames('online-panel__challenges', { 'online-panel__challenges--single': !canCallExact })}>
           {renderChallengeButton(ChallengeType.LIAR, messages.online_game.liar, 'liar')}
-          {renderChallengeButton(ChallengeType.EXACT, messages.online_game.exact, 'exact')}
+          {canCallExact && renderChallengeButton(ChallengeType.EXACT, messages.online_game.exact, 'exact')}
         </div>
       )}
     </div>

@@ -168,4 +168,38 @@
     font-size: 18px;
     color: var(--terra-txt);
   }
+
+  // Variante informative (ex. exceptions du chiffre exact)
+  &__note--info {
+    align-items: flex-start;
+    background: var(--accent-soft);
+    border-color: var(--accent-line);
+    color: var(--ink2) !important;
+
+    .rules__note-icon.MuiIcon-root {
+      color: var(--accent-txt);
+    }
+  }
+
+  // Lien interne vers une autre section des règles
+  &__link {
+    display: inline;
+    padding: 0;
+    background: none;
+    border: none;
+    font: inherit;
+    color: var(--accent-txt);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+
+    &:hover {
+      filter: brightness(1.15);
+    }
+  }
+
+  // Titre ciblé par un lien direct : un peu d'air au-dessus après le défilement
+  &__subtitle[id] {
+    scroll-margin-top: $spacer-3;
+  }
 }

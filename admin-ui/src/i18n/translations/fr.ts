@@ -179,6 +179,7 @@ const frMessages: Translations = {
     NOT_YOUR_TURN: 'Ce n\'est pas ton tour',
     INVALID_BID: 'Cette mise n\'est pas valide',
     NO_BID_TO_CHALLENGE: 'Il n\'y a pas encore de mise à contester',
+    EXACT_NOT_ALLOWED: 'Le chiffre exact n\'est pas autorisé en planificato ni quand il ne reste que deux joueurs',
   },
 } as const;
 

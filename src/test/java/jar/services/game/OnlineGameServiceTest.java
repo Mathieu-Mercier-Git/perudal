@@ -487,9 +487,10 @@ public class OnlineGameServiceTest {
 
     @Test
     public void exact__won_below_the_maximum_gives_a_dice() {
-        TestGame testGame = startedOnlineGame(2);
+        TestGame testGame = startedOnlineGame(3);
         setDices(testGame, 1, 5, 1, 3, 6, 2);
         setDices(testGame, 2, 5, 4, 4, 6);
+        setDices(testGame, 3, 2, 3, 4, 6, 6);
         bid(testGame, 1, 3, 5);
 
         challenge(testGame, 2, ChallengeType.EXACT);
@@ -526,22 +527,24 @@ public class OnlineGameServiceTest {
 
     @Test
     public void exact__won_at_the_maximum_does_not_touch_eliminated_players() {
-        TestGame testGame = startedOnlineGame(3);
+        TestGame testGame = startedOnlineGame(4);
         setDices(testGame, 1, 5, 1, 3, 6, 2);
         setDices(testGame, 2, 5, 4, 4, 6, 3);
-        setDices(testGame, 3);
+        setDices(testGame, 3, 2, 2);
+        setDices(testGame, 4);
         bid(testGame, 1, 3, 5);
 
         challenge(testGame, 2, ChallengeType.EXACT);
 
-        Assertions.assertThat(player(testGame, 3).getDiceNumber()).isZero();
+        Assertions.assertThat(player(testGame, 4).getDiceNumber()).isZero();
     }
 
     @Test
     public void exact__lost_takes_a_dice_from_the_announcer_who_opens_the_next_round() {
-        TestGame testGame = startedOnlineGame(2);
+        TestGame testGame = startedOnlineGame(3);
         setDices(testGame, 1, 5, 1, 3, 6, 2);
         setDices(testGame, 2, 5, 4, 4, 6, 3);
+        setDices(testGame, 3, 2, 3, 4, 6, 6);
         bid(testGame, 1, 4, 5); // il y en a 3
 
         challenge(testGame, 2, ChallengeType.EXACT);
@@ -550,6 +553,34 @@ public class OnlineGameServiceTest {
         Assertions.assertThat(result.isChallengerWon()).isFalse();
         Assertions.assertThat(player(testGame, 2).getDiceNumber()).isEqualTo(4);
         Assertions.assertThat(result.getNextStarterId()).isEqualTo(testGame.player(2));
+    }
+
+    @Test
+    public void exact__is_refused_when_only_two_players_are_left() {
+        TestGame testGame = startedOnlineGame(2);
+        bid(testGame, 1, 3, 5);
+
+        assertError(() -> challenge(testGame, 2, ChallengeType.EXACT), CustomWsError.EXACT_NOT_ALLOWED);
+        Assertions.assertThat(game(testGame).getLastRoundResult()).isNull();
+    }
+
+    @Test
+    public void exact__is_refused_when_eliminated_players_leave_only_two_players() {
+        TestGame testGame = startedOnlineGame(3);
+        setDices(testGame, 3);
+        bid(testGame, 1, 3, 5);
+
+        assertError(() -> challenge(testGame, 2, ChallengeType.EXACT), CustomWsError.EXACT_NOT_ALLOWED);
+    }
+
+    @Test
+    public void exact__is_refused_in_planificato() {
+        TestGame testGame = startedOnlineGame(3);
+        game(testGame).setIsPlanificato(true);
+        bid(testGame, 1, 3, 5);
+
+        assertError(() -> challenge(testGame, 2, ChallengeType.EXACT), CustomWsError.EXACT_NOT_ALLOWED);
+        Assertions.assertThat(game(testGame).getLastRoundResult()).isNull();
     }
 
     // Départ d'un joueur
@@ -690,7 +721,7 @@ public class OnlineGameServiceTest {
 
     @Test
     public void local__finishTurn_exact_below_the_maximum_gives_a_dice() {
-        TestGame testGame = startedLocalGame(2);
+        TestGame testGame = startedLocalGame(3);
         setDices(testGame, 1, 2, 3);
 
         gameService.finishTurn(TurnInfo.of(testGame.gameCode, testGame.player(1), false));
@@ -702,14 +733,37 @@ public class OnlineGameServiceTest {
 
     @Test
     public void local__finishTurn_exact_at_the_maximum_removes_a_dice_from_players_still_in_game() {
-        TestGame testGame = startedLocalGame(3);
-        setDices(testGame, 3);
+        TestGame testGame = startedLocalGame(4);
+        setDices(testGame, 4);
 
         gameService.finishTurn(TurnInfo.of(testGame.gameCode, testGame.player(1), false));
 
         Assertions.assertThat(player(testGame, 1).getDiceNumber()).isEqualTo(DICE_NUMBER);
         Assertions.assertThat(player(testGame, 2).getDiceNumber()).isEqualTo(DICE_NUMBER - 1);
-        Assertions.assertThat(player(testGame, 3).getDiceNumber()).isZero();
+        Assertions.assertThat(player(testGame, 3).getDiceNumber()).isEqualTo(DICE_NUMBER - 1);
+        Assertions.assertThat(player(testGame, 4).getDiceNumber()).isZero();
+    }
+
+    @Test
+    public void local__finishTurn_exact_is_refused_with_two_players_left() {
+        TestGame testGame = startedLocalGame(2);
+
+        assertError(
+            () -> gameService.finishTurn(TurnInfo.of(testGame.gameCode, testGame.player(1), false)),
+            CustomWsError.EXACT_NOT_ALLOWED
+        );
+        Assertions.assertThat(player(testGame, 1).getDiceNumber()).isEqualTo(DICE_NUMBER);
+    }
+
+    @Test
+    public void local__finishTurn_exact_is_refused_in_planificato() {
+        TestGame testGame = startedLocalGame(3);
+        game(testGame).setIsPlanificato(true);
+
+        assertError(
+            () -> gameService.finishTurn(TurnInfo.of(testGame.gameCode, testGame.player(1), false)),
+            CustomWsError.EXACT_NOT_ALLOWED
+        );
     }
 
     @Test

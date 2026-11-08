@@ -17,6 +17,7 @@ import initializeLocalizedDate from './i18n/messages/LocalizedDate';
 import LocaleService from './i18n/locale/LocaleService';
 import NotificationRenderer from './components/theme/NotificationRenderer';
 import UserService from './services/user/UserService';
+import installViewportScrollReset from './utils/ViewportScrollReset';
 
 const currentMillis: number = Date.now();
 const logger: Logger = new Logger('index');
@@ -43,6 +44,9 @@ userService.initializingUserFromStorage()
 initializeLocalizedDate(injector.getInstance(LocaleService));
 // notifications display management
 injector.getInstance(NotificationRenderer).initialize();
+
+// iOS : remet la page en place après la fermeture du clavier
+installViewportScrollReset();
 
 const reactApp: JSX.Element = (
   <React.StrictMode>

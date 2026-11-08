@@ -2,6 +2,9 @@
 
 html {
   height: 100%;
+  // La page ne défile jamais : chaque écran gère son propre scroll interne
+  overflow: hidden;
+  overscroll-behavior: none;
   font-family: $base-font-family;
   font-size: $base-font-size;
   box-sizing: border-box;

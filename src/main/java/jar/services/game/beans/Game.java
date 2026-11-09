@@ -38,6 +38,8 @@ public class Game {
     /** Mises de la manche en cours, dans l'ordre */
     private List<Bid> roundBids = new ArrayList<>();
     private RoundResult lastRoundResult;
+    /** Lancement automatique de la manche suivante, tant que le résultat est affiché */
+    private Instant nextRoundAt;
     /**
      * Joueurs partis pendant la manche en cours : leurs dés restent comptés jusqu'à
      * la résolution de la manche, mais ils ne peuvent plus perdre ni gagner de dé.

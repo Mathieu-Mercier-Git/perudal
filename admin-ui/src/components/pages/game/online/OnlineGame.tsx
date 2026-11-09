@@ -318,7 +318,7 @@ export default function OnlineGame({ game, playerId }: Props) {
           onClose={() => setConfirmAction(undefined)}
         />
       )}
-      {/* La fin de partie s'affiche après l'écran de résultat, au clic de l'admin sur « Tour suivant » */}
+      {/* La fin de partie s'affiche après l'écran de résultat (clic de l'admin sur « Tour suivant » ou fin du compte à rebours) */}
       {!!winner && !roundResult && (
         <FinishGamePopin onClick={() => gameService.cancelGame(game.gameCode)} player={winner} />
       )}

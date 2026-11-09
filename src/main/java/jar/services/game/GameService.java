@@ -35,20 +35,37 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 @Singleton
 public class GameService {
     private static final int MAX_GAME_CODE_ATTEMPTS = 100;
     private static final int MIN_PLAYERS_TO_START = 2;
+    /** Mode en ligne : durée d'affichage du résultat avant le lancement automatique de la manche suivante */
+    private static final Duration NEXT_ROUND_DELAY = Duration.ofSeconds(10);
 
     private final SocketService socketService;
     private final Map<String, Game> games; // Map<GameCode, Game>
+    private final Duration nextRoundDelay;
+    private final ScheduledExecutorService nextRoundTimer;
 
     @Inject
     public GameService(SocketService socketService) {
+        this(socketService, NEXT_ROUND_DELAY);
+    }
+
+    GameService(SocketService socketService, Duration nextRoundDelay) {
         this.socketService = socketService;
         this.games = new ConcurrentHashMap<>();
+        this.nextRoundDelay = nextRoundDelay;
+        this.nextRoundTimer = Executors.newSingleThreadScheduledExecutor(runnable -> {
+            Thread thread = new Thread(runnable, "next-round-timer");
+            thread.setDaemon(true);
+            return thread;
+        });
     }
 
     public GameSession createGame(NewGame newGame) {
@@ -212,6 +229,7 @@ public class GameService {
                 currentGame.setCurrentPlayerId(playerIds.get(0));
                 resetRound(currentGame);
                 currentGame.setLastRoundResult(null);
+                currentGame.setNextRoundAt(null);
             }
 
             games.put(startGame.getGameCode(), currentGame);
@@ -444,6 +462,8 @@ public class GameService {
                 revealedPlayers
             );
             game.setLastRoundResult(result);
+            game.setNextRoundAt(Instant.now().plus(nextRoundDelay));
+            scheduleNextRound(challenge.getGameCode(), game, result);
             socketService.roundResult(RoundResultMessage.of(result, toGameInfo(challenge.getGameCode(), game)));
         }
     }
@@ -457,10 +477,30 @@ public class GameService {
         Game game = games.get(actionGame.getGameCode());
         synchronized (requireOnlineGame(game)) {
             requireAdmin(game, actionGame.getPlayerId());
-
-            game.setLastRoundResult(null);
-            socketService.nextRound(toGameInfo(actionGame.getGameCode(), game));
+            openNextRound(actionGame.getGameCode(), game);
         }
+    }
+
+    /**
+     * À la fin du délai, la manche suivante démarre d'elle-même pour tout le monde.
+     * Sans effet si l'admin l'a lancée avant, si la partie a été annulée ou si un autre
+     * résultat a remplacé celui-ci entre-temps.
+     */
+    private void scheduleNextRound(String gameCode, Game game, RoundResult result) {
+        nextRoundTimer.schedule(() -> {
+            synchronized (game) {
+                if (games.get(gameCode) != game || game.getLastRoundResult() != result) {
+                    return;
+                }
+                openNextRound(gameCode, game);
+            }
+        }, nextRoundDelay.toMillis(), TimeUnit.MILLISECONDS);
+    }
+
+    private void openNextRound(String gameCode, Game game) {
+        game.setLastRoundResult(null);
+        game.setNextRoundAt(null);
+        socketService.nextRound(toGameInfo(gameCode, game));
     }
 
     // Changements de dés, communs aux modes local et en ligne
@@ -641,9 +681,21 @@ public class GameService {
             game.getCurrentBid(),
             new ArrayList<>(game.getRoundBids()),
             game.getLastRoundResult(),
+            nextRoundInMs(game),
             new ArrayList<>(game.getDepartedPlayers().values()),
             new ArrayList<>(game.getLeftPlayers())
         );
+    }
+
+    /**
+     * Temps restant avant la manche suivante, plutôt qu'une date absolue : l'horloge
+     * des téléphones n'est pas forcément à l'heure du serveur.
+     */
+    private static Long nextRoundInMs(Game game) {
+        if (game.getLastRoundResult() == null || game.getNextRoundAt() == null) {
+            return null;
+        }
+        return Math.max(0, Duration.between(Instant.now(), game.getNextRoundAt()).toMillis());
     }
 
     private List<Player> addPlayer(String gameCode, UUID playerId, String username, String emoji, boolean isAdmin) {

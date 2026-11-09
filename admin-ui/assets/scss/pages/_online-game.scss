@@ -567,6 +567,22 @@
     text-align: center;
     color: var(--ink2);
   }
+
+  // Largeur fixe de « 10s » : le libellé ne bouge pas quand le décompte passe à un chiffre
+  &__countdown {
+    display: inline-block;
+    min-width: 3.5ch;
+    margin-left: 8px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    opacity: .75;
+  }
+}
+
+// « Prochain tour… » : bouton inactif mais jauge bien visible, ce n'est pas une action interdite
+.app .loading-button.reveal-button.online-result__waiting .MuiButton-root.Mui-disabled {
+  opacity: 1;
+  cursor: default;
 }
 
 .online-verdict {

@@ -26,6 +26,8 @@ public class GameInfo {
     private Bid currentBid;
     private List<Bid> roundBids;
     private RoundResult lastRoundResult;
+    /** Millisecondes restantes avant le lancement automatique de la manche suivante (null hors écran de résultat) */
+    private Long nextRoundInMs;
     /** Joueurs partis pendant la manche : leurs dés comptent encore jusqu'à sa résolution */
     private List<Player> departedPlayers;
     /** Joueurs ayant quitté la partie en cours, affichés comme tels (sans dés) */

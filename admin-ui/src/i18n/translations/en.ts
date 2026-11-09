@@ -133,7 +133,7 @@ const enMessages: Translations = {
     next_starter: (name: string) => `${name} starts the next round`,
     next_starter_you: 'You start the next round',
     next_round: 'Next round',
-    waiting_for_host: 'Waiting for the host',
+    next_round_soon: 'Next round…',
     confirm_cancel_game: 'Are you sure you want to cancel the game?',
     confirm_quit_game: 'Are you sure you want to leave the game?',
   },

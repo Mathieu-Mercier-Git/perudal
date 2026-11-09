@@ -133,7 +133,7 @@ const frMessages: Translations = {
     next_starter: (name: string) => `${name} commence le prochain tour`,
     next_starter_you: 'Tu commences le prochain tour',
     next_round: 'Tour suivant',
-    waiting_for_host: 'En attente du meneur',
+    next_round_soon: 'Prochain tour…',
     confirm_cancel_game: 'Es-tu sûr de vouloir annuler la partie ?',
     confirm_quit_game: 'Es-tu sûr de vouloir quitter la partie ?',
   },

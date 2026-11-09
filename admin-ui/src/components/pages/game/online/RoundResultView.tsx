@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Icon } from '@mui/material';
 import classNames from '../../../../lib/class-names/ClassNames';
 import useMessages from '../../../../i18n/hooks/messagesHook';
@@ -15,6 +15,47 @@ import BidLabel from './BidLabel';
 import { positionOf } from './OnlineGameUtils';
 
 const FACES: number[] = [1, 2, 3, 4, 5, 6];
+const COUNTDOWN_TICK_MS: number = 250;
+// Durée totale de l'écran de résultat : doit rester alignée sur NEXT_ROUND_DELAY côté serveur (GameService.java)
+const NEXT_ROUND_DELAY_MS: number = 10_000;
+
+type NextRoundCountdown = {
+  seconds: number,
+  // Temps déjà écoulé à l'arrivée du résultat (reconnexion en cours de décompte) : la jauge part de là
+  elapsedMs: number,
+};
+
+/**
+ * Décompte avant le lancement automatique de la manche suivante, décidé par le
+ * serveur. L'échéance est recalculée à partir du temps restant à chaque nouveau résultat,
+ * l'horloge du téléphone pouvant différer de celle du serveur.
+ */
+function useNextRoundCountdown(result: RoundResult, nextRoundInMs?: number | null): NextRoundCountdown | undefined {
+  const [deadline, setDeadline] = useState<number | undefined>(undefined);
+  const [elapsedMs, setElapsedMs] = useState<number>(0);
+  const [now, setNow] = useState<number>(Date.now());
+
+  useEffect(() => {
+    const hasTimer: boolean = nextRoundInMs !== undefined && nextRoundInMs !== null;
+    setDeadline(hasTimer ? Date.now() + (nextRoundInMs as number) : undefined);
+    setElapsedMs(hasTimer ? Math.max(0, NEXT_ROUND_DELAY_MS - (nextRoundInMs as number)) : 0);
+    setNow(Date.now());
+    // Le temps restant ne sert qu'à l'arrivée du résultat : les autres mises à jour de la partie ne le recalent pas
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result]);
+
+  useEffect(() => {
+    if (deadline === undefined) {
+      return undefined;
+    }
+    const interval: ReturnType<typeof setInterval> = setInterval(() => setNow(Date.now()), COUNTDOWN_TICK_MS);
+    return () => clearInterval(interval);
+  }, [deadline]);
+
+  return deadline === undefined
+    ? undefined
+    : { seconds: Math.max(0, Math.ceil((deadline - now) / 1000)), elapsedMs };
+}
 
 type VerdictTone = 'win' | 'lose' | 'neutral';
 
@@ -110,6 +151,22 @@ export default function RoundResultView({
   };
 
   const verdict: Verdict = computeVerdict(messages, result, playerId, nameOf);
+  const countdown: NextRoundCountdown | undefined = useNextRoundCountdown(result, game.nextRoundInMs);
+  // Le fond du bouton se remplit pendant le décompte, comme les boutons « Menteur ! » / « Chiffre exact »
+  const buttonContent = (label: string): React.ReactNode => (
+    <>
+      {countdown && (
+        <span
+          className="reveal-button__progress"
+          style={{ animationDuration: `${NEXT_ROUND_DELAY_MS}ms`, animationDelay: `-${countdown.elapsedMs}ms` }}
+        />
+      )}
+      <span className="reveal-button__label">
+        {label}
+        {countdown && (<span className="online-result__countdown">{`${countdown.seconds}s`}</span>)}
+      </span>
+    </>
+  );
 
   const faceCount = (face: number): number => result.faceCounts[String(face)] ?? 0;
   // Aucun perudo sur la table : rien à mettre en avant sur cette face
@@ -209,13 +266,20 @@ export default function RoundResultView({
         <div className="action-container">
           {isAdmin
             ? (
-              <Button variant="contained" color="primary" onClick={onNext} endIcon={<Icon>arrow_forward</Icon>}>
-                {texts.next_round}
-              </Button>
+              <div className="action-container reveal-button">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={onNext}
+                  endIcon={<Icon className="reveal-button__label">arrow_forward</Icon>}
+                >
+                  {buttonContent(texts.next_round)}
+                </Button>
+              </div>
             )
             : (
-              <ActionButton style={ActionStyle.PRIMARY} disabled>
-                {texts.waiting_for_host}
+              <ActionButton style={ActionStyle.PRIMARY} cssClasses="reveal-button online-result__waiting" disabled>
+                {buttonContent(texts.next_round_soon)}
               </ActionButton>
             )}
         </div>

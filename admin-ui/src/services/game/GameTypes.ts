@@ -38,6 +38,8 @@ export type Game = {
   currentBid?: Bid | null,
   roundBids?: Bid[],
   lastRoundResult?: RoundResult | null,
+  // Millisecondes restantes avant le lancement automatique de la manche suivante (écran de résultat seulement)
+  nextRoundInMs?: number | null,
   // Joueurs partis pendant la manche : leurs dés comptent jusqu'à sa résolution
   departedPlayers?: Player[],
   // Joueurs ayant quitté la partie en cours (affichage seulement, sans dés)

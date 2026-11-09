@@ -30,7 +30,7 @@ export default class GameService {
   private playerId: WritableObservable<string | undefined>;
   private isRestoringSession: WritableObservable<boolean>;
 
-  // Mode en ligne : résultat de la manche qui vient d'être résolue, affiché jusqu'au clic de l'admin sur « Tour suivant »
+  // Mode en ligne : résultat de la manche qui vient d'être résolue, affiché jusqu'au clic de l'admin sur « Tour suivant » ou à la fin du compte à rebours
   private roundResult: WritableObservable<RoundResult | undefined>;
 
   constructor(private readonly gameApi: GameApi) {

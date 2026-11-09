@@ -127,7 +127,7 @@ export type Translations = {
     next_starter: (name: string) => string,
     next_starter_you: string,
     next_round: string,
-    waiting_for_host: string,
+    next_round_soon: string,
     confirm_cancel_game: string,
     confirm_quit_game: string,
   },
